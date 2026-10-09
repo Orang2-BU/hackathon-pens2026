@@ -59,14 +59,14 @@ export function createSourceRecord({ revisionId, sourceId, fileName, recordNumbe
       record_number: recordNumber,
       record_hash: hashRow(row),
       occurred_at: occurredAt(row, schema),
-      payload: JSON.stringify(row),
+      payload: row,
     },
     node: schema.id && ENTITY_TYPES[fileName] ? {
       id: datasetNodeId(revisionId, ENTITY_TYPES[fileName], externalId),
       dataset_revision_id: revisionId,
       type: ENTITY_TYPES[fileName],
       external_key: externalId,
-      properties: JSON.stringify(row),
+      properties: row,
       temporal_status: (schema.dates ?? []).some((column) => Boolean(row[column])) ? 'known' : 'snapshot_only',
     } : null,
     usage: fileName === 'product_usage_daily.csv' ? {
@@ -82,7 +82,9 @@ export function createSourceRecord({ revisionId, sourceId, fileName, recordNumbe
 
 async function insertBatch(tx, table, columns, rows) {
   if (rows.length === 0) return;
-  await tx`INSERT INTO ${tx(table)} ${tx(rows, columns)}`;
+  const jsonColumn = table === 'source_records' ? 'payload' : table === 'nodes' ? 'properties' : null;
+  const values = jsonColumn ? rows.map(row => ({ ...row, [jsonColumn]: tx.json(row[jsonColumn]) })) : rows;
+  await tx`INSERT INTO ${tx(table)} ${tx(values, columns)}`;
 }
 
 async function ingestTransaction(tx, { directory, report, batchSize, revisionId }) {

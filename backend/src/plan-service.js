@@ -1,8 +1,9 @@
+import { strongestParameter } from './workspace.js';
 import { createHash } from 'node:crypto';
 import { createPlan, decidePlan, revisePlan } from './plans.js';
 
 const BUSINESS_AS_OF = '2026-10-01';
-const DEFAULT_FORMULA_VERSION = 'risk-heuristic-v1';
+const DEFAULT_FORMULA_VERSION = 'risk-heuristic-v2';
 
 function stable(value) {
   if (Array.isArray(value)) return value.map(stable);
@@ -39,15 +40,16 @@ async function planInputs(database, accountIdentifier) {
       AND (e.valid_to IS NULL OR ${BUSINESS_AS_OF} < e.valid_to)
     UNION ALL
     SELECT 'factor'::text, NULL::text, NULL::text,
-      jsonb_build_object('factor', af.factor, 'rawValue', af.raw_value, 'normalizedValue', af.normalized_value, 'evidence', af.evidence)
+      jsonb_build_object('factor', af.factor, 'rawValue', af.raw_value, 'normalizedValue', af.normalized_value, 'status', af.status, 'evidence', af.evidence)
     FROM account_factors af
     WHERE af.dataset_revision_id = ${account.dataset_revision_id} AND af.account_node_id = ${account.id}
       AND af.score_run_id = ${account.score_run_id}
     ORDER BY item_type, source_record_id
   `;
   const evidenceHash = createHash('sha256').update(JSON.stringify(stable(evidence.map(({ item_type, source_record_id, record_hash, detail }) => ({ itemType: item_type, sourceRecordId: source_record_id, recordHash: record_hash, detail }))))).digest('hex');
+  const top=strongestParameter(evidence.filter(e=>e.item_type==='factor').map(e=>({...e.detail,status:e.detail.status??'available'})));
   return { accountNodeId: account.id, externalKey: account.external_key,
-    context: createPlanContext({ datasetRevision: account.dataset_revision_id, formulaVersion: account.formula_version }), evidenceHash };
+    context: {...createPlanContext({ datasetRevision: account.dataset_revision_id, formulaVersion: account.formula_version }),leadFactor:top?.factor??null,scoreRunId:account.score_run_id,conditions:evidence.filter(e=>e.item_type==='factor').map(e=>({factor:e.detail.factor,normalizedValue:e.detail.normalizedValue,status:e.detail.status??'available'})),sourceRefs:evidence.filter(e=>e.item_type==='source').map(e=>({id:e.source_record_id,hash:e.record_hash}))}, evidenceHash };
 }
 
 export function createPlanService(database) {

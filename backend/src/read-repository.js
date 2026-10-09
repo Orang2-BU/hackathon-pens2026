@@ -158,10 +158,5 @@ export function createPostgresReadService(database) {
       };
     },
 
-    async answerGraphQuestion() {
-      return { status: 'abstained', intent: null, businessAsOf: BUSINESS_AS_OF,
-        graphRevision: null, text: 'Live Jev routing and evidence-backed answer templates are not configured.',
-        facts: [], citations: [], paths: [], limitations: ['jev_router_unavailable'] };
-    },
   });
 }

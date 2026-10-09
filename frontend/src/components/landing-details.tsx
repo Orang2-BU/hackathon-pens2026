@@ -1,8 +1,9 @@
 import { ArrowDown, ArrowRight, Check, ChevronDown, FileCheck2, GitBranch, Search, ShieldCheck } from "lucide-react";
+import { FeatureBento } from "@/components/feature-bento";
 import { EvidenceMap } from "@/components/evidence-map";
 import { Parallax } from "@/components/ui/parallax";
 import { Reveal } from "@/components/ui/reveal";
-import { factorWeight, riskFactors } from "@/lib/accounts";
+import { factorWeight, riskFactors } from "@/lib/factors";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -43,6 +44,7 @@ export function LandingDetails({ workspaceHref }: { workspaceHref: string }) {
 
       <section aria-labelledby="workflow-heading" className="flex flex-col gap-xl">
         <Reveal><Heading id="workflow-heading" label="02 / Your daily workflow" title="From scattered signals to a considered next step.">Start with the accounts that need attention. Understand the evidence, then review a response with the people who own the relationship.</Heading></Reveal>
+        <FeatureBento />
         <ol className="grid gap-lg md:grid-cols-3">
           {[
             { title: "Find the right account", text: "Review priority, renewal timing and the strongest contributing factor. Use that context to choose where your team should spend its attention.", result: "A clear starting point" },

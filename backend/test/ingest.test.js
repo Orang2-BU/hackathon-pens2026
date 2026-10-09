@@ -9,6 +9,8 @@ test('source records and entity nodes have stable IDs, hashes, and explicit snap
   const second = createSourceRecord(input);
   assert.equal(first.sourceRecord.id, 'source:revision:abc:crm_accounts.csv:r1');
   assert.equal(first.sourceRecord.external_id, 'C01');
+  assert.deepEqual(first.sourceRecord.payload, input.row);
+  assert.deepEqual(first.node.properties, input.row);
   assert.equal(first.sourceRecord.record_hash.length, 64);
   assert.equal(first.sourceRecord.record_hash, second.sourceRecord.record_hash);
   assert.equal(first.node.id, datasetNodeId('revision:abc', 'account', 'C01'));

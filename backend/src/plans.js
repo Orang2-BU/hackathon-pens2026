@@ -29,6 +29,10 @@ export function validatePlanContext(context) {
     contractVersion: '1', businessAsOf: context.businessAsOf,
     datasetRevision: context.datasetRevision, graphRevision: context.graphRevision,
     formulaVersion: context.formulaVersion, synthetic: true,
+    scoreRunId: typeof context.scoreRunId === 'string' ? context.scoreRunId : null,
+    conditions: Array.isArray(context.conditions) ? context.conditions : [],
+    sourceRefs: Array.isArray(context.sourceRefs) ? context.sourceRefs : [],
+    leadFactor: ['usage','service','champion','promiseEngagement','payment'].includes(context.leadFactor) ? context.leadFactor : null,
   });
 }
 
@@ -59,7 +63,8 @@ export async function revisePlan({ database, planId, expectedRevision, body, act
   const planContext = validatePlanContext({ ...context, deviationReason: reason });
   if (!/^[0-9a-f]{64}$/u.test(evidenceHash ?? '')) throw new PlanError('INVALID_INPUT', 'Evidence hash must be SHA-256.');
   return database.begin(async (tx) => {
-    const [plan] = await tx`SELECT id FROM plans WHERE id = ${planId} FOR UPDATE`;
+    await tx`SELECT pg_advisory_xact_lock(hashtextextended(${planId}, 0))`;
+    const [plan] = await tx`SELECT id FROM plans WHERE id = ${planId}`;
     if (!plan) throw new PlanError('NOT_FOUND', 'Plan does not exist.');
     const [current] = await tx`SELECT id, revision FROM plan_revisions WHERE plan_id = ${planId} ORDER BY revision DESC LIMIT 1`;
     if (!current) throw new PlanError('NOT_FOUND', 'Plan does not exist.');
@@ -81,13 +86,16 @@ export async function decidePlan({ database, planRevisionId, idempotencyKey, out
   const payload = { planRevisionId, outcome, reason: decisionReason };
   const payloadHash = createHash('sha256').update(JSON.stringify(stableJson(payload))).digest('hex');
   return database.begin(async (tx) => {
-    const [revision] = await tx`SELECT id, context, evidence_hash FROM plan_revisions WHERE id = ${planRevisionId} FOR UPDATE`;
+    const [revision] = await tx`SELECT id, plan_id, context, evidence_hash FROM plan_revisions WHERE id = ${planRevisionId}`;
     if (!revision) throw new PlanError('NOT_FOUND', 'Plan revision does not exist.');
     const [existing] = await tx`SELECT id, plan_revision_id, actor_id, outcome, reason, context, created_at, payload_hash FROM decisions WHERE actor_id = ${actorId} AND idempotency_key = ${idempotencyKey}`;
     if (existing) {
       if (existing.payload_hash !== payloadHash) throw new PlanError('CONFLICT', 'Idempotency key was already used with a different payload.');
       return decisionDto(existing);
     }
+    await tx`SELECT pg_advisory_xact_lock(hashtextextended(${revision.plan_id}, 0))`;
+    const [latest] = await tx`SELECT id FROM plan_revisions WHERE plan_id = ${revision.plan_id} ORDER BY revision DESC LIMIT 1`;
+    if (latest.id !== planRevisionId) throw new PlanError('CONFLICT', 'Only the latest plan revision can be decided.');
     const [decisionForRevision] = await tx`SELECT id FROM decisions WHERE plan_revision_id = ${planRevisionId}`;
     if (decisionForRevision) throw new PlanError('CONFLICT', 'This plan revision already has a Decision.');
     const id = randomUUID();

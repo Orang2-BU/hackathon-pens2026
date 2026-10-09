@@ -34,6 +34,7 @@ test('employment and monthly feature usage facts preserve exclusive temporal bou
   assert.equal(usage.edge.valid_from, '2026-09-01');
   assert.equal(usage.edge.valid_to, '2026-10-01');
   assert.equal(graph.facts.length, 3);
+  assert.deepEqual(graph.facts[0].value, { accountId: 'C01', organization: 'Kopi', jobTitle: 'Direktur' });
   assert.ok(graph.facts.every((fact) => fact.source_record_id));
 });
 

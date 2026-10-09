@@ -14,7 +14,7 @@ test('risk parameter experiment normalizes factors and scores from available wei
   assert.equal(factors.usage.normalized, 0.5);
   assert.equal(result.score, 85);
   assert.equal(result.coverage, 100);
-  assert.equal(result.level, null);
+  assert.equal(result.level, 'Critical');
   assert.equal(result.weightedValue, 85_000);
 });
 
@@ -69,4 +69,13 @@ test('sensitivity shifts every weight by plus/minus ten and preserves total', ()
     assert.ok(Math.abs(Object.values(scenario.weights).reduce((sum, value) => sum + value, 0) - 100) < 1e-8);
   }
   assert.deepEqual(rankScores(rows).slice(0, 3).map(({ accountId }) => accountId), report.baseTopThree);
+});
+
+// Operational levels reuse the former frontend cutoffs, now computed only in the backend.
+test('v2 heuristic level boundaries and missing-data policy are deterministic', () => {
+  for (const [score,level] of [[0,'Low'],[10.99,'Low'],[11,'Medium'],[14.99,'Medium'],[15,'High'],[29.99,'High'],[30,'Critical'],[100,'Critical']]) {
+    const result=scoreAccount({accountId:'fixture',factors:{usage:{normalized:score/100,status:'available',coverage:1}}});
+    assert.equal(result.level,level);assert.equal(result.formulaVersion,'risk-heuristic-v2');
+  }
+  assert.equal(scoreAccount({accountId:'fixture',factors:{}}).level,null);
 });

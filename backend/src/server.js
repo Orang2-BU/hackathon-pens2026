@@ -8,6 +8,9 @@ import { createFeedbackService } from './feedback.js';
 import { createSignalReviewService } from './signal-review.js';
 import { createPostgresReadService } from './read-repository.js';
 import { createPlanService } from './plan-service.js';
+import { createActionService } from './actions.js';
+import { createWorkspaceService } from './workspace.js';
+import { createConfiguredJevClient } from './jev.js';
 
 function sendJson(response, status, body) {
   response.writeHead(status, {
@@ -85,10 +88,27 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       return;
     }
 
+    const evidenceMatch=path.match(/^\/api\/accounts\/([A-Za-z0-9_-]{1,80})\/(evidence|recommendation)$/u);
+    const actionHistoryMatch=path.match(/^\/api\/actions\/([A-Za-z0-9_-]{1,128})\/history$/u);
+    if (request.method === 'GET' && (path === '/api/data/status' || path === '/api/actions' || path === '/api/graph/evidence' || evidenceMatch || actionHistoryMatch)) {
+      if ((path === '/api/actions' || actionHistoryMatch) && !auth?.readSession(cookieValue(request.headers.cookie))) { sendJson(response,401,{error:'UNAUTHENTICATED'});return; }
+      const url=new URL(request.url,'http://localhost');
+      const depth=Number(url.searchParams.get('depth')??2);
+      const graphEntity=path==='/api/graph/evidence'?url.searchParams.get('entity'):null;
+      if(path==='/api/graph/evidence' && (typeof graphEntity!=='string'||! /^[A-Za-z0-9:_.-]{1,256}$/u.test(graphEntity))) {sendJson(response,400,{error:'INVALID_QUERY'});return;}
+      if ((evidenceMatch || graphEntity) && (!Number.isInteger(depth)||depth<1||depth>4)) {sendJson(response,400,{error:'INVALID_QUERY'});return;}
+      const operation=path==='/api/data/status'?'dataStatus':path==='/api/actions'?'listActions':actionHistoryMatch?'actionHistory':evidenceMatch?.[2]==='recommendation'?'recommendation':'getEvidence';
+      if(!readService?.[operation]){sendJson(response,503,{error:'DATA_UNAVAILABLE'});return;}
+      try {sendJson(response,200,await readService[operation](actionHistoryMatch?.[1]??evidenceMatch?.[1]??graphEntity,depth));}
+      catch(error){sendJson(response,error.code==='NOT_FOUND'?404:503,{error:error.code==='NOT_FOUND'?'NOT_FOUND':'DATA_UNAVAILABLE'});}
+      return;
+    }
+
     const feedbackReplyMatch = path.match(/^\/api\/feedback\/([A-Za-z0-9_-]{1,128})\/replies$/u);
     const signalReviewMatch = path.match(/^\/api\/signals\/([A-Za-z0-9:_-]{1,160})\/review$/u);
-    if (['/api/plans', '/api/decisions', '/api/feedback'].includes(path) && request.method === 'POST'
+    if (['/api/plans', '/api/decisions', '/api/feedback', '/api/actions'].includes(path) && request.method === 'POST'
       || /^\/api\/plans\/[A-Za-z0-9_-]+$/u.test(path) && request.method === 'PATCH'
+      || /^\/api\/actions\/[A-Za-z0-9_-]+$/u.test(path) && request.method === 'PATCH'
       || feedbackReplyMatch && request.method === 'POST'
       || signalReviewMatch && request.method === 'POST') {
       if (!auth) { sendJson(response, 503, { error: 'AUTH_NOT_CONFIGURED' }); return; }
@@ -106,13 +126,13 @@ export function createHttpServer({ database, auth = null, readService = null, wr
         sendJson(response, error.message === 'BODY_TOO_LARGE' ? 413 : 400, { error: error.message === 'BODY_TOO_LARGE' ? 'BODY_TOO_LARGE' : 'INVALID_JSON' });
         return;
       }
-      const operation = path === '/api/plans' ? 'createPlan'
+      const operation = path === '/api/actions' ? 'createAction' : path.startsWith('/api/actions/') ? 'updateAction' : path === '/api/plans' ? 'createPlan'
         : path === '/api/decisions' ? 'decidePlan'
           : path === '/api/feedback' ? 'submitFeedback'
             : feedbackReplyMatch ? 'replyToFeedback' : signalReviewMatch ? 'reviewSignal' : 'revisePlan';
       if (!writeService?.[operation]) { sendJson(response, 503, { error: 'WRITE_UNAVAILABLE' }); return; }
       try {
-        const payload = operation === 'createPlan'
+        const payload = ['createAction','updateAction'].includes(operation) ? {decisionId:body.decisionId,actionId:path.split('/').at(-1),expectedRevision:body.expectedRevision,owner:body.owner,dueDate:body.dueDate,status:body.status,note:body.note,outcome:body.outcome} : operation === 'createPlan'
           ? { accountNodeId: body.accountNodeId, body: body.body }
           : operation === 'revisePlan'
             ? { planId: path.split('/').at(-1), expectedRevision: body.expectedRevision, body: body.body, deviationReason: body.deviationReason }
@@ -149,7 +169,7 @@ export function createHttpServer({ database, auth = null, readService = null, wr
     if (path === '/api/feedback' && request.method === 'GET') {
       if (!auth?.readSession(cookieValue(request.headers.cookie))) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
       const accountNodeId = new URL(request.url ?? '/', 'http://localhost').searchParams.get('accountNodeId');
-      if (accountNodeId && !/^[A-Za-z0-9_-]{1,128}$/u.test(accountNodeId)) { sendJson(response, 400, { error: 'INVALID_QUERY' }); return; }
+      if (accountNodeId && !/^[A-Za-z0-9:_-]{1,256}$/u.test(accountNodeId)) { sendJson(response, 400, { error: 'INVALID_QUERY' }); return; }
       if (!readService?.listFeedback) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
       const session = auth.readSession(cookieValue(request.headers.cookie));
       try { sendJson(response, 200, await readService.listFeedback({ accountNodeId, actorId: session.role === 'user' ? session.actorId : null })); }
@@ -247,8 +267,11 @@ if (import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const signalReviewService = createSignalReviewService(database);
   const planService = createPlanService(database);
   const postgresReadService = createPostgresReadService(database);
-  const readService = Object.freeze({ ...postgresReadService, ...feedbackService, ...signalReviewService });
-  const writeService = Object.freeze({ ...planService, ...feedbackService, ...signalReviewService });
+  const actions=createActionService(database);
+  const jev=process.env.JEV_API_KEY?createConfiguredJevClient({database}):null;
+  const workspace=createWorkspaceService(database,postgresReadService,jev);
+  const readService = Object.freeze({ ...postgresReadService, ...feedbackService, ...signalReviewService, ...workspace, ...actions });
+  const writeService = Object.freeze({ ...planService, ...feedbackService, ...signalReviewService, ...actions });
   const server = createHttpServer({ database, auth, readService, writeService });
 
   server.listen(port, host, () => {

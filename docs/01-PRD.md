@@ -60,10 +60,14 @@ SalesTranscriptQA boleh dipakai sebagai benchmark retrieval tambahan dengan izin
 | Dashboard | Melihat kondisi portofolio sekilas: KPI, sebaran level, renewal 90 hari ke depan, keputusan terbaru (ditambah 9 Okt atas permintaan user, menunggu ACC tim) |
 | Peringkat risiko | Menentukan akun yang perlu ditinjau dari parameter, prioritas, dan cakupan |
 | Detail akun | Memeriksa jalur bukti, timeline, tanya graph, serta rencana tindakan |
+| Investigate | Menelusuri node/edge lintas akun dan sumber, membedakan fakta eksplisit dengan hubungan turunan/review |
+| Actions | Melacak owner, tanggal target, progres, hambatan, dan hasil tindakan dari rencana yang disetujui |
 | Review/save plan | Mengedit dan memutuskan rencana, melihat preseden dan Decision |
 | Data | Melihat sumber, ingest, status Jev, error, dan biaya aktual |
 
 Feedback hadir dalam konteks akun/rencana; jangan menambah halaman kosong. Ikuti `08-DESIGN.md`: satu layar satu tugas, data bersumber, responsif 375/768/1440, tanpa emoji atau elemen dekoratif tanpa fungsi.
+
+Perluasan workspace di atas disetujui pengguna pada 10 Okt 2026 melalui handoff workspace dan instruksi implementasi. [ADR-0008](adr/0008-connected-workspace-and-action-memory.md) mencatat batas memori profesional, skenario kontrak, Actions append-only, dan level operasional heuristik v2. Knowledge tetap proses backend; tindakan historis tidak membuktikan keberhasilan dan keputusan tetap manusia.
 
 ## 7. Klaim dan batas MVP
 

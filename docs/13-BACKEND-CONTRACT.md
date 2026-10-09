@@ -1,6 +1,6 @@
 # 13 — Kontrak backend v1 (BE-01)
 
-> Kontrak implementasi BE-01, 9 Oktober 2026. DTO dan boundary pertukaran ditulis di dokumen ini. Prototype awal ada di working tree frontend dari checkpoint sebelumnya; source canonical service sekarang berada di root `backend/`. HTTP runtime diputuskan pada [ADR-0006](adr/0006-standalone-backend-service.md); PostgreSQL integration masih menunggu database disposable.
+> Kontrak implementasi BE-01, 9 Oktober 2026. DTO dan boundary pertukaran ditulis di dokumen ini. Prototype awal ada di working tree frontend dari checkpoint sebelumnya; source canonical service sekarang berada di root `backend/`. HTTP runtime diputuskan pada [ADR-0006](adr/0006-standalone-backend-service.md); Verifikasi PostgreSQL lokal 10 Okt dicatat di `04-TODO.md`; deployment belum dijalankan.
 
 ## 1. Runtime dan lokasi
 
@@ -72,4 +72,21 @@ Invariants query: graph traversal depth ≤4, cycle guard dan batas response; de
 
 ## 6. Bukti verifikasi
 
-Prototype boundary pada checkpoint BE-01 diverifikasi dan dicatat di [12-BACKEND-TASKS](12-BACKEND-TASKS.md) §6. Service health, schema, dan migration runner dibuat pada BE-02; verifikasi PostgreSQL aktual menunggu database disposable. Tidak ada perubahan UI.
+Prototype boundary pada checkpoint BE-01 diverifikasi dan dicatat di [12-BACKEND-TASKS](12-BACKEND-TASKS.md) §6. Service health, schema, dan migration runner dibuat pada BE-02; checkpoint 9 Okt belum memiliki database disposable. Implementasi workspace dan verifikasi PostgreSQL 10 Okt dijelaskan di §7 dan `04-TODO.md`.
+
+## 7. Workspace terhubung (10 Okt 2026)
+
+Bagian ini memperbarui status implementasi historis di atas; scope disetujui dalam ADR-0008.
+
+| HTTP | DTO/perilaku |
+|---|---|
+| `GET /api/accounts/:id/evidence`, `GET /api/graph/evidence?entity=...&depth=1..4` | rootId, datasetRevision, businessAsOf, recordedAsOf, synthetic, nodes, edges, citations, depth, truncated. Entity dapat external key/node ID; `:` dan `.` diperbolehkan. Batas 60 node, 120 edge per putaran, 400 sitasi. Edge hard/derived dan active/review tetap eksplisit; hanya sumber dengan provenance disajikan. |
+| `GET /api/accounts/:id/recommendation` | leadFactor, reason, draft, citations, sourceGroups, datasetPrecedents, app precedents, limitations. Preseden menyimpan kondisi/sourceRefs/actor/waktu/alasan/hasil; kesamaan satu faktor tidak membuktikan akar penyebab/efektivitas sama. |
+| `GET /api/data/status` | Published revision, sources (basename/count/hash), node/edge counts, Jev configuration/call/error/token/cost. Cost unknown adalah NULL. |
+| `GET /api/actions`, `GET /api/actions/:id/history` | Membutuhkan sesi; daftar latest event dan riwayat event yang immutable. `stuck` bila blocked atau lewat tanggal target dan belum closed, memakai waktu aktual. |
+| `POST /api/actions` | CSM/admin + origin + rate limit; decisionId approved, owner, dueDate YYYY-MM-DD valid, status, note, outcome nullable. Satu action per Decision. |
+| `PATCH /api/actions/:id` | Input yang sama + expectedRevision integer; event baru, bukan mutation. Revision stale atau completed/cancelled →409; completed tanpa hasil →400. |
+
+Status action: planned, in_progress, blocked, completed, cancelled. Owner 1–120 karakter, note/outcome 1–4.000 bila diisi. Actor dari cookie server, bukan body. Progress dan feedback tidak mengubah skor otomatis. Plan context menyimpan leadFactor, scoreRunId, kondisi faktor dan source hash; Decision idempotent menolak revisi lama. Advisory transaction locks digunakan karena role runtime tidak memiliki UPDATE pada tabel immutable.
+
+Frontend meneruskan cookie melalui relay allowlist, membatasi body 16 KiB, memeriksa origin write, dan tidak menampilkan row/provider mentah. `POST /api/graph/answer` merutekan intent melalui Jev yang dikonfigurasi server; tanpa konfigurasi sistem abstain dan Investigate tetap tersedia. Tidak ada training dari cache atau panggilan provider dalam test otomatis.

@@ -29,10 +29,17 @@ export function ResizableNavbar({ items, workspaceHref }: { items: NavItem[]; wo
   const [compact, setCompact] = useState(false);
   const [open, setOpen] = useState(false);
   const menuButton = useRef<HTMLButtonElement>(null);
-  const [hovered, setHovered] = useState<number | null>(null);
+  const [activeHref, setActiveHref] = useState(items[0]?.href);
   const spring = reduced ? { duration: 0 } : ({ type: "spring", stiffness: 200, damping: 50 } as const);
 
   useMotionValueEvent(scrollY, "change", latest => setCompact(latest > 100));
+
+  useEffect(() => {
+    const syncHash = () => setActiveHref(window.location.hash || items[0]?.href);
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    return () => window.removeEventListener("hashchange", syncHash);
+  }, [items]);
 
   useEffect(() => {
     if (!open) return;
@@ -58,17 +65,16 @@ export function ResizableNavbar({ items, workspaceHref }: { items: NavItem[]; wo
         className={`relative mx-auto hidden w-full min-w-0 items-center justify-between gap-md rounded-full px-md py-xs transition-colors lg:flex ${surface(compact)}`}
       >
         <Logo />
-        <div onMouseLeave={() => setHovered(null)} className="flex items-center justify-center gap-xs">
-          {items.map((item, index) => (
+        <div className="flex items-center justify-center gap-xs">
+          {items.map(item => (
             <a
               key={item.href}
               href={item.href}
-              onMouseEnter={() => setHovered(index)}
-              onFocus={() => setHovered(index)}
-              onBlur={() => setHovered(null)}
-              className="relative inline-flex min-h-11 items-center rounded-full px-sm py-sm text-label-md text-on-surface-muted transition-colors hover:text-on-surface"
+              onClick={() => setActiveHref(item.href)}
+              aria-current={activeHref === item.href ? "location" : undefined}
+              className="group relative inline-flex min-h-11 items-center px-sm py-sm text-label-md text-on-surface-muted transition-colors hover:text-on-surface aria-[current=location]:text-on-surface"
             >
-              {hovered === index && <motion.span layoutId="nav-hover" transition={spring} className="absolute inset-0 rounded-full bg-surface-elevated" />}
+              <span aria-hidden className={`pointer-events-none absolute inset-x-sm bottom-1 h-px origin-left bg-primary transition-transform duration-200 motion-reduce:transition-none ${activeHref === item.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"}`} />
               <span className="relative">{item.name}</span>
             </a>
           ))}
@@ -106,8 +112,8 @@ export function ResizableNavbar({ items, workspaceHref }: { items: NavItem[]; wo
               <ul className="flex flex-col border-t border-outline pt-xs">
                 {items.map(item => (
                   <li key={item.href}>
-                    <a href={item.href} onClick={() => setOpen(false)} className="flex min-h-11 items-center px-xs text-body-md text-on-surface-muted hover:text-on-surface">
-                      {item.name}
+                    <a href={item.href} aria-current={activeHref === item.href ? "location" : undefined} onClick={() => { setActiveHref(item.href); setOpen(false); }} className="group flex min-h-11 items-center px-xs text-body-md text-on-surface-muted hover:text-on-surface aria-[current=location]:text-on-surface">
+                      <span className="relative py-sm">{item.name}<span aria-hidden className={`pointer-events-none absolute inset-x-0 bottom-1 h-px origin-left bg-primary transition-transform duration-200 motion-reduce:transition-none ${activeHref === item.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100 group-focus-visible:scale-x-100"}`} /></span>
                     </a>
                   </li>
                 ))}

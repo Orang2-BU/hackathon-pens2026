@@ -32,7 +32,7 @@ function edgeRecord(revisionId, relation, sourceNodeId, targetNodeId, sourceReco
 
 function factRecord(revisionId, nodeId, key, value, sourceRecordId, validFrom = null, validTo = null) {
   const identity = `${revisionId}\0${nodeId}\0${key}\0${sourceRecordId}`;
-  return { id: `fact:${createHash('sha256').update(identity).digest('hex')}`, node_id: nodeId, key, value: JSON.stringify(value), valid_from: validFrom, valid_to: validTo, source_record_id: sourceRecordId };
+  return { id: `fact:${createHash('sha256').update(identity).digest('hex')}`, node_id: nodeId, key, value, valid_from: validFrom, valid_to: validTo, source_record_id: sourceRecordId };
 }
 
 function rowRecords(records, fileName) {
@@ -160,7 +160,9 @@ async function rowsForFile(tx, revisionId, fileName) {
 
 async function insertRows(tx, table, columns, rows) {
   for (let offset = 0; offset < rows.length; offset += 500) {
-    await tx`INSERT INTO ${tx(table)} ${tx(rows.slice(offset, offset + 500), columns)}`;
+    const batch = rows.slice(offset, offset + 500);
+    const values = table === 'node_facts' ? batch.map(row => ({ ...row, value: tx.json(row.value) })) : batch;
+    await tx`INSERT INTO ${tx(table)} ${tx(values, columns)}`;
   }
 }
 

@@ -31,11 +31,10 @@ test('read repository returns explicit synthetic account DTO and sourced evidenc
   assert.ok(calls.every((query) => query.includes('?')));
 });
 
-test('read repository returns null for an unknown account and abstains when the router is not available', async () => {
+test('read repository returns null for an unknown account', async () => {
   const database = async (strings) => strings.join('?').includes('FROM nodes n JOIN dataset_revisions') ? [] : [];
   const service = createPostgresReadService(database);
   assert.equal(await service.getAccount('unknown'), null);
-  assert.equal((await service.answerGraphQuestion('question')).status, 'abstained');
 });
 
 test('account ranking endpoint lists only the 40 customer accounts, not graph-only prospects', async () => {

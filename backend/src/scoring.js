@@ -1,5 +1,6 @@
 export const SCORING_EXPERIMENT = Object.freeze({
-  formulaVersion: 'risk-heuristic-v1',
+  formulaVersion: 'risk-heuristic-v2',
+  metricsVersion: 'kasirnusa-metrics-v2',
   businessAsOf: '2026-10-01',
   weights: Object.freeze({ usage: 30, service: 25, champion: 20, promiseEngagement: 15, payment: 10 }),
   usageMinimumCoverage: 0.9,
@@ -95,8 +96,8 @@ export function scoreAccount({ accountId, factors, annualValue = null, formulaVe
     score,
     status: score === null ? 'unscored' : coverage === 100 ? 'complete' : 'partial',
     coverage,
-    level: null,
-    levelReason: 'Priority level cutoffs have not been approved.',
+    level: score === null ? null : score >= 30 ? 'Critical' : score >= 15 ? 'High' : score >= 11 ? 'Medium' : 'Low',
+    levelReason: score === null ? 'Required measured factors are unavailable.' : 'Operational heuristic cutoffs: Critical >=30, High >=15, Medium >=11. Not calibrated churn probabilities.',
     factors,
     annualValue,
     weightedValue: score === null || !finite(annualValue) ? null : Math.round((annualValue * score / 100) * 100) / 100,

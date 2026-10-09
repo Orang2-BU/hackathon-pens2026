@@ -54,3 +54,11 @@ test('read routes validate parameters, bound questions, and return unavailable w
     await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   }
 });
+
+test('entity IDs match complete tokens without claiming a longer account or bug ID', () => {
+  const entities = [{ id: 'C01' }, { id: 'C010' }, { id: 'BUG-412' }, { id: 'BUG-4120' }];
+  assert.equal(resolveEntity('Explain C010?', entities).entity.id, 'C010');
+  assert.equal(resolveEntity('Explain BUG-4120.', entities).entity.id, 'BUG-4120');
+  assert.equal(resolveEntity('XC01', entities).status, 'missing');
+  assert.equal(resolveEntity('C01 and C010', entities).status, 'ambiguous');
+});

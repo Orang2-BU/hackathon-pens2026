@@ -32,6 +32,11 @@ test('dataset publish, graph compile, Jev signal persistence, and human review a
         (SELECT count(*)::integer FROM usage_daily WHERE dataset_revision_id = ${first.revisionId}) AS usage_count
     `;
     assert.deepEqual(counts, { source_count: 15, record_count: 229627, node_count: 1932, usage_count: 226300 });
+    const [source] = await sql`SELECT sr.payload FROM source_records sr JOIN sources s ON s.id=sr.source_id
+      WHERE s.dataset_revision_id=${first.revisionId} AND s.file_name='crm_accounts.csv' AND sr.external_id='C01'`;
+    const [account] = await sql`SELECT properties FROM nodes WHERE dataset_revision_id=${first.revisionId} AND type='account' AND external_key='C01'`;
+    assert.equal(source.payload.account_id, 'C01');
+    assert.equal(account.properties.tipe, 'pelanggan');
     const second = await ingestDataset({ database: sql, directory: datasetDirectory });
     assert.equal(second.alreadyPublished, true);
     const [runCount] = await sql`SELECT count(*)::integer AS count FROM ingest_runs WHERE dataset_revision_id = ${first.revisionId}`;
@@ -84,6 +89,9 @@ test('dataset publish, graph compile, Jev signal persistence, and human review a
     assert.equal(approved.status, 'active');
 
     const scoreReport = await scoreDataset(datasetDirectory);
+    const c01Score = scoreReport.ranking.find(r => r.accountId === 'C01');
+    assert.equal(c01Score.metrics.promiseEngagement.unmetPromiseCount, 1);
+    assert(c01Score.metrics.promiseEngagement.evidence.some(e => e.file === 'decision_log.csv'));
     const scoreRun = await persistScoreReport({ database: sql, revisionId: first.revisionId, report: scoreReport });
     assert.equal(scoreRun.customerCount, 40);
     assert.equal(scoreRun.factorCount, 200);

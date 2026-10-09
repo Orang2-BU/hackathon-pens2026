@@ -54,19 +54,24 @@ export async function applyMigrations(database, directory) {
       }
       if (previousChecksum) continue;
 
-      await connection.begin(async (transaction) => {
-        await transaction.unsafe(migration.sql, [], { prepare: false });
-        await transaction`
+      await connection.unsafe('BEGIN');
+      try {
+        await connection.unsafe(migration.sql, [], { prepare: false });
+        await connection`
           INSERT INTO schema_migrations (version, checksum)
           VALUES (${migration.version}, ${migration.checksum})
         `;
-      });
+        await connection.unsafe('COMMIT');
+      } catch (error) {
+        await connection.unsafe('ROLLBACK');
+        throw error;
+      }
     }
   } finally {
     try {
       await connection`SELECT pg_advisory_unlock(7319426102481)`;
     } finally {
-      connection.release();
+      try { await connection.unsafe('RESET ROLE'); } finally { connection.release(); }
     }
   }
 }

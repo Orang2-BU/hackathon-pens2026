@@ -243,3 +243,21 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+@layer components {
+  .input {
+    @apply min-h-11 min-w-0 rounded-md bg-neutral px-sm py-sm text-body-sm text-on-surface ring-1 ring-outline ring-inset focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring disabled:opacity-60;
+  }
+}
+
+ .react-flow .react-flow__controls-button {
+    min-width: 44px;
+    min-height: 44px;
+    background: var(--color-surface-elevated);
+    color: var(--color-on-surface);
+    border-color: var(--color-outline);
+    fill: currentColor;
+  }
+ .react-flow .react-flow__controls-button:hover {
+    background: var(--color-outline-active);
+  }

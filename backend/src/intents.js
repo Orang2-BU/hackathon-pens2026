@@ -33,7 +33,9 @@ export function resolveEntity(question, entities) {
   const matches = entities.filter((entity) => [entity.id, entity.name].filter(Boolean)
     .some((value) => {
       const candidate = String(value).normalize('NFKC').toLocaleLowerCase();
-      return normalized.includes(candidate) || (normalized.length >= 3 && candidate.startsWith(`${normalized} `));
+      const escaped = candidate.replace(/[.*+?^${}()|[\]\\]/gu, '\\$&');
+      return new RegExp(`(?<![\\p{L}\\p{N}_-])${escaped}(?![\\p{L}\\p{N}_-])`, 'u').test(normalized)
+        || (normalized.length >= 3 && candidate.startsWith(`${normalized} `));
     }));
   const unique = [...new Map(matches.map((entity) => [entity.id, entity])).values()];
   if (unique.length === 1) return { status: 'resolved', entity: unique[0] };

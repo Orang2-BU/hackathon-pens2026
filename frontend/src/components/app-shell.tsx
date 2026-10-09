@@ -3,12 +3,11 @@
 import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { type ReactNode, useEffect, useRef } from "react";
-import { Database, Globe, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
-import { usePendingPlans } from "@/components/demo-state";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+import { Database, GitBranch, ClipboardList, Globe, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
+import { api } from "@/lib/workspace";
 
-// Demo gate: public pages render bare; workspace routes ask for the demo password (see /login).
-const AUTH_KEY = "tessera-demo-auth";
+// Public pages render bare; workspace writes use the backend-authenticated session.
 const isPublicPath = (pathname: string) => pathname === "/" || pathname.startsWith("/login");
 
 // Exact or nested match, so "/" never claims every route.
@@ -17,6 +16,8 @@ const isOn = (pathname: string, href: string) => pathname === href || pathname.s
 const navigation = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Accounts", icon: Users },
+  { href: "/investigate", label: "Investigate", icon: GitBranch },
+  { href: "/actions", label: "Actions", icon: ClipboardList },
   { href: "/review", label: "Review", icon: ShieldCheck },
   { href: "/data", label: "Data", icon: Database },
   { href: "/", label: "Landing page", icon: Globe },
@@ -28,13 +29,19 @@ const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opa
 function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?: boolean }) {
   const pathname = usePathname();
   const router = useRouter();
-  const pending = usePendingPlans().length;
   const fade = rail ? railFade : "";
+  const [logoutError, setLogoutError] = useState("");
+  const [signingOut, setSigningOut] = useState(false);
 
-  const signOut = () => {
-    sessionStorage.removeItem(AUTH_KEY);
-    onNavigate?.();
-    router.push("/");
+  const signOut = async () => {
+    setSigningOut(true);
+    setLogoutError("");
+    try {
+      await api("auth/logout", "POST");
+      onNavigate?.();
+      router.push("/");
+    } catch { setLogoutError("Sign out failed. Try again."); }
+    finally { setSigningOut(false); }
   };
 
   return (
@@ -66,11 +73,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
                 <Icon size={18} strokeWidth={1.75} aria-hidden />
               </span>
               <span className={fade}>{label}</span>
-              {href === "/review" && pending > 0 && (
-                <span className={`ml-auto mr-1.5 rounded-sm bg-neutral px-1.5 text-label-sm text-on-surface ${fade}`}>
-                  {pending}<span className="sr-only"> pending</span>
-                </span>
-              )}
+
             </Link>
           );
         })}
@@ -89,6 +92,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
       <button
         type="button"
         onClick={signOut}
+        disabled={signingOut}
         title={rail ? "Sign out" : undefined}
         className="btn btn-secondary justify-start px-1.5"
       >
@@ -97,6 +101,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
         </span>
         <span className={fade}>Sign out</span>
       </button>
+      {logoutError && <p role="alert" className={`whitespace-normal text-label-sm text-danger ${fade}`}>{logoutError}</p>}
     </div>
   );
 }
@@ -108,11 +113,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const drawer = useRef<HTMLDialogElement>(null);
   const isPublic = isPublicPath(pathname);
 
-  // Demo gate: workspace routes require the demo password (placeholder auth for judging, see /login).
   useEffect(() => {
-    if (!isPublic && sessionStorage.getItem(AUTH_KEY) !== "1") {
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
-    }
+    if (isPublic) return;
+    let alive = true;
+    api<{ authenticated: boolean }>("auth/session").then(session => {
+      if (alive && !session.authenticated) router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    }).catch(() => { /* The page displays its API error and retry action. */ });
+    return () => { alive = false; };
   }, [isPublic, pathname, router]);
 
   // One delegated listener feeds the border glow on cards, buttons and the sidebar (globals.css).

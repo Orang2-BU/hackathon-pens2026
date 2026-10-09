@@ -15,7 +15,7 @@ function token(value, field) {
 }
 
 export async function submitFeedback({ database, accountNodeId, planRevisionId = null, body, actorId }) {
-  token(accountNodeId, 'accountNodeId');
+  if (typeof accountNodeId !== 'string' || !/^[A-Za-z0-9:_-]{1,256}$/u.test(accountNodeId)) throw new FeedbackError('INVALID_INPUT', 'Invalid account ID.');
   token(actorId, 'actorId');
   if (planRevisionId !== null) token(planRevisionId, 'planRevisionId');
   const content = text(body);

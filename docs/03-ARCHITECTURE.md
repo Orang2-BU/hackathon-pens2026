@@ -6,7 +6,7 @@
 
 | Lapisan | Keputusan / usulan | Catatan |
 |---|---|---|
-| Web | Next.js 16 App Router, TypeScript strict, pnpm | Di `frontend/`; UI ikuti `08-DESIGN.md`; data lewat HTTP ke backend (integrasi belum dibuat) |
+| Web | Next.js 16 App Router, TypeScript strict, pnpm | Di `frontend/`; UI ikuti `08-DESIGN.md`; relay `/api/[...path]` menghubungkan workspace ke HTTP backend |
 | Backend | Node.js ≥22.18 ESM, `node:http`, tanpa framework (ADR-0006) | Di `backend/`; tidak mengimpor source frontend; DTO di `13-BACKEND-CONTRACT.md` |
 | Data | PostgreSQL (ADR-0001) via `postgres` (postgres.js) (ADR stack) | Graph = tabel node/edge/provenance, query SQL + CTE rekursif; migrasi file `.sql` berurutan |
 | AI klasifikasi | Jev/TypeSafe | Sinyal teks ambigu saat ingest; output bertipe, ambang dan keputusan di kode |
@@ -35,6 +35,8 @@ Frontend, jalankan di `frontend/`:
 | Benchmark bila retrieval/model berubah | `pnpm exec tsx scripts/benchmark.ts`, simpan output aktual |
 
 Backend, jalankan di `backend/`: `corepack pnpm test` (unit), `corepack pnpm check`, `corepack pnpm test:integration` (butuh PostgreSQL disposable dan dataset lokal; lihat `backend/README.md`).
+
+Workspace tambahan pada [ADR-0008](adr/0008-connected-workspace-and-action-memory.md) memakai API evidence/recommendation/data/actions. `pnpm test:workspace` menguji fixture kecil pada database disposable `tessera_test_*`, termasuk role runtime, Decision, Actions dan memori; bukan pengganti ingest penuh. `BACKEND_URL` hanya server-side frontend; `PUBLIC_ORIGIN` harus sama persis pada frontend/backend. Compose kini menyertakan frontend standalone; status run aktual dicatat di TODO.
 
 Script dev/test/build/typecheck/lint/knip sudah ada; `scripts/benchmark.ts` belum (hanya bila benchmark retrieval dipakai). Jangan klaim cek lulus sebelum dijalankan. UI juga diperiksa di browser 375/768/1440, keyboard, state, dan Standar UI A1–A8. Jika `08-DESIGN.md` berubah, lint design tokens menurut `07-RULES.md`.
 
@@ -83,9 +85,9 @@ Rencana monolith Next.js di versi lama bagian ini **digantikan ADR-0006**. Backe
 | API HTTP | `backend/src/server.js`: `/api/health/live`, `/api/health/ready`, `/api/auth/{login,logout,session}`, `/api/accounts`, `/api/accounts/:id`, `/api/graph/answer`, `/api/plans`, `/api/decisions`, `/api/feedback`, `/api/signals/review` |
 | Database | Migrasi SQL di `backend/db/migrations/`, role migrator dan runtime terpisah; Decision append-only (UPDATE/DELETE dicabut untuk runtime) |
 | Ingest, graph, skor | CLI operator: `scripts/ingest.js` (`--dry-run`/`--publish`), `compile-graph.js`, `enrich-signals.js` (Jev, butuh izin biaya), `persist-score.js`; tidak ada upload HTTP publik |
-| Frontend | Masih membaca `ingest/scores_40_v1.json` dan menyimpan keputusan di memori; login frontend hanya penanda `sessionStorage`. Integrasi HTTP ke backend adalah task berikutnya |
+| Frontend | Workspace membaca HTTP backend melalui relay Next.js; sesi backend, Decision, feedback dan Actions disimpan PostgreSQL. Ekspor skor lama tidak lagi menjadi sumber UI. |
 
-**Status verifikasi (9 Okt):** unit test backend ada, tetapi backend **belum pernah dijalankan dengan PostgreSQL**; readiness tetap 503 sampai migrasi dan ingest/publish berhasil (`backend/DEPLOY.md`). Belum ada deploy VPS.
+**Status verifikasi:** catatan 9 Okt belum memiliki run PostgreSQL; pada 10 Okt migrations, ingest/publish 15 file, graph, scoring dan persistensi workspace diuji pada PostgreSQL 18 disposable. Bukti dan batas provider/browser ada di TODO. Readiness database baru tetap 503 sampai ingest/publish berhasil; belum ada deploy VPS atau run Compose PostgreSQL 16.
 
 **Prasyarat lokal:** Node ≥22.18, pnpm (corepack), PostgreSQL 16 (Docker Desktop atau instalasi native), dan `dataset_kasirnusa/` di root repo. Per 9 Okt, Docker dan dataset belum ada di laptop dewaaa.
 

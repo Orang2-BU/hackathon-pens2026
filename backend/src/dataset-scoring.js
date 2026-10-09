@@ -138,7 +138,8 @@ export async function scoreDataset(directory, businessAsOf = SCORING_EXPERIMENT.
     };
 
     const accountDecisions = decisionsByAccount.get(accountId);
-    const promiseRows = accountDecisions.filter((row) => row.tipe === 'janji_fitur' && row.status_janji);
+    // A feature commitment can be attached to a discount decision, as in C01.
+    const promiseRows = accountDecisions.filter((row) => row.fitur_dijanjikan && row.status_janji && row.tanggal < businessAsOf);
     const unmetPromiseCount = promiseRows.length ? promiseRows.filter((row) => row.status_janji === 'Belum ditepati').length : null;
     const externalInteractions = interactionsByAccount.get(accountId);
     const lastInteraction = externalInteractions.reduce((latest, row) => !latest || row.tanggal > latest.tanggal ? row : latest, null);
