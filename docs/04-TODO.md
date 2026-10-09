@@ -4,7 +4,7 @@
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-08 score persistence path checks 58/58; PostgreSQL/deploy/organik masih blocked
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-10 list/detail kini memproyeksikan score run terakhir; unit 58/58, PostgreSQL/deploy/organik masih blocked
 
 ## Task
 
@@ -80,3 +80,4 @@
 | 9 Okt 2026 | BE-06 rubric correction: urgency now uses Score 0–3; sentiment uses Choice positive/neutral/negative/mixed; Noul remains for champion exit/competitor/expansion. Threshold tests + typed enrichment mocks pass 55/55; no live provider request. |
 | 9 Okt 2026 | BE-10 account ranking excludes prospect nodes; actual local CSV check confirms 40 `pelanggan` + 5 `prospek`. Unit/static checks 56/56; actual DB ranking query remains unverified. |
 | 9 Okt 2026 | BE-08 score persistence: migration 006 + hash-versioned transaction writes 40 results/200 factors; explicit CLI and isolated scoring profile added. Actual local preview remains C01/C05/C03, C04 renewal 35d, 10 sensitivity scenarios. Backend tests 58/58 + check/syntax pass; DB integration unavailable. |
+| 9 Okt 2026 | BE-10 scoring read projection: account list/detail now join latest revision score run, include formula/status/coverage/evidence parameter run and weighted value, and sort by persisted risk/weighted value. Unscored fallback retained. Unit 58/58 + check/syntax/diff pass; PostgreSQL query still unverified. |

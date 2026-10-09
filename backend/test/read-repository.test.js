@@ -46,10 +46,17 @@ test('account ranking endpoint lists only the 40 customer accounts, not graph-on
     accountQuery = query;
     return Array.from({ length: 40 }, (_, index) => ({ id: `node:${index}`, dataset_revision_id: 'revision:r1',
       external_key: `C${String(index + 1).padStart(2, '0')}`, properties: { nama: `Customer ${index + 1}`, tipe: 'pelanggan' },
-      annual_value_idr: null, renewal_date: null }));
+      annual_value_idr: null, renewal_date: null, priority_score: 40 - index, priority_status: 'complete',
+      priority_coverage: '100', formula_version: 'risk-heuristic-v1', score_run_id: 'score-run:1',
+      weighted_value_idr: String((40 - index) * 1000) }));
   };
   const result = await createPostgresReadService(database).listAccounts({ sort: 'priority' });
   assert.equal(result.items.length, 40);
   assert.ok(result.items.every((account) => account.type === 'customer'));
+  assert.equal(result.items[0].id, 'C01');
+  assert.equal(result.items[0].priority.score, 40);
+  assert.equal(result.items[0].priority.formulaVersion, 'risk-heuristic-v1');
+  assert.equal(result.items[0].weightedValueIdr, 40000);
   assert.match(accountQuery, /n\.properties->>'tipe' = 'pelanggan'/u);
+  assert.match(accountQuery, /score_run_results/u);
 });

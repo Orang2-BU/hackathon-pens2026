@@ -6,6 +6,7 @@ function accountName(properties, externalKey) {
 
 function summary(row) {
   const properties = row.properties ?? {};
+  const score = row.priority_score == null ? null : Number(row.priority_score);
   return {
     id: row.external_key,
     nodeId: row.id,
@@ -14,7 +15,16 @@ function summary(row) {
     datasetRevision: row.dataset_revision_id,
     businessAsOf: BUSINESS_AS_OF,
     synthetic: true,
-    priority: { score: null, status: 'unscored', coverage: null, reason: 'Persisted score run is not available.' },
+    priority: {
+      score,
+      status: row.priority_status ?? 'unscored',
+      coverage: row.priority_coverage == null ? null : Number(row.priority_coverage),
+      reason: row.priority_reason ?? 'Persisted score run is not available.',
+      formulaVersion: row.formula_version ?? null,
+      scoreRunId: row.score_run_id ?? null,
+      level: row.priority_level ?? null,
+    },
+    weightedValueIdr: row.weighted_value_idr == null ? null : Number(row.weighted_value_idr),
     annualValueIdr: row.annual_value_idr == null ? null : Number(row.annual_value_idr),
     renewalDate: row.renewal_date ?? null,
     nps: properties.nps_terakhir === '' || properties.nps_terakhir == null ? null : Number(properties.nps_terakhir),
@@ -29,6 +39,9 @@ export function createPostgresReadService(database) {
       if (!revision) return { items: [], datasetRevision: null, businessAsOf: BUSINESS_AS_OF, synthetic: true };
       const rows = await database`
         SELECT n.id, n.dataset_revision_id, n.external_key, n.properties,
+          sr.id AS score_run_id, sr.formula_version,
+          srr.score AS priority_score, srr.status AS priority_status, srr.coverage AS priority_coverage,
+          srr.level AS priority_level, srr.level_reason AS priority_reason, srr.weighted_value_idr,
           (SELECT NULLIF(sr.payload->>'nilai_tahunan', '')::numeric
            FROM source_records sr JOIN sources s ON s.id = sr.source_id
            WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
@@ -38,6 +51,11 @@ export function createPostgresReadService(database) {
            WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
              AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS renewal_date
         FROM nodes n
+        LEFT JOIN LATERAL (
+          SELECT run.id, run.formula_version FROM score_runs run
+          WHERE run.dataset_revision_id = n.dataset_revision_id ORDER BY run.created_at DESC, run.id DESC LIMIT 1
+        ) sr ON true
+        LEFT JOIN score_run_results srr ON srr.score_run_id = sr.id AND srr.account_node_id = n.id
         WHERE n.dataset_revision_id = ${revision.id} AND n.type = 'account'
           AND n.properties->>'tipe' = 'pelanggan'
           AND (${search} = '' OR n.external_key ILIKE ${`%${search}%`} OR n.properties->>'nama' ILIKE ${`%${search}%`})
@@ -46,13 +64,17 @@ export function createPostgresReadService(database) {
       `;
       const items = rows.map(summary);
       if (sort === 'renewal') items.sort((a, b) => (a.renewalDate ?? '9999').localeCompare(b.renewalDate ?? '9999') || a.id.localeCompare(b.id));
-      else items.sort((a, b) => a.id.localeCompare(b.id));
+      else if (sort === 'weighted') items.sort((a, b) => (b.weightedValueIdr ?? -1) - (a.weightedValueIdr ?? -1) || a.id.localeCompare(b.id));
+      else items.sort((a, b) => (b.priority.score ?? -1) - (a.priority.score ?? -1) || a.id.localeCompare(b.id));
       return { items, datasetRevision: revision.id, businessAsOf: BUSINESS_AS_OF, synthetic: true };
     },
 
     async getAccount(accountId) {
       const [row] = await database`
         SELECT n.id, n.dataset_revision_id, n.external_key, n.properties,
+          sr.id AS score_run_id, sr.formula_version,
+          srr.score AS priority_score, srr.status AS priority_status, srr.coverage AS priority_coverage,
+          srr.level AS priority_level, srr.level_reason AS priority_reason, srr.weighted_value_idr,
           (SELECT NULLIF(sr.payload->>'nilai_tahunan', '')::numeric
            FROM source_records sr JOIN sources s ON s.id = sr.source_id
            WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
@@ -62,6 +84,11 @@ export function createPostgresReadService(database) {
            WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
              AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS renewal_date
         FROM nodes n JOIN dataset_revisions r ON r.id = n.dataset_revision_id
+        LEFT JOIN LATERAL (
+          SELECT run.id, run.formula_version FROM score_runs run
+          WHERE run.dataset_revision_id = n.dataset_revision_id ORDER BY run.created_at DESC, run.id DESC LIMIT 1
+        ) sr ON true
+        LEFT JOIN score_run_results srr ON srr.score_run_id = sr.id AND srr.account_node_id = n.id
         WHERE n.type = 'account' AND n.external_key = ${accountId} AND r.status = 'published'
         ORDER BY r.published_at DESC LIMIT 1
       `;
@@ -69,6 +96,7 @@ export function createPostgresReadService(database) {
       const factors = await database`
         SELECT factor, raw_value, normalized_value, unit, status, reason, period_start, period_end, evidence
         FROM account_factors WHERE dataset_revision_id = ${row.dataset_revision_id} AND account_node_id = ${row.id}
+          AND score_run_id = ${row.score_run_id}
         ORDER BY factor
       `;
       const sourceRows = await database`

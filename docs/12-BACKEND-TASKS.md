@@ -306,7 +306,8 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Backend unit 48/48, static check dan syntax checks lulus. PostgreSQL repository query tidak teruji karena `TEST_DATABASE_URL` belum tersedia. Query intent, Jev routing, held-out parafrase dan committed-vs-rolled-back Decision belum diverifikasi.
 - Data profile aktual dipakai untuk ringkasan: NPS `nps_terakhir`, dashboard `health_score_dashboard`, dan nilai tahunan/renewal diambil dari `contracts_billing.csv`. Nilai kontrak tidak dibaca dari record account yang memang tidak memuat kolom tersebut.
 - `GET /api/accounts` kini hanya meranking `tipe='pelanggan'`; dataset aktual diverifikasi berisi 40 pelanggan + 5 prospek. Prospek tetap tersedia sebagai entitas graph tetapi tidak masuk ranking pelanggan.
-- Backend unit 56/56 dan static check lulus setelah filter/DTO test; actual SQL results tetap menunggu PostgreSQL integration.
+- List/detail memilih score run terakhir pada revision ter-publish dan memproyeksikan indeks, coverage, status, formula version, run ID, level (NULL jika belum disetujui), nilai tertimbang, dan parameter dari run yang sama. Sort priority/weighted memakai nilai tersimpan; tanpa hasil tetap `unscored`.
+- Backend unit 58/58 dan static check lulus setelah filter/DTO/score projection test; actual SQL results tetap menunggu PostgreSQL integration.
 
 ## Catatan implementasi lanjutan — BE-11
 
