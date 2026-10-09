@@ -57,14 +57,20 @@ export function createFeedbackService(database) {
   return Object.freeze({
     submitFeedback: (input) => submitFeedback({ database, ...input }),
     replyToFeedback: (input) => replyToFeedback({ database, ...input }),
-    async listFeedback({ accountNodeId = null }) {
-      const rows = accountNodeId
-        ? await database`SELECT id, account_node_id, plan_revision_id, actor_id, body, status, created_at FROM feedback WHERE account_node_id = ${accountNodeId} ORDER BY created_at DESC LIMIT 100`
-        : await database`SELECT id, account_node_id, plan_revision_id, actor_id, body, status, created_at FROM feedback ORDER BY created_at DESC LIMIT 100`;
+    async listFeedback({ accountNodeId = null, actorId = null }) {
+      const rows = await database`
+        SELECT id, account_node_id, plan_revision_id, actor_id, body, status, created_at FROM feedback
+        WHERE (${accountNodeId}::text IS NULL OR account_node_id = ${accountNodeId})
+          AND (${actorId}::text IS NULL OR actor_id = ${actorId})
+        ORDER BY created_at DESC LIMIT 100
+      `;
       return { items: rows.map(feedbackDto) };
     },
-    async getFeedback(feedbackId) {
-      const [row] = await database`SELECT id, account_node_id, plan_revision_id, actor_id, body, status, created_at FROM feedback WHERE id = ${feedbackId}`;
+    async getFeedback(feedbackId, { actorId = null } = {}) {
+      const [row] = await database`
+        SELECT id, account_node_id, plan_revision_id, actor_id, body, status, created_at FROM feedback
+        WHERE id = ${feedbackId} AND (${actorId}::text IS NULL OR actor_id = ${actorId})
+      `;
       if (!row) return null;
       const replies = await database`SELECT id, feedback_id, actor_id, body, created_at FROM feedback_replies WHERE feedback_id = ${feedbackId} ORDER BY created_at, id`;
       return { ...feedbackDto(row), replies: replies.map((reply) => ({ id: reply.id, feedbackId: reply.feedback_id, actorId: reply.actor_id, body: reply.body, createdAt: reply.created_at })) };

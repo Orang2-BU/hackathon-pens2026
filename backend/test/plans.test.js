@@ -19,7 +19,7 @@ test('plan/decision validators fail before touching storage on invalid input', a
 });
 
 test('write routes require session and origin and derive actor from session, not request body', async () => {
-  const auth = createAuth({ demoPassword: 'correct horse battery staple', sessionSecret: '0123456789abcdef0123456789abcdef', publicOrigin: 'https://demo.example' });
+  const auth = createAuth({ demoPassword: 'correct horse battery staple', userPassword: 'user password sufficiently long', sessionSecret: '0123456789abcdef0123456789abcdef', publicOrigin: 'https://demo.example' });
   let captured;
   const server = createHttpServer({ database: async () => [], auth, writeService: {
     createPlan: async (input) => { captured = input; return { id: 'created' }; },
@@ -29,6 +29,9 @@ test('write routes require session and origin and derive actor from session, not
   try {
     const unauth = await fetch(`${origin}/api/plans`, { method: 'POST', headers: { origin: 'https://demo.example', 'content-type': 'application/json' }, body: JSON.stringify({ accountNodeId: 'C01', body: 'Draft' }) });
     assert.equal(unauth.status, 401);
+    const userToken = auth.issueSession(auth.authenticate('user password sufficiently long'));
+    const forbiddenUserWrite = await fetch(`${origin}/api/plans`, { method: 'POST', headers: { origin: 'https://demo.example', cookie: `tessera_session=${userToken}`, 'content-type': 'application/json' }, body: JSON.stringify({ accountNodeId: 'C01', body: 'Draft' }) });
+    assert.equal(forbiddenUserWrite.status, 403);
     const token = auth.issueSession();
     const response = await fetch(`${origin}/api/plans`, { method: 'POST', headers: { origin: 'https://demo.example', cookie: `tessera_session=${token}`, 'content-type': 'application/json' }, body: JSON.stringify({ accountNodeId: 'C01', body: 'Draft', actorId: 'forged', context: { fake: true } }) });
     assert.equal(response.status, 201);

@@ -75,7 +75,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-09 — Auth, role, origin dan rate limit
 
-- **Trace:** T6; TASK-009. **Prerequisite:** BE-01/02. **Status:** In Progress (single-admin signed session/login prototype tested; action authorization and deployment hardening remain).
+- **Trace:** T6; TASK-009. **Prerequisite:** BE-01/02. **Status:** In Progress (signed sessions now support distinct optional admin/CSM/user demo credentials; deployment hardening remains).
 - **Output:** login/logout/session helpers, bounded limiter dan protected actions; role demo CSM sesuai ADR stack.
 - **Kerja:** env validation, fixed-length timing-safe password digest compare, HMAC session/expiry; HTTP-only/Secure/SameSite; origin/CSRF, proxy/IP policy; input size cap, brute force lock/rate limit; actor dari server.
 - **Lulus:** missing/expired/tampered session, salah role/origin, oversized input ditolak; read publik tetap berfungsi; login abuse 429; credential/key tak ada pada client bundle/log. Auth action dan cookie diuji di HTTPS deployment, bukan hanya localhost.
@@ -96,7 +96,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-12 — Feedback dua arah persisten
 
-- **Trace:** T5; TASK-012. **Prerequisite:** BE-09/11. **Status:** In Progress (feedback service/routes implemented; database verification and distinct CSM/user provisioning remain).
+- **Trace:** T5; TASK-012. **Prerequisite:** BE-09/11. **Status:** In Progress (user feedback/read-own-thread and CSM/admin reply permissions implemented; PostgreSQL verification remains).
 - **Output:** feedback/reply dengan actor, waktu, account/plan context, status tanggapan.
 - **Kerja:** plain text escaping/length checks; authenticated submit/reply; context FK dan authorization; tidak menulis ulang skor/fakta/Decision.
 - **Lulus:** thread survive refresh/restart; actor dari sesi; invalid context/unauthenticated write ditolak; sebelum/sesudah feedback memiliki score dan Decision identik. Akses pelanggan akhir belum masuk implementasi.
@@ -327,4 +327,5 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 ## Catatan implementasi lanjutan — BE-09
 
 - Tes autentikasi membuat token non-admin dengan HMAC valid dan memastikan parser sesi menolaknya; role tidak dapat ditentukan melalui claim tak tepercaya. Route tests menegaskan actor write berasal dari sesi dan write memerlukan Origin/session.
-- Backend unit 58/58, `check`, dan syntax checks lulus. BE-09 tetap parsial: hanya satu credential demo-admin yang ada; role CSM/user dan authorization feedback dua arah belum diprovisikan/disetujui. Cookie/proxy/HTTPS dan rate limit lintas-instance perlu validasi deploy.
+- Auth supports one required admin credential and optional, distinct CSM/user demo credentials; all configured identities map to fixed server-side actor/role claims. CSM/admin can create/revise plans, decide, review signals, and reply. User can submit feedback and read only own feedback threads. Password comparison evaluates all configured identities; weak/duplicate optional secrets fail configuration.
+- Backend unit 60/60, `check`, and syntax checks pass. BE-09/12 remain partial: PostgreSQL-owned feedback scope, production secret provisioning, cookie/proxy/HTTPS and multi-instance rate limiting need deployment/integration validation; CSM/user credentials are optional and not configured in this checkout.

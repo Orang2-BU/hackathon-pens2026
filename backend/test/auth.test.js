@@ -37,6 +37,17 @@ test('origin check and bounded rate limiter reject unsafe or excessive requests'
   assert.equal(allow('b').allowed, true);
 });
 
+test('optional CSM and user credentials map to fixed identities and reject duplicates or weak secrets', () => {
+  const auth = createAuth({ ...config, csmPassword: 'csm password sufficiently long', userPassword: 'user password sufficiently long' });
+  const csm = auth.authenticate('csm password sufficiently long');
+  const user = auth.authenticate('user password sufficiently long');
+  assert.deepEqual({ actorId: csm.actorId, role: csm.role }, { actorId: 'demo-csm', role: 'csm' });
+  assert.deepEqual({ actorId: user.actorId, role: user.role }, { actorId: 'demo-user', role: 'user' });
+  assert.equal(auth.readSession(auth.issueSession(user)).role, 'user');
+  assert.throws(() => createAuth({ ...config, userPassword: config.demoPassword }), /distinct/u);
+  assert.throws(() => createAuth({ ...config, csmPassword: 'short' }), /12 characters/u);
+});
+
 let server;
 let baseUrl;
 const auth = createAuth(config);

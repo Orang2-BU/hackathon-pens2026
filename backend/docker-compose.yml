@@ -90,6 +90,8 @@ services:
     environment:
       DATABASE_URL: postgres://tessera_runtime_login:${TESSERA_RUNTIME_PASSWORD:?Set TESSERA_RUNTIME_PASSWORD in backend/.env}@db:5432/${POSTGRES_DB:-tessera}
       DEMO_PASSWORD: ${DEMO_PASSWORD:?Set DEMO_PASSWORD in backend/.env}
+      DEMO_CSM_PASSWORD: ${DEMO_CSM_PASSWORD:-}
+      DEMO_USER_PASSWORD: ${DEMO_USER_PASSWORD:-}
       SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in backend/.env}
       PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN in backend/.env}
       NODE_ENV: production

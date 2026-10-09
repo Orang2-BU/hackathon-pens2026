@@ -13,20 +13,35 @@ function constantTimeTextEqual(left, right) {
   return timingSafeEqual(leftDigest, rightDigest);
 }
 
-export function createAuth({ demoPassword, sessionSecret, publicOrigin, secureCookies = true, now = () => Date.now() }) {
+export function createAuth({ demoPassword, csmPassword, userPassword, sessionSecret, publicOrigin, secureCookies = true, now = () => Date.now() }) {
   if (typeof demoPassword !== 'string' || demoPassword.length < 12) throw new TypeError('DEMO_PASSWORD must contain at least 12 characters.');
   if (typeof sessionSecret !== 'string' || Buffer.byteLength(sessionSecret) < 32) throw new TypeError('SESSION_SECRET must contain at least 32 bytes.');
   let origin;
   try { origin = new URL(publicOrigin).origin; } catch { throw new TypeError('PUBLIC_ORIGIN must be an absolute HTTP(S) origin.'); }
   if (!['http:', 'https:'].includes(new URL(origin).protocol)) throw new TypeError('PUBLIC_ORIGIN must use HTTP or HTTPS.');
+  const identities = [
+    { password: demoPassword, actorId: 'demo-admin', displayName: 'Demo Admin', role: 'admin' },
+    ...(csmPassword ? [{ password: csmPassword, actorId: 'demo-csm', displayName: 'Demo CSM', role: 'csm' }] : []),
+    ...(userPassword ? [{ password: userPassword, actorId: 'demo-user', displayName: 'Demo User', role: 'user' }] : []),
+  ];
+  if (identities.some(({ password }) => typeof password !== 'string' || password.length < 12)) throw new TypeError('Configured demo credentials must contain at least 12 characters.');
+  if (new Set(identities.map(({ password }) => password)).size !== identities.length) throw new TypeError('Demo credentials must be distinct.');
 
   const sign = (payload) => createHmac('sha256', sessionSecret).update(payload).digest('base64url');
   return Object.freeze({
     cookieName: SESSION_COOKIE,
-    verifyPassword: (candidate) => typeof candidate === 'string' && constantTimeTextEqual(candidate, demoPassword),
-    issueSession() {
+    authenticate(candidate) {
+      if (typeof candidate !== 'string') return null;
+      const matches = identities.map(({ password }) => constantTimeTextEqual(candidate, password));
+      const matchIndex = matches.findIndex(Boolean);
+      return matchIndex < 0 ? null : identities[matchIndex];
+    },
+    verifyPassword: (candidate) => typeof candidate === 'string'
+      && identities.map(({ password }) => constantTimeTextEqual(candidate, password)).some(Boolean),
+    issueSession(identity = identities[0]) {
+      if (!identities.includes(identity)) throw new TypeError('Session identity is not configured.');
       const exp = Math.floor(now() / 1000) + SESSION_TTL_SECONDS;
-      const payload = base64url(JSON.stringify({ actorId: 'demo-admin', displayName: 'Demo Admin', role: 'admin', exp }));
+      const payload = base64url(JSON.stringify({ actorId: identity.actorId, displayName: identity.displayName, role: identity.role, exp }));
       return `${payload}.${sign(payload)}`;
     },
     readSession(token) {
@@ -38,7 +53,8 @@ export function createAuth({ demoPassword, sessionSecret, publicOrigin, secureCo
       if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null;
       try {
         const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
-        if (claims.role !== 'admin' || claims.actorId !== 'demo-admin' || !Number.isInteger(claims.exp) || claims.exp <= Math.floor(now() / 1000)) return null;
+        const identity = identities.find(({ role, actorId }) => claims.role === role && claims.actorId === actorId);
+        if (!identity || claims.displayName !== identity.displayName || !Number.isInteger(claims.exp) || claims.exp <= Math.floor(now() / 1000)) return null;
         return Object.freeze({ actorId: claims.actorId, displayName: claims.displayName, role: claims.role, exp: claims.exp });
       } catch { return null; }
     },

@@ -38,9 +38,10 @@ export function createHttpServer({ database, auth = null, readService = null, wr
         sendJson(response, error.message === 'BODY_TOO_LARGE' ? 413 : 400, { error: error.message === 'BODY_TOO_LARGE' ? 'BODY_TOO_LARGE' : 'INVALID_JSON' });
         return;
       }
-      if (!auth.verifyPassword(body.password)) { sendJson(response, 401, { error: 'INVALID_CREDENTIALS' }); return; }
-      response.setHeader('set-cookie', auth.cookie(auth.issueSession()));
-      sendJson(response, 200, { authenticated: true, role: 'admin' });
+      const identity = auth.authenticate(body.password);
+      if (!identity) { sendJson(response, 401, { error: 'INVALID_CREDENTIALS' }); return; }
+      response.setHeader('set-cookie', auth.cookie(auth.issueSession(identity)));
+      sendJson(response, 200, { authenticated: true, role: identity.role });
       return;
     }
 
@@ -94,7 +95,10 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       if (!auth.originAllowed(request.headers.origin)) { sendJson(response, 403, { error: 'ORIGIN_FORBIDDEN' }); return; }
       const session = auth.readSession(cookieValue(request.headers.cookie));
       if (!session) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
-      if (session.role !== 'admin') { sendJson(response, 403, { error: 'FORBIDDEN' }); return; }
+      const feedbackSubmission = path === '/api/feedback';
+      if (!['admin', 'csm'].includes(session.role) && !(feedbackSubmission && session.role === 'user')) {
+        sendJson(response, 403, { error: 'FORBIDDEN' }); return;
+      }
       const limit = writeLimit(request.socket.remoteAddress ?? 'unknown');
       if (!limit.allowed) { response.setHeader('retry-after', String(limit.retryAfterSeconds)); sendJson(response, 429, { error: 'RATE_LIMITED' }); return; }
       let body;
@@ -147,7 +151,8 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       const accountNodeId = new URL(request.url ?? '/', 'http://localhost').searchParams.get('accountNodeId');
       if (accountNodeId && !/^[A-Za-z0-9_-]{1,128}$/u.test(accountNodeId)) { sendJson(response, 400, { error: 'INVALID_QUERY' }); return; }
       if (!readService?.listFeedback) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
-      try { sendJson(response, 200, await readService.listFeedback({ accountNodeId })); }
+      const session = auth.readSession(cookieValue(request.headers.cookie));
+      try { sendJson(response, 200, await readService.listFeedback({ accountNodeId, actorId: session.role === 'user' ? session.actorId : null })); }
       catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
       return;
     }
@@ -167,7 +172,8 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       if (!auth?.readSession(cookieValue(request.headers.cookie))) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
       if (!readService?.getFeedback) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
       try {
-        const thread = await readService.getFeedback(feedbackReadMatch[1]);
+        const session = auth.readSession(cookieValue(request.headers.cookie));
+        const thread = await readService.getFeedback(feedbackReadMatch[1], { actorId: session.role === 'user' ? session.actorId : null });
         if (!thread) { sendJson(response, 404, { error: 'NOT_FOUND' }); return; }
         sendJson(response, 200, thread);
       } catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
@@ -230,6 +236,8 @@ if (import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
     const { createAuth } = await import('./auth.js');
     auth = createAuth({
       demoPassword: process.env.DEMO_PASSWORD,
+      csmPassword: process.env.DEMO_CSM_PASSWORD,
+      userPassword: process.env.DEMO_USER_PASSWORD,
       sessionSecret: process.env.SESSION_SECRET,
       publicOrigin: process.env.PUBLIC_ORIGIN,
       secureCookies: process.env.NODE_ENV !== 'development',
