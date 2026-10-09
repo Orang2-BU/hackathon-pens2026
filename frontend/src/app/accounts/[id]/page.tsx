@@ -83,7 +83,7 @@ export default function AccountDetailPage() {
                     >
                       <span className="w-28 shrink-0">{factor}</span>
                       <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-neutral" aria-hidden>
-                        <span className="absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${value}%` }} />
+                        <span className="metric-fill absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${value}%` }} />
                       </span>
                       <span className="w-12 text-right font-semibold">{value}</span>
                       <span className="w-12 text-right text-label-sm text-on-surface-muted">{factorWeight[factor]}%</span>
@@ -136,7 +136,7 @@ export default function AccountDetailPage() {
                 placeholder="Which tickets link this account to a bug?"
                 className="h-11 w-full rounded-md bg-neutral pl-sm pr-11 text-body-sm ring-1 ring-outline ring-inset placeholder:text-on-surface-muted focus-visible:ring-primary"
               />
-              <button type="submit" aria-label="Ask" className="absolute right-0 top-0 grid size-11 place-items-center text-on-surface-muted hover:text-on-surface">
+              <button type="submit" aria-label="Ask" className="btn btn-secondary absolute right-0 top-0 size-11 p-0">
                 <Search size={18} aria-hidden />
               </button>
             </form>

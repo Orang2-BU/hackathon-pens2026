@@ -8,7 +8,7 @@ import { Database, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X 
 import { usePendingPlans } from "@/components/demo-state";
 
 // Demo gate: public pages render bare; workspace routes ask for the demo password (see /login).
-export const AUTH_KEY = "tessera-demo-auth";
+const AUTH_KEY = "tessera-demo-auth";
 const isPublicPath = (pathname: string) => pathname === "/" || pathname.startsWith("/login");
 
 const navigation = [
@@ -86,7 +86,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
         type="button"
         onClick={signOut}
         title={rail ? "Sign out" : undefined}
-        className="flex min-h-11 items-center gap-sm rounded-md px-1.5 text-label-md text-on-surface-muted transition-colors hover:bg-surface-elevated hover:text-on-surface xl:min-h-10"
+        className="btn btn-secondary justify-start px-1.5"
       >
         <span className="grid size-7 shrink-0 place-items-center rounded-sm">
           <LogOut size={18} strokeWidth={1.75} aria-hidden />
@@ -111,10 +111,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
   }, [isPublic, pathname, router]);
 
-  // One delegated listener feeds the border glow on cards and the sidebar (globals.css).
+  // One delegated listener feeds the border glow on cards, buttons and the sidebar (globals.css).
   useEffect(() => {
     const onMove = (event: PointerEvent) => {
-      const card = event.target instanceof Element ? event.target.closest<HTMLElement>(".card, .card-featured, .edge-glow") : null;
+      const card = event.target instanceof Element ? event.target.closest<HTMLElement>(".btn:not(:disabled), .card, .card-featured, .edge-glow") : null;
       if (!card) return;
       const box = card.getBoundingClientRect();
       card.style.setProperty("--spot-x", `${event.clientX - box.left}px`);
@@ -165,7 +165,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           type="button"
           onClick={closeDrawer}
           aria-label="Close navigation"
-          className="absolute right-5 top-5 grid size-11 place-items-center rounded-full text-on-surface-muted transition-colors hover:bg-surface-elevated hover:text-on-surface"
+          className="absolute right-5 top-5 grid size-11 place-items-center text-on-surface-muted transition-colors hover:text-on-surface"
         >
           <X size={20} aria-hidden />
         </button>
@@ -177,7 +177,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             type="button"
             onClick={() => drawer.current?.showModal()}
             aria-label="Open navigation"
-            className="grid size-11 place-items-center rounded-full bg-surface transition-colors hover:bg-surface-elevated xl:hidden"
+            className="btn btn-secondary size-11 rounded-full p-0 xl:hidden"
           >
             <Menu size={20} aria-hidden />
           </button>
@@ -195,7 +195,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Form>
         </header>
-        <main>{children}</main>
+        <main key={pathname} className="page-enter">{children}</main>
       </div>
     </div>
   );

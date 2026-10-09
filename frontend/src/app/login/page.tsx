@@ -26,7 +26,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="glass edge-glow flex w-full max-w-md flex-col gap-md rounded-lg p-lg">
+    <div className="glass edge-glow flex w-full max-w-(--container-md) flex-col gap-md rounded-lg p-lg">
       <div className="flex flex-col items-start gap-sm">
         <span className="grid size-10 place-items-center rounded-sm bg-primary text-on-primary">
           <LockKeyhole size={20} aria-hidden />
@@ -65,8 +65,8 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="grid min-h-dvh place-items-center bg-neutral px-md py-lg text-on-surface">
-      <div className="flex w-full max-w-md flex-col items-center gap-md">
+    <div className="grid min-h-dvh grid-cols-1 place-items-center bg-neutral px-md py-lg text-on-surface">
+      <div className="flex w-full max-w-(--container-md) flex-col items-center gap-md">
         <Link href="/" className="flex items-center gap-sm self-start text-label-md text-on-surface-muted transition-colors hover:text-on-surface">
           <ArrowLeft size={16} aria-hidden /> Back to overview
         </Link>

@@ -90,13 +90,13 @@ export default function LandingPage() {
       </header>
 
       <main className="mx-auto w-full max-w-6xl px-md pb-xl">
-        <section className="grid items-center gap-lg py-lg xl:grid-cols-2">
+        <section className="grid grid-cols-1 items-center gap-lg py-lg xl:grid-cols-2">
           <div className="flex flex-col gap-md">
             <p className="label-caps text-primary">Churn Early Warning Graph · KasirNusa Customer Success</p>
             <h1 className="text-headline-lg font-bold tracking-headline-lg">
               Your dashboard says healthy.<br />Your best account is already leaving.
             </h1>
-            <p className="max-w-xl text-body-md text-on-surface-muted">
+            <p className="max-w-(--container-xl) text-body-md text-on-surface-muted">
               Tessera connects the CRM, support, usage, and billing data of PT KasirNusa Teknologi into one context graph,
               ranks all 40 accounts by evidence-backed priority, and warns the account manager while renewal can still be saved.
             </p>
@@ -118,17 +118,17 @@ export default function LandingPage() {
             </div>
             <ul className="flex flex-col">
               {top.map((account, index) => (
-                <li key={account.id} className="flex items-center gap-sm border-b border-outline py-sm last:border-0">
-                  <span className="w-6 text-label-md text-on-surface-muted">#{index + 1}</span>
+                <li key={account.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-sm border-b border-outline py-sm last:border-0 sm:flex">
+                  <span className="row-span-2 w-6 shrink-0 text-label-md text-on-surface-muted">#{index + 1}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-body-md font-semibold">{account.name}</span>
                     <span className="block text-body-sm text-on-surface-muted">{account.id} · renewal {account.renewalDate}</span>
                   </span>
-                  <span className="text-right">
+                  <span className="col-span-2 col-start-2 row-start-2 flex items-baseline justify-between gap-sm text-right sm:block">
                     <span className="block text-body-md font-bold">{account.priorityScore.toFixed(1)}</span>
                     <span className="block text-body-sm text-on-surface-muted">{formatMoney(account.weightedValue, account.currency, true)} weighted</span>
                   </span>
-                  <RiskBadge level={account.riskLevel} />
+                  <span className="col-start-3 row-start-1"><RiskBadge level={account.riskLevel} /></span>
                 </li>
               ))}
             </ul>
@@ -185,7 +185,7 @@ export default function LandingPage() {
 
         <section className="card-featured edge-glow flex flex-col items-start gap-md">
           <h2 className="text-title font-semibold">See the ranking the dashboard cannot show you</h2>
-          <p className="max-w-2xl text-body-md text-on-surface-muted">
+          <p className="max-w-(--container-2xl) text-body-md text-on-surface-muted">
             Sign in with the demo password and open C01. Follow the evidence path yourself — every number on that page can be traced back to a source record.
           </p>
           <Link href="/login?next=/dashboard" className="flex items-center gap-sm rounded-full bg-primary px-md py-3 font-semibold text-on-primary transition-opacity hover:opacity-90">

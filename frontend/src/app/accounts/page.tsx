@@ -33,16 +33,14 @@ export default function AccountsPage() {
               </Link>
             )}
           </div>
-          <div role="group" aria-label="Filter by risk level" className="flex rounded-md bg-neutral p-xs">
+          <div role="group" aria-label="Filter by risk level" className="flex flex-wrap gap-xs">
             {riskOptions.map(option => (
               <button
                 key={option}
                 type="button"
                 aria-pressed={risk === option}
                 onClick={() => setRisk(option)}
-                className={`min-h-11 rounded-sm px-sm text-label-md transition-colors xl:min-h-9 ${
-                  risk === option ? "bg-surface-elevated text-on-surface" : "text-on-surface-muted hover:text-on-surface"
-                }`}
+                className="btn btn-secondary rounded-sm px-sm"
               >
                 {option}
               </button>
