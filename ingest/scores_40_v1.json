@@ -15,10 +15,10 @@
   "nilai_tertimbang": 60273770,
   "renewal": "2026-12-15",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "3 tiket masih terbuka; 1 tiket dalam 90 hari terakhir",
-   "Champion Rina Hapsari pindah ke Grup Ritel Mandala (sejak 2026-09-01); CRM belum diperbarui",
-   "1 janji belum ditepati (FEAT-07)"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "3 support tickets still open; 1 tickets in the last 90 days",
+   "Champion Rina Hapsari moved to Grup Ritel Mandala (since 2026-09-01); CRM not updated",
+   "1 unkept commitments (FEAT-07)"
   ]
  },
  {
@@ -37,9 +37,9 @@
   "nilai_tertimbang": 22568328,
   "renewal": "2027-01-20",
   "signals": [
-   "Transaksi/hari turun 12% (90 hari terakhir vs 90 hari sebelumnya)",
-   "6 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "6 tiket masih terbuka, 6 terkait isu sinkron/BUG-412 (derived); 8 tiket dalam 90 hari terakhir"
+   "Transactions per day down 12% (last 90 days vs prior 90 days)",
+   "6 outlets in active offline mode (exposed to sync issues)",
+   "6 support tickets still open, 6 match the offline-sync/BUG-412 pattern (derived); 8 tickets in the last 90 days"
   ]
  },
  {
@@ -58,9 +58,9 @@
   "nilai_tertimbang": 31177133,
   "renewal": "2027-04-10",
   "signals": [
-   "5 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "4 tiket masih terbuka, 4 terkait isu sinkron/BUG-412 (derived); 6 tiket dalam 90 hari terakhir",
-   "100 hari tanpa kontak masuk dari pelanggan"
+   "5 outlets in active offline mode (exposed to sync issues)",
+   "4 support tickets still open, 4 match the offline-sync/BUG-412 pattern (derived); 6 tickets in the last 90 days",
+   "100 days without inbound customer contact"
   ]
  },
  {
@@ -79,8 +79,8 @@
   "nilai_tertimbang": 18508612,
   "renewal": "2027-03-01",
   "signals": [
-   "3 tiket masih terbuka; 9 tiket dalam 90 hari terakhir",
-   "79 hari tanpa kontak masuk dari pelanggan"
+   "3 support tickets still open; 9 tickets in the last 90 days",
+   "79 days without inbound customer contact"
   ]
  },
  {
@@ -99,9 +99,9 @@
   "nilai_tertimbang": 7878885,
   "renewal": "2027-08-28",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "2 tiket masih terbuka; 5 tiket dalam 90 hari terakhir",
-   "301 hari tanpa kontak masuk dari pelanggan"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "2 support tickets still open; 5 tickets in the last 90 days",
+   "301 days without inbound customer contact"
   ]
  },
  {
@@ -120,9 +120,9 @@
   "nilai_tertimbang": 13605900,
   "renewal": "2027-04-05",
   "signals": [
-   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "365 hari tanpa kontak masuk dari pelanggan",
-   "Riwayat telat bayar 1x dalam 12 bulan"
+   "2 outlets in active offline mode (exposed to sync issues)",
+   "365 days without inbound customer contact",
+   "Late payment 1x in the last 12 months"
   ]
  },
  {
@@ -141,8 +141,8 @@
   "nilai_tertimbang": 4872000,
   "renewal": "2026-11-05",
   "signals": [
-   "176 hari tanpa kontak masuk dari pelanggan",
-   "Riwayat telat bayar 2x dalam 12 bulan"
+   "176 days without inbound customer contact",
+   "Late payment 2x in the last 12 months"
   ]
  },
  {
@@ -161,8 +161,8 @@
   "nilai_tertimbang": 2844975,
   "renewal": "2027-04-21",
   "signals": [
-   "136 hari tanpa kontak masuk dari pelanggan",
-   "Riwayat telat bayar 1x dalam 12 bulan"
+   "136 days without inbound customer contact",
+   "Late payment 1x in the last 12 months"
   ]
  },
  {
@@ -181,8 +181,8 @@
   "nilai_tertimbang": 7938000,
   "renewal": "2027-03-20",
   "signals": [
-   "196 hari tanpa kontak masuk dari pelanggan",
-   "Riwayat telat bayar 1x dalam 12 bulan"
+   "196 days without inbound customer contact",
+   "Late payment 1x in the last 12 months"
   ]
  },
  {
@@ -201,8 +201,8 @@
   "nilai_tertimbang": 5076508,
   "renewal": "2026-12-30",
   "signals": [
-   "1 tiket masih terbuka; 5 tiket dalam 90 hari terakhir",
-   "175 hari tanpa kontak masuk dari pelanggan"
+   "1 support tickets still open; 5 tickets in the last 90 days",
+   "175 days without inbound customer contact"
   ]
  },
  {
@@ -221,8 +221,8 @@
   "nilai_tertimbang": 5369844,
   "renewal": "2026-11-25",
   "signals": [
-   "1 tiket masih terbuka; 4 tiket dalam 90 hari terakhir",
-   "365 hari tanpa kontak masuk dari pelanggan"
+   "1 support tickets still open; 4 tickets in the last 90 days",
+   "365 days without inbound customer contact"
   ]
  },
  {
@@ -241,8 +241,8 @@
   "nilai_tertimbang": 3209195,
   "renewal": "2027-05-12",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "322 hari tanpa kontak masuk dari pelanggan"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "322 days without inbound customer contact"
   ]
  },
  {
@@ -261,7 +261,7 @@
   "nilai_tertimbang": 3528000,
   "renewal": "2026-11-24",
   "signals": [
-   "215 hari tanpa kontak masuk dari pelanggan"
+   "215 days without inbound customer contact"
   ]
  },
  {
@@ -280,7 +280,7 @@
   "nilai_tertimbang": 4189500,
   "renewal": "2026-11-28",
   "signals": [
-   "161 hari tanpa kontak masuk dari pelanggan"
+   "161 days without inbound customer contact"
   ]
  },
  {
@@ -299,7 +299,7 @@
   "nilai_tertimbang": 1764785,
   "renewal": "2027-09-06",
   "signals": [
-   "105 hari tanpa kontak masuk dari pelanggan"
+   "105 days without inbound customer contact"
   ]
  },
  {
@@ -318,8 +318,8 @@
   "nilai_tertimbang": 3270326,
   "renewal": "2027-06-14",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "160 hari tanpa kontak masuk dari pelanggan"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "160 days without inbound customer contact"
   ]
  },
  {
@@ -338,7 +338,7 @@
   "nilai_tertimbang": 8778000,
   "renewal": "2027-01-10",
   "signals": [
-   "112 hari tanpa kontak masuk dari pelanggan"
+   "112 days without inbound customer contact"
   ]
  },
  {
@@ -357,8 +357,8 @@
   "nilai_tertimbang": 8718150,
   "renewal": "2027-05-12",
   "signals": [
-   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "109 hari tanpa kontak masuk dari pelanggan"
+   "2 outlets in active offline mode (exposed to sync issues)",
+   "109 days without inbound customer contact"
   ]
  },
  {
@@ -377,8 +377,8 @@
   "nilai_tertimbang": 2375871,
   "renewal": "2027-09-08",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "1 tiket masih terbuka; 7 tiket dalam 90 hari terakhir"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "1 support tickets still open; 7 tickets in the last 90 days"
   ]
  },
  {
@@ -397,8 +397,8 @@
   "nilai_tertimbang": 6981602,
   "renewal": "2027-03-26",
   "signals": [
-   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "62 hari tanpa kontak masuk dari pelanggan"
+   "2 outlets in active offline mode (exposed to sync issues)",
+   "62 days without inbound customer contact"
   ]
  },
  {
@@ -417,8 +417,8 @@
   "nilai_tertimbang": 4360540,
   "renewal": "2026-12-15",
   "signals": [
-   "58 hari tanpa kontak masuk dari pelanggan",
-   "Riwayat telat bayar 1x dalam 12 bulan"
+   "58 days without inbound customer contact",
+   "Late payment 1x in the last 12 months"
   ]
  },
  {
@@ -437,8 +437,8 @@
   "nilai_tertimbang": 6094187,
   "renewal": "2027-07-23",
   "signals": [
-   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "1 tiket masih terbuka; 5 tiket dalam 90 hari terakhir"
+   "2 outlets in active offline mode (exposed to sync issues)",
+   "1 support tickets still open; 5 tickets in the last 90 days"
   ]
  },
  {
@@ -457,7 +457,7 @@
   "nilai_tertimbang": 5724852,
   "renewal": "2027-05-06",
   "signals": [
-   "1 tiket masih terbuka; 4 tiket dalam 90 hari terakhir"
+   "1 support tickets still open; 4 tickets in the last 90 days"
   ]
  },
  {
@@ -476,8 +476,8 @@
   "nilai_tertimbang": 9066047,
   "renewal": "2027-07-01",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "1 tiket masih terbuka; 3 tiket dalam 90 hari terakhir"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "1 support tickets still open; 3 tickets in the last 90 days"
   ]
  },
  {
@@ -496,8 +496,8 @@
   "nilai_tertimbang": 3962521,
   "renewal": "2027-08-11",
   "signals": [
-   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "1 tiket masih terbuka; 3 tiket dalam 90 hari terakhir"
+   "2 outlets in active offline mode (exposed to sync issues)",
+   "1 support tickets still open; 3 tickets in the last 90 days"
   ]
  },
  {
@@ -516,8 +516,8 @@
   "nilai_tertimbang": 3894036,
   "renewal": "2027-07-25",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "80 hari tanpa kontak masuk dari pelanggan"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "80 days without inbound customer contact"
   ]
  },
  {
@@ -536,7 +536,7 @@
   "nilai_tertimbang": 4757856,
   "renewal": "2026-12-21",
   "signals": [
-   "242 hari tanpa kontak masuk dari pelanggan"
+   "242 days without inbound customer contact"
   ]
  },
  {
@@ -555,7 +555,7 @@
   "nilai_tertimbang": 7296912,
   "renewal": "2027-04-23",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)"
+   "1 outlets in active offline mode (exposed to sync issues)"
   ]
  },
  {
@@ -574,7 +574,7 @@
   "nilai_tertimbang": 5386500,
   "renewal": "2026-12-05",
   "signals": [
-   "208 hari tanpa kontak masuk dari pelanggan"
+   "208 days without inbound customer contact"
   ]
  },
  {
@@ -593,7 +593,7 @@
   "nilai_tertimbang": 6930000,
   "renewal": "2027-05-30",
   "signals": [
-   "103 hari tanpa kontak masuk dari pelanggan"
+   "103 days without inbound customer contact"
   ]
  },
  {
@@ -612,7 +612,7 @@
   "nilai_tertimbang": 3685500,
   "renewal": "2027-05-05",
   "signals": [
-   "236 hari tanpa kontak masuk dari pelanggan"
+   "236 days without inbound customer contact"
   ]
  },
  {
@@ -631,7 +631,7 @@
   "nilai_tertimbang": 1992391,
   "renewal": "2027-05-28",
   "signals": [
-   "297 hari tanpa kontak masuk dari pelanggan"
+   "297 days without inbound customer contact"
   ]
  },
  {
@@ -650,8 +650,8 @@
   "nilai_tertimbang": 3747211,
   "renewal": "2027-01-16",
   "signals": [
-   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "79 hari tanpa kontak masuk dari pelanggan"
+   "1 outlets in active offline mode (exposed to sync issues)",
+   "79 days without inbound customer contact"
   ]
  },
  {
@@ -670,7 +670,7 @@
   "nilai_tertimbang": 2457000,
   "renewal": "2026-11-20",
   "signals": [
-   "139 hari tanpa kontak masuk dari pelanggan"
+   "139 days without inbound customer contact"
   ]
  },
  {
@@ -689,7 +689,7 @@
   "nilai_tertimbang": 5012846,
   "renewal": "2026-11-27",
   "signals": [
-   "Riwayat telat bayar 1x dalam 12 bulan"
+   "Late payment 1x in the last 12 months"
   ]
  },
  {
@@ -708,7 +708,7 @@
   "nilai_tertimbang": 2273391,
   "renewal": "2027-09-07",
   "signals": [
-   "1 tiket masih terbuka; 2 tiket dalam 90 hari terakhir"
+   "1 support tickets still open; 2 tickets in the last 90 days"
   ]
  },
  {
@@ -744,7 +744,7 @@
   "nilai_tertimbang": 3020219,
   "renewal": "2027-05-12",
   "signals": [
-   "60 hari tanpa kontak masuk dari pelanggan"
+   "60 days without inbound customer contact"
   ]
  },
  {

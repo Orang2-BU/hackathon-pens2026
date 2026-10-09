@@ -119,10 +119,10 @@ for aid in ids:
     rel = (r - p) / p if p and p > 0 else None
     pakai = max(0.0, min(100.0, -rel * 200)) if rel is not None else 0.0
     if rel is not None and rel <= -0.10:
-        sig.append(f"Transaksi/hari turun {abs(rel)*100:.0f}% (90 hari terakhir vs 90 hari sebelumnya)")
+        sig.append(f"Transactions per day down {abs(rel)*100:.0f}% (last 90 days vs prior 90 days)")
     n_off = int(offline_outlets.get(aid, 0))
     if n_off:
-        sig.append(f"{n_off} outlet mode offline aktif (rawan isu sinkronisasi)")
+        sig.append(f"{n_off} outlets in active offline mode (exposed to sync issues)")
     t = tickets[tickets.account_id == aid]
     t_open = t[t.status == "Terbuka"]
     t_90 = t[t.dibuat >= "2026-07-03"]
@@ -130,26 +130,26 @@ for aid in ids:
     t_prio = t_open[t_open.prioritas.str.lower().isin(["tinggi", "high", "urgent", "kritis"])]
     layanan = min(100.0, min(len(t_open) * 12, 48) + min(len(t_90) * 4, 24) + min(len(t_bug) * 10, 20) + min(len(t_prio) * 5, 8))
     if len(t_open):
-        extra = f", {len(t_bug)} terkait isu sinkron/BUG-412 (derived)" if len(t_bug) else ""
-        sig.append(f"{len(t_open)} tiket masih terbuka{extra}; {len(t_90)} tiket dalam 90 hari terakhir")
+        extra = f", {len(t_bug)} match the offline-sync/BUG-412 pattern (derived)" if len(t_bug) else ""
+        sig.append(f"{len(t_open)} support tickets still open{extra}; {len(t_90)} tickets in the last 90 days")
     left = champ_left(champ.get(aid), aid)
     champ_score = 100.0 if left else 0.0
     if left:
         org, sejak = left
         cname = contact_nama.get(champ.get(aid), champ.get(aid))
-        sig.append(f"Champion {cname} pindah ke {org} (sejak {sejak.date()}); CRM belum diperbarui")
+        sig.append(f"Champion {cname} moved to {org} (since {sejak.date()}); CRM not updated")
     d = decisions[(decisions.account_id == aid) & (decisions.status_janji == "Belum ditepati")]
     li = last_in.get(aid)
     days = int((SNAP - li).days) if pd.notna(li) else 365
     janji = min(100.0, min(len(d) * 40, 80) + min(days, 100) * 0.3)
     if len(d):
-        sig.append(f"{len(d)} janji belum ditepati (" + ", ".join(d.fitur_dijanjikan.dropna().astype(str)) + ")")
+        sig.append(f"{len(d)} unkept commitments (" + ", ".join(d.fitur_dijanjikan.dropna().astype(str)) + ")")
     if days >= 45:
-        sig.append(f"{days} hari tanpa kontak masuk dari pelanggan")
+        sig.append(f"{days} days without inbound customer contact")
     nlate = int(late.get(aid, 0))
     bayar = 0.0 if nlate == 0 else (50.0 if nlate == 1 else 100.0)
     if nlate:
-        sig.append(f"Riwayat telat bayar {nlate}x dalam 12 bulan")
+        sig.append(f"Late payment {nlate}x in the last 12 months")
 
     total = 0.30 * pakai + 0.25 * layanan + 0.20 * champ_score + 0.15 * janji + 0.10 * bayar
     level = "Kritis" if total >= 30 else ("Tinggi" if total >= 15 else ("Sedang" if total >= 11 else "Rendah"))
