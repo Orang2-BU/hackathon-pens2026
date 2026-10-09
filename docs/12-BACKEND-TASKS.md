@@ -40,8 +40,8 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-04 — Parser, staging, ingest 15 file
 
-- **Trace:** T2; TASK-006. **Prerequisite:** BE-02/03. **Status:** In Progress; parser and dry-run are implemented. Publish/staging waits on the BE-02 PostgreSQL integration gate.
-- **Output:** `ingest --dir ... --dry-run`, actual ingest, revision/source records, raw usage dan report counts/errors/coverage.
+- **Trace:** T2; TASK-006. **Prerequisite:** BE-02/03. **Status:** In Progress; parser, dry-run and transactional publish path are implemented. Real publish/reconciliation waits on PostgreSQL integration.
+- **Output:** `ingest --dir ... --dry-run`, `--publish`, revision/source records, raw usage and report counts/errors/coverage.
 - **Kerja:** allowlist file/schema; parser CSV benar; JSONL per baris; stable record IDs; stream/COPY usage; validate references; transaction publish; unexpected/unknown refs dilaporkan, tidak dibuang diam-diam.
 - **Lulus:** counts cocok 11 §4; 40 customer +5 prospect; 620 outlet/226.300 usage; re-ingest identik no duplicate; revisi berubah tidak menghapus sumber lama; invalid file menahan publish; inject failure tidak mengganti published graph. Snapshot cutoff dan blank NULL diuji. Dry-run counts pass; publication/idempotency remain unverified until PostgreSQL is available.
 
@@ -141,7 +141,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 | Kebutuhan | Menghalangi apa | Pekerjaan yang tetap bisa dilakukan |
 |---|---|---|
-| PostgreSQL test/local dan Docker/native runtime | BE-02 DB integration, actual ingest dan Compose validation | DTO, migration SQL, fixture, pure unit tests dan packaging |
+| `TEST_DATABASE_URL` + `TEST_DATASET_DIR`, PostgreSQL test/local dan Docker/native runtime | BE-02 DB integration, actual ingest dan Compose validation | DTO, migration SQL, fixture, pure unit tests dan packaging |
 | `JEV_API_KEY`, model/rate/budget tersedia di env server | BE-06 live eval/enrichment, BE-10 live intent | Provider validator/mock, graph hard links, numeric parameters |
 | SSH target/user, deploy directory, domain/HTTPS, env VPS | BE-14 deploy publik | Backend lokal, quality gates, runbook dan container files |
 | Review hasil normalization/coverage/cutoff | Final level dan klaim ranking | Raw factors dan report eksperimen, score/level nullable bila belum layak |
@@ -207,13 +207,15 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Verifikasi `corepack pnpm test` lulus 8/8; `corepack pnpm check` lulus. Tidak ada Jev call dan tidak ada klaim akurasi.
 - BE-03 belum Done: rubric-specific 30-sample sets untuk tiap Jev primitive yang nanti dipakai belum tersedia dan label draft perlu konfirmasi tim sebelum evaluasi live.
 
-## 9. Eksekusi BE-04 (parsial; publish menunggu PostgreSQL)
+## 9. Eksekusi BE-04 (parsial; publish perlu verifikasi PostgreSQL)
 
 - Parser CSV streaming menangani BOM, CRLF, comma, escaped quote, quoted newline, invalid UTF-8, malformed quote dan batas ukuran field; JSONL diparse per baris dengan schema allowlist.
-- `node scripts/ingest.js --dir ../dataset_kasirnusa --dry-run` memeriksa allowlist 15 file, header/schema, primary ID, tanggal/angka, referensi, kecocokan outlet-akun, jumlah baris, SHA-256 per file dan hash revision agregat.
+- `node scripts/ingest.js --dir ../dataset_kasirnusa --dry-run` memeriksa allowlist 15 file, header/schema, primary ID, tanggal/angka, referensi, kecocokan outlet-akun, jumlah baris, SHA-256 per file dan hash revision agregat. `--publish` sekarang memerlukan `MIGRATION_DATABASE_URL`, mengulangi validasi sebelum menulis, memakai `SET LOCAL ROLE tessera_migrator`, revision ID dari hash, advisory transaction lock, batch insert, serta satu transaksi revision/source rows/nodes/usage/publish. Published hash yang sama no-op; error menggulung transaksi dan mencoba mencatat run failed yang aman.
+- Cek aktual terbaru: `corepack pnpm test` 41/41, `corepack pnpm check` lulus, dry-run data aktual 15 file dengan expected counts dan 0 issue/orphan; tidak ada data mentah yang masuk Git.
 - Run aktual pada dataset lokal mencocokkan semua profil baris: 45 akun, 160 kontak, 217 employment, 22 deal, 10 employee, 350 interaction, 620 outlet, 226.300 usage, 1.178 feature usage, 640 ticket, 4 bug, 3 release, 8 feature, 40 kontrak, 30 decision log. `issueCount=0`, `orphanCount=0`; agregat SHA-256 `1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`.
 - Test backend lulus 11/11; syntax check lulus. Tidak ada isi dataset yang dimasukkan Git.
-- BE-04 belum Done: belum ada staging/publish transaksional atau re-ingest idempotency aktual karena PostgreSQL disposable belum tersedia. Tidak ada Jev call.
+- `test:integration` sekarang mencakup assertion publish 229.627 source rows, 15 sources, 1.932 nodes, 226.300 usage rows, serta rerun revision menjadi no-op; memerlukan `TEST_DATABASE_URL` + `TEST_DATASET_DIR` dan disposable schema/roles. Run lokal gagal sebelum test karena `TEST_DATABASE_URL` tidak disetel.
+- BE-04 belum Done: jalur staging/publish/idempotency sudah diimplementasikan tetapi belum diuji terhadap PostgreSQL, termasuk rollback/privileges dan rerun no-op, karena disposable DB belum tersedia. Node identities dibuat terpisah namespace-nya; source raw rows disimpan di `source_records`, usage juga ke `usage_daily`; graph edges/facts belum dikompilasi (BE-05). Tidak ada Jev call.
 
 ## 11. Eksekusi BE-06 (adapter/mocks selesai; live gate blocked)
 

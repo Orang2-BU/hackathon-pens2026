@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { TextDecoder } from 'node:util';
 import { parseCsv, validateHeader } from './csv.js';
 
-const DATASET = {
+export const DATASET_SCHEMA = Object.freeze({
   'crm_accounts.csv': { columns: 'account_id,nama,tipe,industri,kota,paket,jumlah_outlet,account_owner_id,champion_contact_id,nps_terakhir,health_score_dashboard', id: 'account_id', refs: { account_owner_id: 'employees', champion_contact_id: 'contacts' } },
   'crm_contacts.csv': { columns: 'contact_id,nama,email,account_id_saat_ini,jabatan_saat_ini', id: 'contact_id', refs: { account_id_saat_ini: 'accounts' } },
   'contact_employment_history.csv': { columns: 'contact_id,account_id,organisasi,jabatan,mulai,selesai', id: null, refs: { contact_id: 'contacts', account_id: 'accounts' }, dates: ['mulai', 'selesai'] },
@@ -21,7 +21,7 @@ const DATASET = {
   'features.csv': { columns: 'feature_id,nama,status,target_awal,target_terkini,catatan', id: 'feature_id' },
   'contracts_billing.csv': { columns: 'contract_id,account_id,paket,outlet_kontrak,batas_outlet_paket,mulai,tanggal_renewal,harga_per_outlet_bulan,diskon_pct,nilai_tahunan,keterlambatan_bayar_12bln,decision_id', id: 'contract_id', refs: { account_id: 'accounts', decision_id: 'decisions' }, dates: ['mulai', 'tanggal_renewal'], numbers: ['outlet_kontrak', 'harga_per_outlet_bulan', 'diskon_pct', 'nilai_tahunan', 'keterlambatan_bayar_12bln'] },
   'decision_log.csv': { columns: 'decision_id,tanggal,tipe,account_id,deal_id,diminta_oleh,diputuskan_oleh,keputusan,nilai,alasan,bukti_interaction_id,fitur_dijanjikan,status_janji', id: 'decision_id', refs: { account_id: 'accounts', deal_id: 'deals', diputuskan_oleh: 'employees', bukti_interaction_id: 'interactions', fitur_dijanjikan: 'features' }, dates: ['tanggal'] },
-};
+});
 
 const EXPECTED_COUNTS = {
   'crm_accounts.csv': 45,
@@ -78,7 +78,7 @@ async function* rowsFor(filePath, fileName) {
   for await (const row of parseCsv(source)) {
     if (!header) {
       header = row;
-      validateHeader(header, DATASET[fileName].columns.split(','), fileName);
+      validateHeader(header, DATASET_SCHEMA[fileName].columns.split(','), fileName);
       continue;
     }
     if (row.length !== header.length) throw new Error(`${fileName}: record has an unexpected number of fields.`);
@@ -88,7 +88,7 @@ async function* rowsFor(filePath, fileName) {
 }
 
 export async function* readDatasetRows(directory, fileName) {
-  if (!DATASET[fileName]) throw new Error(`Dataset file is not allowlisted: ${fileName}`);
+  if (!DATASET_SCHEMA[fileName]) throw new Error(`Dataset file is not allowlisted: ${fileName}`);
   yield* rowsFor(join(directory, fileName), fileName);
 }
 
@@ -117,7 +117,7 @@ async function collectIds(directory, report) {
       let recordNumber = 0;
       for await (const row of rowsFor(join(directory, fileName), fileName)) {
         recordNumber += 1;
-        const id = row[DATASET[fileName].id];
+        const id = row[DATASET_SCHEMA[fileName].id];
         if (!id) continue;
         ids[setName].add(id);
         if (fileName === 'outlets.csv') outletAccounts.set(id, row.account_id);
@@ -131,7 +131,7 @@ async function collectIds(directory, report) {
 }
 
 function validateRecord(fileName, row, recordNumber, ids, report) {
-  const schema = DATASET[fileName];
+  const schema = DATASET_SCHEMA[fileName];
   const id = schema.id ? row[schema.id] : null;
   if (schema.id && !id) addIssue(report, { file: fileName, record: recordNumber, code: 'MISSING_PRIMARY_ID' });
   for (const column of schema.dates ?? []) {
@@ -177,11 +177,11 @@ export async function inspectDataset(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const names = entries.map((entry) => entry.name).sort();
   const nonRegularEntries = new Set(entries.filter((entry) => !entry.isFile() && entry.name !== 'README.md').map((entry) => entry.name));
-  const dataNames = names.filter((name) => DATASET[name]);
-  const expectedNames = Object.keys(DATASET).sort();
+  const dataNames = names.filter((name) => DATASET_SCHEMA[name]);
+  const expectedNames = Object.keys(DATASET_SCHEMA).sort();
   const report = { files: [], issueCount: 0, issues: [], orphanCount: 0, orphans: [], datasetHash: null };
-  if (names.some((name) => !DATASET[name] && name !== 'README.md') || nonRegularEntries.size > 0 || dataNames.length !== expectedNames.length || dataNames.some((name, index) => name !== expectedNames[index])) {
-    const unexpected = [...names.filter((name) => !DATASET[name] && name !== 'README.md'), ...nonRegularEntries];
+  if (names.some((name) => !DATASET_SCHEMA[name] && name !== 'README.md') || nonRegularEntries.size > 0 || dataNames.length !== expectedNames.length || dataNames.some((name, index) => name !== expectedNames[index])) {
+    const unexpected = [...names.filter((name) => !DATASET_SCHEMA[name] && name !== 'README.md'), ...nonRegularEntries];
     const missing = expectedNames.filter((name) => !dataNames.includes(name));
     addIssue(report, { code: 'FILE_ALLOWLIST_MISMATCH', unexpected, missing });
   }
@@ -198,7 +198,7 @@ export async function inspectDataset(directory) {
       for await (const row of rowsFor(filePath, fileName)) {
         recordNumber += 1;
         validateRecord(fileName, row, recordNumber, ids, report);
-        const idColumn = DATASET[fileName].id;
+        const idColumn = DATASET_SCHEMA[fileName].id;
         if (idColumn && row[idColumn]) {
           if (seenIds.has(row[idColumn])) addIssue(report, { file: fileName, record: recordNumber, code: 'DUPLICATE_ID' });
           seenIds.add(row[idColumn]);

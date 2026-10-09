@@ -11,7 +11,7 @@
 | ID | Task | Pemilik | Status | Bukti / kriteria selesai |
 |---|---|---|---|---|
 | T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | BE-02 membuat service, schema, dan migration runner dalam `backend/`; unit 6/6. Integrasi aktual menunggu PostgreSQL disposable; milestone T1 belum Done. Frontend tidak diubah. |
-| T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | 🟦 | BE-04 parser/dry-run memvalidasi semua 15 file; 0 issue/orphan dan hash aktual tercatat di 12 §9. Publish PostgreSQL, graph, Jev dan review masih belum selesai; BE-02 DB gate belum tersedia. |
+| T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | 🟦 | BE-04 parser/dry-run + jalur transactional publish/idempotensi diimplementasikan; dry-run 15 file, 0 issue/orphan. Publish DB belum diuji; graph edges, Jev live, review persistence belum selesai. Bukti 12 §9. |
 | T3 | Parameter dan skor prioritas deterministik | — | 🟦 | Eksperimen formula risiko 30/25/20/15/10 dan sensitivitas ±10 diuji pada 40 akun; C03 di tiga besar, renewal C04 35 hari. Belum disetujui, belum ada level/mismatch, sinyal Jev dan hasil DB-persisted; rincian 12 §13. |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | 🟦 | Query boundary, katalog 10 intent/threshold dan evidence gate tersedia; repository PostgreSQL, Jev live, graph sitasi dan eval reviewed masih pending. Bukti 12 §15. |
 | T5 | Save plan, Decision append-only, feedback dua arah | — | 🟦 | Plan/revision/Decision + protected boundary dan feedback thread service ada; DB verification dan akun user/CSM terpisah pending. Tidak ada outreach. Bukti 12 §16–17. |
@@ -69,3 +69,4 @@
 | 9 Okt 2026 | BE-12 parsial: submit/reply/list feedback berbasis sesi; total backend 38/38 + syntax check. DB persistence dan akun CSM/user terpisah belum terverifikasi. Bukti 12 §17. |
 | 9 Okt 2026 | BE-13 tidak disentuh sesuai scope backend-only. BE-14 Docker/Compose/runbook ditambahkan; Docker/target VPS tak tersedia, BE-04 ingest/publish belum ada, jadi tidak deploy. BE-15 unit/syntax checks saja (38/38); BE-16 organik belum mungkin tanpa deploy dan tester. Bukti 12 §18. |
 | 9 Okt 2026 | BE-15 gate diulang setelah privilege/migration changes: unit 38/38, syntax check, migration discovery 001/002/003 lulus; `test:integration` berjalan dan berhenti karena `TEST_DATABASE_URL` tidak ada. BE-16 tetap blocked; tidak ada sesi user/deploy yang diklaim. |
+| 9 Okt 2026 | BE-04 publish path ditambahkan: preflight, revision hash/idempotency, batch source/node/usage persistence dan atomic publish/rollback path. Unit backend 41/41, syntax check, dry-run data aktual 15 file, 0 issue/orphan. PostgreSQL integration belum tersedia. |
