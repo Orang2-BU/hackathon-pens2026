@@ -83,7 +83,7 @@ export default function AccountDetailPage() {
                     >
                       <span className="w-28 shrink-0">{factor}</span>
                       <span className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-neutral" aria-hidden>
-                        <span className="metric-fill absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${value}%` }} />
+                        <span className="absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${value}%` }} />
                       </span>
                       <span className="w-12 text-right font-semibold">{value}</span>
                       <span className="w-12 text-right text-label-sm text-on-surface-muted">{factorWeight[factor]}%</span>
