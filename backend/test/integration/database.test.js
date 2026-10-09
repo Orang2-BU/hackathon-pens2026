@@ -6,6 +6,8 @@ import { ingestDataset } from '../../src/ingest.js';
 import { compilePublishedGraph } from '../../src/graph-compiler.js';
 import { enrichInteraction, SIGNAL_QUESTIONS, SIGNAL_RUBRIC_VERSION } from '../../src/signal-enrichment.js';
 import { reviewSignal } from '../../src/signal-review.js';
+import { scoreDataset } from '../../src/dataset-scoring.js';
+import { persistScoreReport } from '../../src/score-repository.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL is required for disposable PostgreSQL integration tests.');
@@ -80,6 +82,18 @@ test('dataset publish, graph compile, Jev signal persistence, and human review a
     assert.equal(decision.decision, 'accepted');
     const [approved] = await sql`SELECT status FROM signals WHERE id = ${signal.id}`;
     assert.equal(approved.status, 'active');
+
+    const scoreReport = await scoreDataset(datasetDirectory);
+    const scoreRun = await persistScoreReport({ database: sql, revisionId: first.revisionId, report: scoreReport });
+    assert.equal(scoreRun.customerCount, 40);
+    assert.equal(scoreRun.factorCount, 200);
+    const repeatedScoreRun = await persistScoreReport({ database: sql, revisionId: first.revisionId, report: scoreReport });
+    assert.equal(repeatedScoreRun.alreadyPersisted, true);
+    const [storedScoreCounts] = await sql`
+      SELECT (SELECT count(*)::integer FROM account_factors WHERE score_run_id = ${scoreRun.scoreRunId}) AS factor_count,
+        (SELECT count(*)::integer FROM score_run_results WHERE score_run_id = ${scoreRun.scoreRunId}) AS result_count
+    `;
+    assert.deepEqual(storedScoreCounts, { factor_count: 200, result_count: 40 });
   } finally {
     await sql.end({ timeout: 5 });
   }

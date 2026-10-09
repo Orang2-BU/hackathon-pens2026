@@ -68,7 +68,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-08 — Parameter, formula percobaan, ranking dan sensitivitas
 
-- **Trace:** T3; TASK-008. **Prerequisite:** BE-04/05/03; signal aktif BE-06/07 untuk faktor teks lengkap. **Status:** In Progress (pure experiment + dataset preview implemented; persisted/approved score run still gated by PostgreSQL and reviewed signal integration).
+- **Trace:** T3; TASK-008. **Prerequisite:** BE-04/05/03; reviewed signal integration is optional for the numeric MVP factors. **Status:** In Progress; pure experiment, dataset preview, transactional/idempotent persistence, and score-run schema are implemented; PostgreSQL write/read remains unverified.
 - **Output:** parameter mentah/sumber, fungsi murni scoring, score run 40 akun, level/mismatch/coverage, report sensitivity.
 - **Kerja:** windows 90+90 hari persis; blank/baseline zero/partial policy; exclude offline-related usage double count; config normalization/cutoffs/subfactor aggregation; renewal/NPS/value sebagai konteks. Hitungan IDR dan denominator coverage eksplisit.
 - **Lulus:** oracle numerik dari data dibanding actual; tidak ada scoring branch khusus C01–C06; C03 tiga besar/C05-C01 mismatch diaudit sebagai hipotesis QA; C04 renewal 35 hari dari Oct 1; missing bukan zero. ±10 poin per bobot renormalized dan top-three changes disimpan. Bila target QA gagal, temuan dicatat dan hipotesis direvisi berversi, bukan hasil di-hardcode.
@@ -276,12 +276,12 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 ## 18. Eksekusi BE-13 sampai BE-16 (status batas dan gate)
 
 - BE-13 tidak dikerjakan karena integrasi UI adalah perubahan frontend dan user secara eksplisit membatasi scope ke backend. Tidak ada source/frontend file diubah dalam rangkaian task backend ini.
-- BE-14 scaffold dibuat di `backend/Dockerfile`, `backend/docker-compose.yml`, `.dockerignore`, role bootstrap dan `backend/DEPLOY.md`. Image berbasis Node `22.23.3-bookworm-slim` dan PostgreSQL `16.15-alpine3.24`; runtime non-root/read-only, DB tanpa port publik, API bind loopback, volume DB bernama. Migrasi `003_runtime-privileges.sql` membatasi runtime ke SELECT + insert yang diperlukan dan update terpilih; Decision tetap tidak dapat diubah/dihapus. Pemeriksaan daftar migrasi menemukan dan memperbaiki regex discovery yang sebelumnya melewatkan `002_jev_cache.sql` karena underscore; daftar sebelumnya 001/002/003, migrasi lanjutan kini mencakup 004/005.
-- BE-14 belum deploy/Done: Docker/Compose tidak tersedia pada laptop; tidak ada VPS/SSH/domain/HTTPS/secrets. Belum ada backend ingest/publish, jadi readiness diharapkan `503` walau container hidup. Tag image diperiksa terhadap image resmi saat pembuatan, tetapi build/scan/compose config tidak dijalankan.
-- BE-15 checkpoint 9 Okt setelah BE-05/06/07/10/11: backend `corepack pnpm test` 54/54, `corepack pnpm check`, `node --check` atas source terkait, migration discovery 001–005, dan `git diff --check` lulus. `corepack pnpm test:integration` sebelumnya berhenti sebelum tes karena `TEST_DATABASE_URL` kosong; sesudah enrichment, integrasi tetap belum tersedia. Docker CLI, DATABASE/MIGRATION/TEST URLs, dataset integration path, JEV_API_KEY, DEPLOY_HOST, SSH key, dan PUBLIC_ORIGIN tidak tersedia. Scripts build/typecheck/lint/dead-code belum dikonfigurasi di package backend. Ini bukan DB/provider/security/Golden path release pass; deployment/CI gates belum ada.
+- BE-14 scaffold dibuat di `backend/Dockerfile`, `backend/docker-compose.yml`, `.dockerignore`, role bootstrap dan `backend/DEPLOY.md`. Image berbasis Node `22.23.3-bookworm-slim` dan PostgreSQL `16.15-alpine3.24`; runtime non-root/read-only, DB tanpa port publik, API bind loopback, volume DB bernama. Migrasi `003_runtime-privileges.sql` membatasi runtime ke SELECT + insert yang diperlukan dan update terpilih; Decision tetap tidak dapat diubah/dihapus. Migration discovery kini menemukan urutan 001–006.
+- BE-14 belum deploy/Done: Docker/Compose tidak tersedia pada laptop; tidak ada VPS/SSH/domain/HTTPS/secrets. Ingest, graph, Jev enrichment, dan score persistence memiliki command operator, tetapi tidak dijalankan terhadap database/Compose nyata. Readiness belum dibuktikan 200; build/scan/compose config tidak dijalankan.
+- BE-15 checkpoint terbaru setelah BE-05/06/07/08/10/11: backend `corepack pnpm test` 58/58, `corepack pnpm check`, `node --check` atas source terkait, migration discovery 001–006, dan `git diff --check` lulus. `corepack pnpm test:integration` berhenti sebelum tes karena `TEST_DATABASE_URL` kosong. Docker CLI, DATABASE/MIGRATION/TEST URLs, dataset integration path, JEV_API_KEY, DEPLOY_HOST, SSH key, dan PUBLIC_ORIGIN tidak tersedia. Scripts build/typecheck/lint/dead-code belum dikonfigurasi di package backend. Ini bukan DB/provider/security/Golden path release pass; deployment/CI gates belum ada.
 - BE-16 dicoba dari sisi prasyarat tetapi tidak bisa dimulai: backend belum dapat dideploy tanpa Docker/VPS/HTTPS/secrets, dan tester/endpoint online tidak tersedia. O01–O15, sesi CSM/juri, serta feedback/Decision organik belum dijalankan; tidak ada hasil live yang diklaim.
 
-## 10. Eksekusi BE-05 (parsial)
+## Catatan implementasi lanjutan — BE-05
 
 - `backend/src/graph.js` menyediakan traversal terbatas depth 1–4, edge aktif pada `businessAsOf` dengan rentang valid `[validFrom, validTo)`, hop dua arah, cycle guard, status review/rejected tidak aktif, serta provenance/reason untuk edge turunan.
 - Batas jumlah jalur maksimum 100; rekomendasi dapat memeriksa cakupan kelompok sumber tanpa menghitung beberapa source dari kelompok yang sama berulang.
@@ -290,7 +290,7 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Preview read-only menghasilkan revision `revision:1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`, 14 file graph, 4.140 hard edges, 1.398 facts, dan lima candidate (T0521/T0523/T0526 di C03; T0563/T0580 di C05), semuanya BUG-412 dan empat sumber.
 - Backend test 44/44, static `check`, dan preview dataset pass. Integration test publish/compile/rerun disiapkan tetapi belum dijalankan karena PostgreSQL/`TEST_DATABASE_URL` belum tersedia. Preview bukan bukti persistence database.
 
-## 11. Eksekusi BE-07 (parsial)
+## Catatan implementasi lanjutan — BE-07
 
 - Migration `004_signal-review-idempotency.sql` menambahkan unique key per actor dan payload hash untuk review yang dapat di-retry tanpa duplikasi.
 - `backend/src/signal-review.js` hanya mengizinkan kandidat berstatus `review` untuk diterima (`active`) atau ditolak (`discarded`), dalam satu transaksi; keputusan review tidak mengubah audit row sebelumnya.
@@ -299,7 +299,7 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Migration `005_signal_source-provenance.sql` menambahkan source record/hash/field untuk setiap signal baru. Review queue join ke source record dan Jev run untuk menampilkan citation metadata, model, rubric, serta output bertipe asli tanpa raw payload.
 - BE-06 enrichment kini menyimpan positives sebagai `review` sampai ada human approval; rejection/low-confidence tidak aktif. Unit queue projection diuji; integration persist/review diperluas tetapi belum bisa dijalankan tanpa PostgreSQL.
 
-## 12. Eksekusi BE-10 (parsial)
+## Catatan implementasi lanjutan — BE-10
 
 - `backend/src/read-repository.js` menyediakan parameter-bound account list/detail, risk-factor dan evidence/citation projection dari PostgreSQL. Account tanpa persisted score ditampilkan `unscored`, bukan diberi skor sintetis. Detail menyertakan graph revision deterministik dan hanya field yang diizinkan.
 - Unknown account menghasilkan `null` (HTTP 404); pertanyaan graph abstain eksplisit saat live Jev router belum dikonfigurasi. Boundary HTTP yang sudah ada tetap membatasi ukuran/rate pertanyaan.
@@ -308,9 +308,16 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - `GET /api/accounts` kini hanya meranking `tipe='pelanggan'`; dataset aktual diverifikasi berisi 40 pelanggan + 5 prospek. Prospek tetap tersedia sebagai entitas graph tetapi tidak masuk ranking pelanggan.
 - Backend unit 56/56 dan static check lulus setelah filter/DTO test; actual SQL results tetap menunggu PostgreSQL integration.
 
-## 13. Eksekusi BE-11 (parsial; konteks dan query tersambung)
+## Catatan implementasi lanjutan — BE-11
 
 - `backend/src/plan-service.js` menyusun `QueryContext` dari account pada published revision, formula version dari score run bila ada (fallback formula eksperimen terversi), dan hash SHA-256 atas source records/factors aktif pada snapshot bisnis. Context/evidence tidak diterima dari request body.
 - Plan create/revise/Decision services disambungkan pada runtime backend. Validator ID menerima node ID revision-scoped (`node:revision:...`) yang benar-benar dihasilkan oleh BE-04; ini memperbaiki mismatch yang sebelumnya membuat plan create untuk akun dataset ditolak.
 - Account detail kini memproyeksikan plan revisions dan Decision secara eksplisit, tanpa idempotency/payload hash, sehingga hasil keputusan dapat dibaca setelah refresh/query. `outreachSent` selalu false.
 - Backend unit 51/51, static check dan syntax checks lulus. PostgreSQL transaction/concurrency/restart verification belum dijalankan karena `TEST_DATABASE_URL` tidak tersedia.
+
+## Catatan implementasi lanjutan — BE-08
+
+- `backend/src/score-repository.js` menerima hanya laporan synthetic 40 customer dengan dataset revision hash yang sama dan status published. Satu transaction menyimpan formula/weights/sensitivity/QA ke `score_runs`, lima parameter × 40 account ke `account_factors`, dan hasil ranking 40 account ke `score_run_results`.
+- Score run ID deterministik dari revision + report/config; advisory lock dan existence check membuat retry no-op. Kolom score, coverage, status, level (tetap NULL), raw values, period, unit, IDR/weighted value, dan evidence disimpan terpisah. Bobot/cutoff tetap eksperimen; hasil bernama indeks risiko, bukan probabilitas churn.
+- `scripts/persist-score.js` wajib flag `--persist`, revision eksplisit dan validasi dataset aktual; Compose profile `scoring` mount dataset read-only dan hanya memakai DB-private network. Integration test menguji 40 hasil/200 parameter dan no-op repeat.
+- Preview lokal aktual: 40 customer, hash revision sesuai dataset, formula `risk-heuristic-v1`, top three C01/C05/C03, C04 renewal 35 hari, 10 sensitivity scenarios. Unit backend 58/58 + `check`/syntax pass. PostgreSQL persistence belum dijalankan karena Docker dan `TEST_DATABASE_URL` tidak tersedia; database contents belum diklaim.
