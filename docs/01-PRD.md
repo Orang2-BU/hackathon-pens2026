@@ -1,6 +1,6 @@
 # 01 — PRD: Relasi untuk KasirNusa
 
-> Status: draf, menunggu ACC. Sumber data demo: `dataset_kasirnusa/` (15 file data sintetis dan README; ZIP serta ekstraknya diabaikan Git). Snapshot 1 Oktober 2026. Rincian graph dan contoh akun ada di `09-BUILD-PLAN-KASIRNUSA.md`; peta kolom, pengukuran, dan batasan aktual ada di `10-DATA-PROFILE-KASIRNUSA.md`.
+> Status: ACC — QA joko, 9 Okt 2026. Catatan ACC: (1) istilah mengikuti ADR-0002 (parameter risiko & skor prioritas, bukan probabilitas churn); (2) F5/autentikasi cakupan minimal agar tidak memblokir F2–F4; (3) target 22.00 dan deadline resmi masih menunggu klarifikasi (lihat §8). Sumber data demo: `dataset_kasirnusa/` (15 file data sintetis dan README; ZIP serta ekstraknya diabaikan Git). Snapshot 1 Oktober 2026. Rincian graph dan contoh akun ada di `09-BUILD-PLAN-KASIRNUSA.md`; peta kolom, pengukuran, dan batasan aktual ada di `10-DATA-PROFILE-KASIRNUSA.md`.
 
 ## 1. Masalah dan tujuan
 
@@ -39,6 +39,8 @@ Feedback dua arah mencatat penulis, waktu, akun/rencana terkait, isi, status, da
 | F5 | Feedback dua arah | Pengguna aplikasi menyampaikan pendapat; CSM/admin menanggapi; audit waktu/penulis; terpisah dari approval |
 | F6 | Demo publik | Read sesuai izin, write memerlukan autentikasi/otorisasi, rate limit; aplikasi berjalan dan dapat diakses saat demo |
 
+**Urutan prioritas MVP (ACC 9 Okt):** F1 → F2 → F3 → F4 diselesaikan lebih dulu. F5 dan autentikasi pada F6 diimplementasikan seminimal mungkin (satu peran terautentikasi demo) selama tidak menggeser empat fitur inti.
+
 SalesTranscriptQA boleh dipakai sebagai benchmark retrieval tambahan dengan izin/lisensi yang sesuai; hasilnya tidak membuktikan prediksi churn KasirNusa. Outcome churn historis dan evaluasi kalibrasi belum tersedia untuk klaim probabilitas.
 
 ## 5. Golden Demo Path
@@ -76,3 +78,4 @@ Demo membuktikan kompilasi graph, jalur bukti, jawaban pertanyaan baru, scoring 
 | Tanggal | Perubahan |
 |---|---|
 | 9 Okt 2026 | Menyelaraskan PRD ke KasirNusa, parameter risiko, bobot uji, feedback dua arah, dan target 22.00; menggantikan draf SalesTranscriptQA sebagai demo utama |
+| 9 Okt 2026 | ACC QA (joko): status disahkan; catatan cakupan MVP F5/autentikasi dan urutan prioritas F1–F4 ditambahkan |
