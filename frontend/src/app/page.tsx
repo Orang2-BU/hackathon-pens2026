@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, BellRing, CalendarClock, GitBranch, MessagesSquare, ShieldCheck, UserRoundSearch } from "lucide-react";
 import { accounts, formatMoney } from "@/lib/accounts";
 import { RiskBadge } from "@/components/risk-badge";
+import { BeamVisual } from "@/components/beam-visual";
 
 const top = [...accounts].sort((a, b) => b.priorityScore - a.priorityScore).slice(0, 5);
 const critical = accounts.filter(a => a.riskLevel === "Critical");
@@ -157,6 +158,7 @@ export default function LandingPage() {
 
         <section id="how" className="flex flex-col gap-md py-lg">
           <p className="label-caps text-primary">How it works</p>
+          <BeamVisual />
           <div className="grid gap-md md:grid-cols-2 xl:grid-cols-4">
             {steps.map((step, index) => (
               <article key={step.title} className="card edge-glow flex flex-col gap-sm">
