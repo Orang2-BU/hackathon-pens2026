@@ -4,7 +4,7 @@
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** BE-09 auth claim non-admin diuji; unit 58/58, role multipengguna dan deploy masih blocked
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** BE-11 mengikat formula/faktor plan ke score run yang sama; unit 58/58, PostgreSQL/deploy masih blocked
 
 ## Task
 
@@ -82,3 +82,4 @@
 | 9 Okt 2026 | BE-08 score persistence: migration 006 + hash-versioned transaction writes 40 results/200 factors; explicit CLI and isolated scoring profile added. Actual local preview remains C01/C05/C03, C04 renewal 35d, 10 sensitivity scenarios. Backend tests 58/58 + check/syntax pass; DB integration unavailable. |
 | 9 Okt 2026 | BE-10 scoring read projection: account list/detail now join latest revision score run, include formula/status/coverage/evidence parameter run and weighted value, and sort by persisted risk/weighted value. Unscored fallback retained. Unit 58/58 + check/syntax/diff pass; PostgreSQL query still unverified. |
 | 9 Okt 2026 | BE-09 auth hardening test: a non-admin claim signed with the valid HMAC secret is still rejected; actor/origin/session route checks remain covered. Unit 58/58 + check/syntax pass. Single demo-admin only; CSM/user roles, two-way feedback authorization, HTTPS/proxy, and distributed limiter remain unresolved/undeployed. |
+| 9 Okt 2026 | BE-11 consistency fix: server-derived plan context now hashes factor evidence only from the latest score run used for its formula version; mock test asserts run scoping. Unit 58/58 + check/syntax/diff pass; PostgreSQL transaction checks still unavailable. |

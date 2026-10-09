@@ -2,13 +2,15 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createPlanContext, createPlanService } from '../src/plan-service.js';
 
-function fakeDatabase({ account = { id: 'node:revision:r1:account:C01', external_key: 'C01', dataset_revision_id: 'revision:r1', formula_version: 'risk-v2' }, evidence = [] } = {}) {
+function fakeDatabase({ account = { id: 'node:revision:r1:account:C01', external_key: 'C01', dataset_revision_id: 'revision:r1', score_run_id: 'score-run:r2', formula_version: 'risk-v2' }, evidence = [] } = {}) {
   const state = { plan: null, revision: null, queries: [] };
   const database = async (strings) => {
     const query = strings.join('?');
     state.queries.push(query);
     if (query.includes('FROM nodes n JOIN dataset_revisions')) return account ? [account] : [];
     if (query.includes('FROM edges e JOIN edge_sources')) return evidence;
+    if (query.includes('FROM account_factors af')) return [{ item_type: 'factor', source_record_id: null, record_hash: null,
+      detail: { factor: 'usage', normalizedValue: 0.4, evidence: ['source:r2'] } }];
     throw new Error(`Unexpected query: ${query}`);
   };
   database.begin = (callback) => {
@@ -45,6 +47,8 @@ test('plan service derives context and evidence hash server-side before atomic p
   assert.equal(result.revision.context.synthetic, true);
   assert.match(result.revision.evidenceHash, /^[0-9a-f]{64}$/u);
   assert.equal(result.revision.actorId, 'demo-admin');
+  assert.ok(state.queries.some((query) => query.includes('af.score_run_id = ?')));
+  assert.match(state.queries.find((query) => query.includes('FROM nodes n JOIN dataset_revisions')), /LEFT JOIN LATERAL/u);
 });
 
 test('plan service rejects accounts outside a published dataset', async () => {

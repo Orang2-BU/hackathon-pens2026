@@ -18,9 +18,13 @@ export function createPlanContext({ datasetRevision, formulaVersion = DEFAULT_FO
 
 async function planInputs(database, accountIdentifier) {
   const [account] = await database`
-    SELECT n.id, n.external_key, n.dataset_revision_id,
-      COALESCE((SELECT sr.formula_version FROM score_runs sr WHERE sr.dataset_revision_id = n.dataset_revision_id ORDER BY sr.created_at DESC LIMIT 1), ${DEFAULT_FORMULA_VERSION}) AS formula_version
+    SELECT n.id, n.external_key, n.dataset_revision_id, latest_score.id AS score_run_id,
+      COALESCE(latest_score.formula_version, ${DEFAULT_FORMULA_VERSION}) AS formula_version
     FROM nodes n JOIN dataset_revisions dr ON dr.id = n.dataset_revision_id
+    LEFT JOIN LATERAL (
+      SELECT sr.id, sr.formula_version FROM score_runs sr
+      WHERE sr.dataset_revision_id = n.dataset_revision_id ORDER BY sr.created_at DESC, sr.id DESC LIMIT 1
+    ) latest_score ON true
     WHERE n.type = 'account' AND (n.id = ${accountIdentifier} OR n.external_key = ${accountIdentifier}) AND dr.status = 'published'
     ORDER BY dr.published_at DESC LIMIT 1
   `;
@@ -38,6 +42,7 @@ async function planInputs(database, accountIdentifier) {
       jsonb_build_object('factor', af.factor, 'rawValue', af.raw_value, 'normalizedValue', af.normalized_value, 'evidence', af.evidence)
     FROM account_factors af
     WHERE af.dataset_revision_id = ${account.dataset_revision_id} AND af.account_node_id = ${account.id}
+      AND af.score_run_id = ${account.score_run_id}
     ORDER BY item_type, source_record_id
   `;
   const evidenceHash = createHash('sha256').update(JSON.stringify(stable(evidence.map(({ item_type, source_record_id, record_hash, detail }) => ({ itemType: item_type, sourceRecordId: source_record_id, recordHash: record_hash, detail }))))).digest('hex');

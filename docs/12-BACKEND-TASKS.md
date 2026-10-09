@@ -314,6 +314,7 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - `backend/src/plan-service.js` menyusun `QueryContext` dari account pada published revision, formula version dari score run bila ada (fallback formula eksperimen terversi), dan hash SHA-256 atas source records/factors aktif pada snapshot bisnis. Context/evidence tidak diterima dari request body.
 - Plan create/revise/Decision services disambungkan pada runtime backend. Validator ID menerima node ID revision-scoped (`node:revision:...`) yang benar-benar dihasilkan oleh BE-04; ini memperbaiki mismatch yang sebelumnya membuat plan create untuk akun dataset ditolak.
 - Account detail kini memproyeksikan plan revisions dan Decision secara eksplisit, tanpa idempotency/payload hash, sehingga hasil keputusan dapat dibaca setelah refresh/query. `outreachSent` selalu false.
+- Plan context kini memilih formula dan parameter/evidence hanya dari latest score run revision tersebut, mencegah faktor dari percobaan lama tercampur pada hash konteks baru.
 - Backend unit 51/51, static check dan syntax checks lulus. PostgreSQL transaction/concurrency/restart verification belum dijalankan karena `TEST_DATABASE_URL` tidak tersedia.
 
 ## Catatan implementasi lanjutan — BE-08
