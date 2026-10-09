@@ -60,3 +60,4 @@
 | 9 Okt 2026 | BE-03 parsial: 30 pertanyaan intent untuk 10 kategori dan 8 fixture integrity tersedia, versi dan status draft tercatat. Unit 8/8. Rubric-specific Jev label sets dan konfirmasi tim belum ada; tidak ada Jev call atau akurasi yang diklaim. |
 | 9 Okt 2026 | BE-04 parsial: streaming parser/dry-run memvalidasi seluruh dataset lokal (15 file; expected counts; 0 issue/orphan). Belum ada database staging/publish/idempotency; tidak ada data mentah masuk Git. |
 | 9 Okt 2026 | BE-05 parsial: traversal graph murni dengan batas waktu/depth/cycle/provenance dan synthetic tests 14/14. Kompilasi/query graph dari dataset masih menunggu BE-04 dan PostgreSQL. |
+| 9 Okt 2026 | BE-06 adapter/mock parsial: Jev API contract official diverifikasi; response validation, server fetch, retry, cache interface dan UTF-16 chunks diuji (backend 19/19). JEV_API_KEY dan TEST_DATABASE_URL tidak tersedia; live run/provider cost tidak diklaim. |

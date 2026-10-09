@@ -54,7 +54,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-06 — Client Jev, cache, budget, enrichment dan eval
 
-- **Trace:** T2; TASK-007. **Prerequisite:** BE-02/03; enrichment sesudah BE-04. **Status:** Todo; live gate credential/budget belum tersedia.
+- **Trace:** T2; TASK-007. **Prerequisite:** BE-02/03; enrichment sesudah BE-04. **Status:** In Progress; typed adapter/cache/retry/chunk code and mocks implemented. Live run is Blocked by missing JEV_API_KEY, PostgreSQL store, and rubric-label review.
 - **Output:** typed response validator, versioned rubric, run log/cache, chunk spans, kandidat dan signal write/review/discard; hasil eval aktual.
 - **Kerja:** cek quickstart resmi + health-check; batch questions; timeout/retry 429/5xx sementara, tidak retry 401/403; limit concurrency/request/cost; cache hash input/model/rubric; provider result tidak menghitung aritmetika.
 - **Lulus:** threshold exact boundary, invalid response/span, negasi, retry dan cache tests hijau; source quote match; review/discard tak aktif. Run pertama fixture/C01–C06 dicatat sebelum full enrichment; report N/error/latency/token/cost aktual. Tanpa credential, status Blocked live; mock test tidak disebut Jev live.
@@ -214,6 +214,14 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Run aktual pada dataset lokal mencocokkan semua profil baris: 45 akun, 160 kontak, 217 employment, 22 deal, 10 employee, 350 interaction, 620 outlet, 226.300 usage, 1.178 feature usage, 640 ticket, 4 bug, 3 release, 8 feature, 40 kontrak, 30 decision log. `issueCount=0`, `orphanCount=0`; agregat SHA-256 `1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`.
 - Test backend lulus 11/11; syntax check lulus. Tidak ada isi dataset yang dimasukkan Git.
 - BE-04 belum Done: belum ada staging/publish transaksional atau re-ingest idempotency aktual karena PostgreSQL disposable belum tersedia. Tidak ada Jev call.
+
+## 11. Eksekusi BE-06 (adapter/mocks selesai; live gate blocked)
+
+- API contract dicocokkan dengan [TypeSafe OpenAPI](https://api.typesafe.ai/openapi.json): `POST /v1/systemone`, typed `noul`/`score`/`choice`, response `model`/`answers`/`usage`. Adapter menolak key jawaban/type/probability/token yang malformed.
+- `backend/src/jev.js` memakai `fetch` server-side, timeout 60s, retry maksimal dua kali hanya untuk 429/5xx/network, tidak retry 401/403/422, batas request/concurrency/ukuran, versioned cache key dan source-preserving UTF-16 chunks <=2.000 code units.
+- `backend/src/jev-store.js` menyimpan hasil valid dan error code minimal; migration `002_jev_cache.sql` menambah cache response dan key model requested. Input teks mentah tidak disimpan di `jev_runs`.
+- Test fake response/retry/no-retry/cache/malformed answer/chunk offsets lulus. Keseluruhan backend `corepack pnpm test` lulus 19/19; `corepack pnpm check` lulus.
+- `JEV_API_KEY` dan `TEST_DATABASE_URL` tidak tersedia di environment, sehingga tidak ada request provider, live health-check, enrichment, token/cost/latency run, atau DB cache test. Nilai biaya aktual tetap NULL; test mock bukan hasil Jev live. Tidak ada data yang dikirim keluar.
 
 ## 10. Eksekusi BE-05 (parsial)
 
