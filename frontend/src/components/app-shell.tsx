@@ -16,7 +16,7 @@ const navigation = [
 ];
 
 // Desktop rail: labels fade out while the aside is collapsed and fade in on hover or keyboard focus.
-const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100";
+const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opacity-100 group-has-[:focus-visible]/rail:opacity-100";
 
 function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?: boolean }) {
   const pathname = usePathname();
@@ -25,7 +25,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
   const fade = rail ? railFade : "";
 
   return (
-    <div className="flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg bg-surface p-md">
+    <div className={`flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md ${rail ? "bg-surface" : "glass"}`}>
       <Link href="/accounts" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
         <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-primary text-on-primary">
           <Waypoints size={18} strokeWidth={2} aria-hidden />
@@ -85,7 +85,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh xl:grid xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-md xl:p-md">
-      <aside className="group/rail sticky top-md hidden h-[calc(100dvh-2rem)] w-[76px] transition-[width] duration-200 ease-out hover:w-[248px] focus-within:w-[248px] xl:block">
+      <aside className="group/rail sticky top-md hidden h-[calc(100dvh-2rem)] w-[76px] transition-[width] duration-200 ease-out hover:w-[248px] has-[:focus-visible]:w-[248px] xl:block">
         <Sidebar rail />
       </aside>
 
@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         ref={drawer}
         aria-label="Navigation"
         onClick={event => event.target === event.currentTarget && closeDrawer()}
-        className="m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-transparent p-sm text-on-surface backdrop:bg-black/60"
+        className="m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-transparent p-sm text-on-surface backdrop:bg-black/40 backdrop:backdrop-blur-sm"
       >
         <Sidebar onNavigate={closeDrawer} />
         <button

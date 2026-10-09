@@ -333,7 +333,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
    background: radial-gradient(ellipse at 50% -10%, rgb(141 224 44 / 0.28) 0%, rgb(21 28 16 / 0) 70%), #151C10;
    ```
    Text on it stays `on-surface` / `on-surface-muted`; the glow sits behind the label row, never behind the value.
-3. **Popovers, tooltips, dropdowns:** `surface-elevated`, 1px `outline`, radius 12px, shadow `0 12px 32px rgb(0 0 0 / 0.5)`.
+3. **Popovers, dropdowns, mobile drawer (glass):** `surface-elevated` at 62% opacity, `backdrop-filter: blur(24px) saturate(180%)`, 1px border `on-surface` at 12%, inset top highlight `on-surface` 8%, shadow `0 16px 40px rgb(0 0 0 / 0.5)`, radius 12px (drawer 16px). Implemented as the `glass` utility. Native `<select>` uses customizable select (`appearance: base-select`, Chrome 135+) with the same glass picker; other browsers keep the native picker. Drawer scrim: black 40% + small backdrop blur.
 4. **Interactive cards:** on hover, 1px `outline-active` inset ring appears; no lift, no transform. Transition 150ms ease-out. Respect `prefers-reduced-motion`.
 
 ## Shapes & Geometry
