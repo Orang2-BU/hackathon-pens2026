@@ -305,6 +305,8 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Unknown account menghasilkan `null` (HTTP 404); pertanyaan graph abstain eksplisit saat live Jev router belum dikonfigurasi. Boundary HTTP yang sudah ada tetap membatasi ukuran/rate pertanyaan.
 - Backend unit 48/48, static check dan syntax checks lulus. PostgreSQL repository query tidak teruji karena `TEST_DATABASE_URL` belum tersedia. Query intent, Jev routing, held-out parafrase dan committed-vs-rolled-back Decision belum diverifikasi.
 - Data profile aktual dipakai untuk ringkasan: NPS `nps_terakhir`, dashboard `health_score_dashboard`, dan nilai tahunan/renewal diambil dari `contracts_billing.csv`. Nilai kontrak tidak dibaca dari record account yang memang tidak memuat kolom tersebut.
+- `GET /api/accounts` kini hanya meranking `tipe='pelanggan'`; dataset aktual diverifikasi berisi 40 pelanggan + 5 prospek. Prospek tetap tersedia sebagai entitas graph tetapi tidak masuk ranking pelanggan.
+- Backend unit 56/56 dan static check lulus setelah filter/DTO test; actual SQL results tetap menunggu PostgreSQL integration.
 
 ## 13. Eksekusi BE-11 (parsial; konteks dan query tersambung)
 

@@ -37,3 +37,19 @@ test('read repository returns null for an unknown account and abstains when the 
   assert.equal(await service.getAccount('unknown'), null);
   assert.equal((await service.answerGraphQuestion('question')).status, 'abstained');
 });
+
+test('account ranking endpoint lists only the 40 customer accounts, not graph-only prospects', async () => {
+  let accountQuery = '';
+  const database = async (strings) => {
+    const query = strings.join('?');
+    if (query.includes('FROM dataset_revisions')) return [{ id: 'revision:r1' }];
+    accountQuery = query;
+    return Array.from({ length: 40 }, (_, index) => ({ id: `node:${index}`, dataset_revision_id: 'revision:r1',
+      external_key: `C${String(index + 1).padStart(2, '0')}`, properties: { nama: `Customer ${index + 1}`, tipe: 'pelanggan' },
+      annual_value_idr: null, renewal_date: null }));
+  };
+  const result = await createPostgresReadService(database).listAccounts({ sort: 'priority' });
+  assert.equal(result.items.length, 40);
+  assert.ok(result.items.every((account) => account.type === 'customer'));
+  assert.match(accountQuery, /n\.properties->>'tipe' = 'pelanggan'/u);
+});

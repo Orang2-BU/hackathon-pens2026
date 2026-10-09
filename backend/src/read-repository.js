@@ -39,6 +39,7 @@ export function createPostgresReadService(database) {
              AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS renewal_date
         FROM nodes n
         WHERE n.dataset_revision_id = ${revision.id} AND n.type = 'account'
+          AND n.properties->>'tipe' = 'pelanggan'
           AND (${search} = '' OR n.external_key ILIKE ${`%${search}%`} OR n.properties->>'nama' ILIKE ${`%${search}%`})
         ORDER BY n.external_key
         LIMIT 100
