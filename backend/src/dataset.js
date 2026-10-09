@@ -87,6 +87,11 @@ async function* rowsFor(filePath, fileName) {
   if (!header) throw new Error(`${fileName}: file is empty.`);
 }
 
+export async function* readDatasetRows(directory, fileName) {
+  if (!DATASET[fileName]) throw new Error(`Dataset file is not allowlisted: ${fileName}`);
+  yield* rowsFor(join(directory, fileName), fileName);
+}
+
 function dateIsValid(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) return false;
   const date = new Date(`${value}T00:00:00.000Z`);

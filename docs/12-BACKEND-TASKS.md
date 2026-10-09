@@ -68,7 +68,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-08 — Parameter, formula percobaan, ranking dan sensitivitas
 
-- **Trace:** T3; TASK-008. **Prerequisite:** BE-04/05/03; signal aktif BE-06/07 untuk faktor teks lengkap. **Status:** Todo.
+- **Trace:** T3; TASK-008. **Prerequisite:** BE-04/05/03; signal aktif BE-06/07 untuk faktor teks lengkap. **Status:** In Progress (pure experiment + dataset preview implemented; persisted/approved score run still gated by PostgreSQL and reviewed signal integration).
 - **Output:** parameter mentah/sumber, fungsi murni scoring, score run 40 akun, level/mismatch/coverage, report sensitivity.
 - **Kerja:** windows 90+90 hari persis; blank/baseline zero/partial policy; exclude offline-related usage double count; config normalization/cutoffs/subfactor aggregation; renewal/NPS/value sebagai konteks. Hitungan IDR dan denominator coverage eksplisit.
 - **Lulus:** oracle numerik dari data dibanding actual; tidak ada scoring branch khusus C01–C06; C03 tiga besar/C05-C01 mismatch diaudit sebagai hipotesis QA; C04 renewal 35 hari dari Oct 1; missing bukan zero. ±10 poin per bobot renormalized dan top-three changes disimpan. Bila target QA gagal, temuan dicatat dan hipotesis direvisi berversi, bukan hasil di-hardcode.
@@ -230,6 +230,15 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Entity resolution: `>=0.95` merge hanya bila tidak ada konflik hard ID; `0.60–<0.95` review; di bawah terpisah; konflik hard ID selalu blocked.
 - Unit test batas, span, ID stabil, merge guard lulus; seluruh backend 23/23; syntax check lulus.
 - BE-07 belum Done: persistensi daftar review, append-only actor/reason, idempotency, transisi review, dan audit output provider memerlukan DB disposable serta auth BE-09. Tidak ada UI atau frontend changes.
+
+## 13. Eksekusi BE-08 (parsial; eksperimen numerik)
+
+- `backend/src/scoring.js` menetapkan formula `risk-heuristic-v1` dengan bobot eksperimen pemakaian/layanan/champion/janji-engagement/pembayaran 30/25/20/15/10. Ini parameter indeks risiko, bukan probabilitas churn; level prioritas tetap `null` karena cutoffs belum disetujui.
+- `backend/src/dataset-scoring.js` menghitung dua jendela 90 hari sampai 1 Okt 2026, coverage outlet/hari, tiket aktif/umur, status champion dari employment, interaksi eksternal, janji yang terukur, dan keterlambatan pembayaran dari 15 file allowlist. Outlet dengan bukti gangguan sinkronisasi dikeluarkan dari delta pemakaian dan disimpan sebagai bukti pengecualian. Skenario tidak mengklaim dampak profit.
+- Preview aktual: `node scripts/score-preview.js --dir ../dataset_kasirnusa`; 40 akun, `synthetic=true`, dataset hash `1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`. Tiga teratas eksperimen C01/C05/C03; C03 masuk tiga besar; konteks renewal C04 = 35 hari. Dashboard mismatch sengaja tidak dihitung karena mapping level belum disetujui.
+- Sensitivitas mengubah setiap bobot ±10 dan meratakan ulang bobot lain: 10 skenario; perubahan top-three terjadi pada usage +10, promise/engagement ±10. Variasi payment −10 menghasilkan bobot nol yang sah hanya di skenario; konfigurasi dasar seluruh bobot tetap positif. Ini analisis sensitivitas, bukan bukti prediktif.
+- `corepack pnpm test` lulus 27/27; `corepack pnpm check` lulus. Preview sukses pada data yang diabaikan Git; tidak ada data mentah/score export yang dikomit.
+- BE-08 belum Done: formula, bobot, saturation, dan kebijakan coverage masih perlu review tim; Jev signal belum terintegrasi ke faktor teks; hasil belum dipersistenkan/di-query dari PostgreSQL. Integration DB gate juga tetap menunggu `TEST_DATABASE_URL`. Tidak ada branch khusus C01–C06 dan tidak ada perubahan frontend.
 
 ## 10. Eksekusi BE-05 (parsial)
 

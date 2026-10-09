@@ -4,7 +4,7 @@
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-01 selesai dengan kontrak v1 dan quality gates lokal
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-08 eksperimen formula dan preview dataset selesai; task masih parsial
 
 ## Task
 
@@ -12,7 +12,7 @@
 |---|---|---|---|---|
 | T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | BE-02 membuat service, schema, dan migration runner dalam `backend/`; unit 6/6. Integrasi aktual menunggu PostgreSQL disposable; milestone T1 belum Done. Frontend tidak diubah. |
 | T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | 🟦 | BE-04 parser/dry-run memvalidasi semua 15 file; 0 issue/orphan dan hash aktual tercatat di 12 §9. Publish PostgreSQL, graph, Jev dan review masih belum selesai; BE-02 DB gate belum tersedia. |
-| T3 | Parameter dan skor prioritas deterministik | — | ⬜ | Bobot 30/25/20/15/10 diuji pada C01–C06 dan 40 pelanggan; data kosong/offline jelas; sensitivitas bobot; QA §6 dokumen 09 |
+| T3 | Parameter dan skor prioritas deterministik | — | 🟦 | Eksperimen formula risiko 30/25/20/15/10 dan sensitivitas ±10 diuji pada 40 akun; C03 di tiga besar, renewal C04 35 hari. Belum disetujui, belum ada level/mismatch, sinyal Jev dan hasil DB-persisted; rincian 12 §13. |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | ⬜ | Pertanyaan baru dijawab dari graph lewat router intent Jev; jalur bukti ≥3 sumber bila rekomendasi; abstain bila tidak cukup; eval routing 30 pertanyaan berlabel |
 | T5 | Save plan, Decision append-only, feedback dua arah | — | ⬜ | Preseden dikutip; approval atomik/idempotent; reply feedback tercatat; tidak ada outreach |
 | T6 | Demo publik dan verifikasi UI/golden path | — | 🟦 | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD. 9 Okt: shell + 5 layar sesuai 08-DESIGN, browser 375/768/1440 tanpa scroll horizontal, drawer lulus; data masih seed sintetis (belum KasirNusa). |
@@ -62,3 +62,4 @@
 | 9 Okt 2026 | BE-05 parsial: traversal graph murni dengan batas waktu/depth/cycle/provenance dan synthetic tests 14/14. Kompilasi/query graph dari dataset masih menunggu BE-04 dan PostgreSQL. |
 | 9 Okt 2026 | BE-06 adapter/mock parsial: Jev API contract official diverifikasi; response validation, server fetch, retry, cache interface dan UTF-16 chunks diuji (backend 19/19). JEV_API_KEY dan TEST_DATABASE_URL tidak tersedia; live run/provider cost tidak diklaim. |
 | 9 Okt 2026 | BE-07 parsial: threshold Noul/Score, exact source span, idempotent candidate ID dan hard-ID merge guard diuji; total 23/23. Review persistence/auth masih menunggu DB + BE-09. |
+| 9 Okt 2026 | BE-08 parsial: formula eksperimen indeks risiko, data preview 40 akun, coverage/missing handling dan 10 sensitivitas; tests 27/27 + syntax check. Tidak mengklaim probabilitas churn; level/mismatch dan persetujuan bobot ditunda. Bukti 12 §13. |
