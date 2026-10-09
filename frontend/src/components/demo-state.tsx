@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, useState } from "react";
-import { accounts, type Decision } from "@/lib/demo-data";
+import { accounts, isElevated, type Decision } from "@/lib/accounts";
 
 export type SessionDecision = Decision & { accountId: string };
 export type Feedback = { id: string; accountId: string; text: string; createdAt: string; reply?: string };
@@ -40,7 +40,8 @@ export function useDemoState() {
   return state;
 }
 
+// Save plans are drafted for High and Critical accounts only.
 export function usePendingPlans() {
   const { decisions } = useDemoState();
-  return accounts.filter(account => !decisions.some(decision => decision.id === planDecisionId(account.id)));
+  return accounts.filter(account => isElevated(account) && !decisions.some(decision => decision.id === planDecisionId(account.id)));
 }

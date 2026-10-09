@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/demo-data";
+import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/accounts";
 
 const riskOptions = ["All", "Critical", "High", "Medium", "Low"] as const;
 
@@ -62,7 +62,7 @@ export default function AccountsPage() {
         </div>
 
         <div className="-mx-md mt-md overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-body-sm">
+          <table className="w-full min-w-[880px] text-left text-body-sm">
             <thead className="label-caps text-on-surface-muted">
               <tr className="border-b border-outline">
                 <th scope="col" className="px-md py-sm">Account</th>
@@ -88,7 +88,10 @@ export default function AccountsPage() {
                       <Link href={`/accounts/${account.id}`} className="inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:text-primary hover:underline xl:min-h-0">
                         {account.name}
                       </Link>
-                      <div className="text-label-sm text-on-surface-muted">{account.domain}</div>
+                      <div className="flex items-center gap-xs text-label-sm text-on-surface-muted">
+                        {account.id}
+                        {account.focus && <span className="badge text-on-surface">Focus</span>}
+                      </div>
                     </td>
                     <td className="px-md py-sm">
                       <span className="flex items-center gap-sm">
@@ -96,8 +99,8 @@ export default function AccountsPage() {
                         <RiskBadge level={account.riskLevel} />
                       </span>
                     </td>
-                    <td className="px-md py-sm" title={account.signals.join(", ")}>
-                      {account.signals[0]}
+                    <td className="max-w-80 px-md py-sm" title={account.signals.join(", ")}>
+                      {account.signals[0] ?? <span className="text-on-surface-muted">No signal</span>}
                       {account.signals.length > 1 && <span className="text-on-surface-muted"> +{account.signals.length - 1}</span>}
                     </td>
                     <td className="px-md py-sm">{account.renewalDate}</td>

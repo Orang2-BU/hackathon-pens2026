@@ -66,8 +66,8 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
           <Database size={18} strokeWidth={1.75} aria-hidden />
         </span>
         <div className={fade}>
-          <p className="text-label-md font-semibold">Demo workspace</p>
-          <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic seed data</p>
+          <p className="text-label-md font-semibold">KasirNusa</p>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic dataset · 1 Oct 2026</p>
         </div>
       </div>
     </div>

@@ -62,7 +62,7 @@ export default function DataPage() {
       <section className="card">
         <div className="flex flex-wrap items-center gap-sm">
           <h2 className="card-title mr-auto">Sources</h2>
-          <span className="badge text-warning">Not ingested</span>
+          <span className="badge text-warning">Graph ingest pending</span>
         </div>
         <div className="-mx-md mt-md overflow-x-auto">
           <table className="w-full min-w-[520px] text-left text-body-sm">

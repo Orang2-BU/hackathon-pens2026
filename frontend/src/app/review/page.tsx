@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Check, GitCommitHorizontal, MessageSquare, X } from "lucide-react";
+import { Check, MessageSquare, X } from "lucide-react";
 import { planDecisionId, useDemoState, usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts } from "@/lib/demo-data";
+import { accounts, SCORING_VERSION, strongestFactor } from "@/lib/accounts";
 
 const field = "w-full rounded-md bg-neutral p-sm text-body-sm ring-1 ring-outline ring-inset placeholder:text-on-surface-muted focus-visible:ring-primary";
 
@@ -63,18 +63,9 @@ export default function ReviewPage() {
 
         <section>
           <h3 className="label-caps text-on-surface-muted">Precedent</h3>
-          {account.decisions.length === 0 ? (
-            <p className="mt-xs text-body-sm text-on-surface-muted">No earlier decision for a similar pattern. This plan sets a new precedent.</p>
-          ) : (
-            <ul className="mt-xs flex flex-col gap-sm">
-              {account.decisions.map(item => (
-                <li key={item.id} className="flex gap-sm text-body-sm">
-                  <GitCommitHorizontal size={18} aria-hidden className="mt-0.5 shrink-0 text-graph-decision" />
-                  <span><span className="font-semibold">{item.action}</span> · {item.decidedAt}<br /><span className="text-on-surface-muted">{item.rationale}</span></span>
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="mt-xs text-body-sm text-on-surface-muted">
+            Drafted from the strongest factor ({strongestFactor(account)}). Precedent from <code>decision_log</code> is not in the {SCORING_VERSION} export yet; it is cited here once the graph ingest loads it.
+          </p>
         </section>
 
         {decision ? (

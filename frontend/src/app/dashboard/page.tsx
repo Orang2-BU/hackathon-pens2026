@@ -4,10 +4,9 @@ import Link from "next/link";
 import { ArrowRight, CalendarClock, ClipboardCheck, Database, GitCommitHorizontal, type LucideIcon, Scale, ShieldAlert, TriangleAlert } from "lucide-react";
 import { useDemoState, usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, formatMoney, isElevated, isMismatch, riskFactors, type RiskLevel } from "@/lib/demo-data";
+import { accounts, formatMoney, isElevated, riskFactors, SCORING_VERSION, SNAPSHOT, type RiskLevel } from "@/lib/accounts";
 
-// Analysis snapshot from docs/10-DATA-PROFILE-KASIRNUSA.md; day counts are measured from it, not from today.
-const SNAPSHOT = "2026-10-01";
+// Day counts are measured from the analysis snapshot, not from today.
 const DAY_MS = 86_400_000;
 const levelRank: Record<RiskLevel, number> = { Critical: 0, High: 1, Medium: 2, Low: 3 };
 const daysToRenewal = (date: string) => Math.round((Date.parse(date) - Date.parse(SNAPSHOT)) / DAY_MS);
@@ -17,7 +16,6 @@ const elevated = accounts.filter(isElevated);
 const attention = [...elevated]
   .sort((a, b) => levelRank[a.riskLevel] - levelRank[b.riskLevel] || a.renewalDate.localeCompare(b.renewalDate))
   .slice(0, 5);
-const mismatches = accounts.filter(isMismatch);
 const renewals90 = accounts.filter(account => daysToRenewal(account.renewalDate) <= 90).length;
 const factorCounts = riskFactors.map(factor => ({ factor, count: accounts.filter(account => account.factors.includes(factor)).length }));
 
@@ -43,10 +41,7 @@ function Stat({ icon: Icon, label, value, note, featured }: StatProps) {
 export default function DashboardPage() {
   const pendingPlans = usePendingPlans().length;
   const { decisions } = useDemoState();
-  const recent = [
-    ...accounts.flatMap(account => account.decisions.map(decision => ({ ...decision, accountId: account.id }))),
-    ...decisions,
-  ]
+  const recent = [...decisions]
     .sort((a, b) => b.decidedAt.localeCompare(a.decidedAt))
     .slice(0, 4);
 
@@ -93,30 +88,10 @@ export default function DashboardPage() {
             <TriangleAlert size={18} aria-hidden className="text-warning" /> CRM says healthy
           </h2>
           <p className="mt-xs text-label-sm text-on-surface-muted">Green in the CRM dashboard, High or Critical in the graph.</p>
-          {mismatches.length === 0 ? (
-            <p className="mt-md text-body-sm text-on-surface-muted">No mismatch with the CRM dashboard.</p>
-          ) : (
-            <ul className="mt-md flex flex-col gap-sm">
-              {mismatches.map(account => (
-                <li key={account.id}>
-                  <Link
-                    href={`/accounts/${account.id}`}
-                    className="block rounded-md bg-surface-elevated p-sm text-body-sm transition-colors hover:bg-outline"
-                  >
-                    <span className="flex flex-wrap items-center gap-sm">
-                      <span className="font-semibold">{account.name}</span>
-                      <span className="badge text-success">CRM Green</span>
-                      <RiskBadge level={account.riskLevel} />
-                    </span>
-                    <span className="mt-xs block text-on-surface-muted">{account.signals.join(" · ")}</span>
-                    <span className="mt-sm flex items-center gap-xs text-label-md font-semibold">
-                      See evidence path <ArrowRight size={14} aria-hidden />
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="mt-md text-body-sm">
+            Needs <code>health_score_dashboard</code> from <code>crm_accounts.csv</code>, which the {SCORING_VERSION} export does not include yet.
+          </p>
+          <p className="mt-sm text-label-sm text-on-surface-muted">Expected once added (docs/09 §6): C05 and C01 are Green in the CRM but Critical here.</p>
         </section>
       </div>
 
@@ -129,7 +104,7 @@ export default function DashboardPage() {
           note="Contract × priority score ÷ 100; not expected loss"
         />
         <Stat icon={ShieldAlert} label="Accounts at High/Critical" value={`${elevated.length} of ${accounts.length}`} note="Level set by the scoring formula" />
-        <Stat icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Drafts for every account, all levels" />
+        <Stat icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Drafts for High and Critical accounts" />
         <Stat icon={CalendarClock} label="Renewals in 90 days" value={String(renewals90)} note={`From the ${SNAPSHOT} snapshot`} />
       </div>
 
@@ -158,7 +133,7 @@ export default function DashboardPage() {
         <section className="card" aria-labelledby="decisions-heading">
           <h2 id="decisions-heading" className="card-title">Recent decisions</h2>
           {recent.length === 0 ? (
-            <p className="mt-md text-body-sm text-on-surface-muted">No decisions recorded yet.</p>
+            <p className="mt-md text-body-sm text-on-surface-muted">No decisions recorded yet. Approve or reject a plan in Review to start the trail.</p>
           ) : (
             <ul className="mt-md flex flex-col gap-md">
               {recent.map(decision => (
@@ -182,10 +157,10 @@ export default function DashboardPage() {
         <section className="card" aria-labelledby="health-heading">
           <div className="flex flex-wrap items-center gap-sm">
             <h2 id="health-heading" className="card-title mr-auto">Data and Jev</h2>
-            <span className="badge text-warning">Not ingested</span>
+            <span className="badge text-success">Scores loaded</span>
           </div>
-          <p className="mt-md text-body-sm">0 of 15 KasirNusa sources ingested. Jev signals, review queue, and call cost appear here after the first ingest.</p>
-          <p className="mt-sm text-label-sm text-on-surface-muted">Every figure on this page uses synthetic seed data until then.</p>
+          <p className="mt-md text-body-sm">{accounts.length} KasirNusa accounts scored by {SCORING_VERSION} (snapshot {SNAPSHOT}).</p>
+          <p className="mt-sm text-label-sm text-on-surface-muted">Jev is not connected yet: text signals, the review queue, and call cost appear after the graph ingest. The dataset itself is synthetic.</p>
           <Link href="/data" className="btn btn-secondary mt-md">
             <Database size={16} aria-hidden /> Open data sources
           </Link>
