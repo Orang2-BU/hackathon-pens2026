@@ -1,0 +1,784 @@
+[
+ {
+  "account_id": "C01",
+  "nama": "Kopi Lintas Nusantara",
+  "skor": 40.2,
+  "level": "Kritis",
+  "sub": {
+   "pakai": 0.1,
+   "layanan": 48,
+   "champion": 100.0,
+   "janji": 54.4,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 149940000,
+  "nilai_tertimbang": 60273770,
+  "renewal": "2026-12-15",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "3 tiket masih terbuka; 1 tiket dalam 90 hari terakhir",
+   "Champion Rina Hapsari pindah ke Grup Ritel Mandala (sejak 2026-09-01); CRM belum diperbarui",
+   "1 janji belum ditepati (FEAT-07)"
+  ]
+ },
+ {
+  "account_id": "C03",
+  "nama": "Apotek Sehat Sentosa",
+  "skor": 33.2,
+  "level": "Kritis",
+  "sub": {
+   "pakai": 23.4,
+   "layanan": 97,
+   "champion": 0.0,
+   "janji": 12.6,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 68040000,
+  "nilai_tertimbang": 22568328,
+  "renewal": "2027-01-20",
+  "signals": [
+   "Transaksi/hari turun 12% (90 hari terakhir vs 90 hari sebelumnya)",
+   "6 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "6 tiket masih terbuka, 6 terkait BUG-412; 8 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C05",
+  "nama": "Minimarket Berkah",
+  "skor": 32.6,
+  "level": "Kritis",
+  "sub": {
+   "pakai": 10.2,
+   "layanan": 100.0,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 95760000,
+  "nilai_tertimbang": 31177133,
+  "renewal": "2027-04-10",
+  "signals": [
+   "5 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "4 tiket masih terbuka, 4 terkait BUG-412; 6 tiket dalam 90 hari terakhir",
+   "100 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C02",
+  "nama": "TB Sinar Jaya",
+  "skor": 18.6,
+  "level": "Tinggi",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 60,
+   "champion": 0.0,
+   "janji": 23.7,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 99750000,
+  "nilai_tertimbang": 18508612,
+  "renewal": "2027-03-01",
+  "signals": [
+   "3 tiket masih terbuka; 9 tiket dalam 90 hari terakhir",
+   "79 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C34",
+  "nama": "Grosir Plastik Jaya",
+  "skor": 15.6,
+  "level": "Tinggi",
+  "sub": {
+   "pakai": 0.4,
+   "layanan": 44,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 50400000,
+  "nilai_tertimbang": 7878885,
+  "renewal": "2027-08-28",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "2 tiket masih terbuka; 5 tiket dalam 90 hari terakhir",
+   "301 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C35",
+  "nama": "Frozen Food Mama",
+  "skor": 15.5,
+  "level": "Tinggi",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 50.0
+  },
+  "nilai_tahunan": 87780000,
+  "nilai_tertimbang": 13605900,
+  "renewal": "2027-04-05",
+  "signals": [
+   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "365 hari tanpa kontak masuk dari pelanggan",
+   "Riwayat telat bayar 1x dalam 12 bulan"
+  ]
+ },
+ {
+  "account_id": "C04",
+  "nama": "Roti Kenanga",
+  "skor": 14.5,
+  "level": "Sedang",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 0,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 100.0
+  },
+  "nilai_tahunan": 33600000,
+  "nilai_tertimbang": 4872000,
+  "renewal": "2026-11-05",
+  "signals": [
+   "176 hari tanpa kontak masuk dari pelanggan",
+   "Riwayat telat bayar 2x dalam 12 bulan"
+  ]
+ },
+ {
+  "account_id": "C20",
+  "nama": "Pet Shop Sahabat",
+  "skor": 13.5,
+  "level": "Sedang",
+  "sub": {
+   "pakai": 0.2,
+   "layanan": 16,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 50.0
+  },
+  "nilai_tahunan": 21000000,
+  "nilai_tertimbang": 2844975,
+  "renewal": "2027-04-21",
+  "signals": [
+   "136 hari tanpa kontak masuk dari pelanggan",
+   "Riwayat telat bayar 1x dalam 12 bulan"
+  ]
+ },
+ {
+  "account_id": "C32",
+  "nama": "Toko Herbal Alami",
+  "skor": 13.5,
+  "level": "Sedang",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 16,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 50.0
+  },
+  "nilai_tahunan": 58800000,
+  "nilai_tertimbang": 7938000,
+  "renewal": "2027-03-20",
+  "signals": [
+   "196 hari tanpa kontak masuk dari pelanggan",
+   "Riwayat telat bayar 1x dalam 12 bulan"
+  ]
+ },
+ {
+  "account_id": "C26",
+  "nama": "Ayam Geprek Mantul",
+  "skor": 12.7,
+  "level": "Sedang",
+  "sub": {
+   "pakai": 0.7,
+   "layanan": 32,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 39900000,
+  "nilai_tertimbang": 5076508,
+  "renewal": "2026-12-30",
+  "signals": [
+   "1 tiket masih terbuka; 5 tiket dalam 90 hari terakhir",
+   "175 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C36",
+  "nama": "Bakso Cak Man",
+  "skor": 11.6,
+  "level": "Sedang",
+  "sub": {
+   "pakai": 0.4,
+   "layanan": 28,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 46200000,
+  "nilai_tertimbang": 5369844,
+  "renewal": "2026-11-25",
+  "signals": [
+   "1 tiket masih terbuka; 4 tiket dalam 90 hari terakhir",
+   "365 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C19",
+  "nama": "Mie Ayam Gajah Mada",
+  "skor": 10.6,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.4,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 30240000,
+  "nilai_tertimbang": 3209195,
+  "renewal": "2027-05-12",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "322 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C16",
+  "nama": "Toko Besi Makmur",
+  "skor": 10.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 33600000,
+  "nilai_tertimbang": 3528000,
+  "renewal": "2026-11-24",
+  "signals": [
+   "215 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C24",
+  "nama": "Bengkel Motor Sentosa",
+  "skor": 10.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 39900000,
+  "nilai_tertimbang": 4189500,
+  "renewal": "2026-11-28",
+  "signals": [
+   "161 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C33",
+  "nama": "Kopi Kenangan Desa",
+  "skor": 10.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 16800000,
+  "nilai_tertimbang": 1764785,
+  "renewal": "2027-09-06",
+  "signals": [
+   "105 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C18",
+  "nama": "Fashion Outlet Anggun",
+  "skor": 9.7,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.8,
+   "layanan": 20,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 33600000,
+  "nilai_tertimbang": 3270326,
+  "renewal": "2027-06-14",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "160 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C11",
+  "nama": "Swalayan Sumber Rejeki",
+  "skor": 9.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 20,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 92400000,
+  "nilai_tertimbang": 8778000,
+  "renewal": "2027-01-10",
+  "signals": [
+   "112 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C15",
+  "nama": "Kedai Teh Nusantara",
+  "skor": 9.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 20,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 91770000,
+  "nilai_tertimbang": 8718150,
+  "renewal": "2027-05-12",
+  "signals": [
+   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "109 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C23",
+  "nama": "Kafe Senja",
+  "skor": 9.4,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.7,
+   "layanan": 36,
+   "champion": 0.0,
+   "janji": 1.5,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 25200000,
+  "nilai_tertimbang": 2375871,
+  "renewal": "2027-09-08",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "1 tiket masih terbuka; 7 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C10",
+  "nama": "Bakmi Jowo Pak Gondo",
+  "skor": 8.8,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 18.6,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 79380000,
+  "nilai_tertimbang": 6981602,
+  "renewal": "2027-03-26",
+  "signals": [
+   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "62 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C29",
+  "nama": "Roti Bakar 88",
+  "skor": 8.7,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.1,
+   "layanan": 4,
+   "champion": 0.0,
+   "janji": 17.4,
+   "bayar": 50.0
+  },
+  "nilai_tahunan": 50400000,
+  "nilai_tertimbang": 4360540,
+  "renewal": "2026-12-15",
+  "signals": [
+   "58 hari tanpa kontak masuk dari pelanggan",
+   "Riwayat telat bayar 1x dalam 12 bulan"
+  ]
+ },
+ {
+  "account_id": "C39",
+  "nama": "Es Teh Indonesia Lokal",
+  "skor": 8.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.4,
+   "layanan": 32,
+   "champion": 0.0,
+   "janji": 2.4,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 71820000,
+  "nilai_tertimbang": 6094187,
+  "renewal": "2027-07-23",
+  "signals": [
+   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "1 tiket masih terbuka; 5 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C30",
+  "nama": "Depot Rawon Setan",
+  "skor": 8.4,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 28,
+   "champion": 0.0,
+   "janji": 9.6,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 67830000,
+  "nilai_tertimbang": 5724852,
+  "renewal": "2027-05-06",
+  "signals": [
+   "1 tiket masih terbuka; 4 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C06",
+  "nama": "Saiyo Group",
+  "skor": 8.0,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.2,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 12.9,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 113400000,
+  "nilai_tertimbang": 9066047,
+  "renewal": "2027-07-01",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "1 tiket masih terbuka; 3 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C28",
+  "nama": "Toko Mainan Ceria",
+  "skor": 7.9,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.1,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 12.3,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 50400000,
+  "nilai_tertimbang": 3962521,
+  "renewal": "2027-08-11",
+  "signals": [
+   "2 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "1 tiket masih terbuka; 3 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C37",
+  "nama": "Toko Sepatu Langkah",
+  "skor": 7.7,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.4,
+   "layanan": 16,
+   "champion": 0.0,
+   "janji": 24.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 50400000,
+  "nilai_tertimbang": 3894036,
+  "renewal": "2027-07-25",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "80 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C09",
+  "nama": "Apotek Medika Farma",
+  "skor": 7.6,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.2,
+   "layanan": 12,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 63000000,
+  "nilai_tertimbang": 4757856,
+  "renewal": "2026-12-21",
+  "signals": [
+   "242 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C12",
+  "nama": "Toko Kue Delima",
+  "skor": 7.6,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 24,
+   "champion": 0.0,
+   "janji": 10.8,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 95760000,
+  "nilai_tertimbang": 7296912,
+  "renewal": "2027-04-23",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)"
+  ]
+ },
+ {
+  "account_id": "C22",
+  "nama": "Toko Buku Pelita",
+  "skor": 7.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 12,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 71820000,
+  "nilai_tertimbang": 5386500,
+  "renewal": "2026-12-05",
+  "signals": [
+   "208 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C27",
+  "nama": "Apotek Kimia Sejahtera",
+  "skor": 7.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 12,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 92400000,
+  "nilai_tertimbang": 6930000,
+  "renewal": "2027-05-30",
+  "signals": [
+   "103 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C31",
+  "nama": "Material Bangunan Kokoh",
+  "skor": 7.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 12,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 49140000,
+  "nilai_tertimbang": 3685500,
+  "renewal": "2027-05-05",
+  "signals": [
+   "236 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C14",
+  "nama": "Optik Prima Vision",
+  "skor": 6.6,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.3,
+   "layanan": 8,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 30240000,
+  "nilai_tertimbang": 1992391,
+  "renewal": "2027-05-28",
+  "signals": [
+   "297 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C25",
+  "nama": "Toko Sembako Maju",
+  "skor": 6.6,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.2,
+   "layanan": 12,
+   "champion": 0.0,
+   "janji": 23.7,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 56700000,
+  "nilai_tertimbang": 3747211,
+  "renewal": "2027-01-16",
+  "signals": [
+   "1 outlet mode offline aktif (rawan isu sinkronisasi)",
+   "79 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C40",
+  "nama": "Toko Alat Tulis Cerdas",
+  "skor": 6.5,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 8,
+   "champion": 0.0,
+   "janji": 30.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 37800000,
+  "nilai_tertimbang": 2457000,
+  "renewal": "2026-11-20",
+  "signals": [
+   "139 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C07",
+  "nama": "Warung Sambal Bu Tini",
+  "skor": 6.3,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 4,
+   "champion": 0.0,
+   "janji": 2.1,
+   "bayar": 50.0
+  },
+  "nilai_tahunan": 79380000,
+  "nilai_tertimbang": 5012846,
+  "renewal": "2026-11-27",
+  "signals": [
+   "Riwayat telat bayar 1x dalam 12 bulan"
+  ]
+ },
+ {
+  "account_id": "C21",
+  "nama": "Martabak Bangka Jaya",
+  "skor": 6.0,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.7,
+   "layanan": 20,
+   "champion": 0.0,
+   "janji": 5.4,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 37800000,
+  "nilai_tertimbang": 2273391,
+  "renewal": "2027-09-07",
+  "signals": [
+   "1 tiket masih terbuka; 2 tiket dalam 90 hari terakhir"
+  ]
+ },
+ {
+  "account_id": "C08",
+  "nama": "Toko Elektronik Cahaya",
+  "skor": 4.8,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 16,
+   "champion": 0.0,
+   "janji": 5.1,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 58800000,
+  "nilai_tertimbang": 2801820,
+  "renewal": "2026-12-18",
+  "signals": []
+ },
+ {
+  "account_id": "C13",
+  "nama": "Resto Seafood Bahari",
+  "skor": 4.7,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 8,
+   "champion": 0.0,
+   "janji": 18.0,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 64260000,
+  "nilai_tertimbang": 3020219,
+  "renewal": "2027-05-12",
+  "signals": [
+   "60 hari tanpa kontak masuk dari pelanggan"
+  ]
+ },
+ {
+  "account_id": "C17",
+  "nama": "Apotek Bunda Sehat",
+  "skor": 2.9,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.7,
+   "layanan": 4,
+   "champion": 0.0,
+   "janji": 11.1,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 37800000,
+  "nilai_tertimbang": 1091137,
+  "renewal": "2027-05-09",
+  "signals": []
+ },
+ {
+  "account_id": "C38",
+  "nama": "Laundry Bersih Kilat",
+  "skor": 1.1,
+  "level": "Rendah",
+  "sub": {
+   "pakai": 0.0,
+   "layanan": 4,
+   "champion": 0.0,
+   "janji": 0.6,
+   "bayar": 0.0
+  },
+  "nilai_tahunan": 88200000,
+  "nilai_tertimbang": 961380,
+  "renewal": "2027-06-28",
+  "signals": []
+ }
+]

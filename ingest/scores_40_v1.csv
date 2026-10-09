@@ -1,0 +1,41 @@
+account_id,nama,skor,level,nilai_tahunan,nilai_tertimbang,renewal
+C01,Kopi Lintas Nusantara,40.2,Kritis,149940000,60273770,2026-12-15
+C03,Apotek Sehat Sentosa,33.2,Kritis,68040000,22568328,2027-01-20
+C05,Minimarket Berkah,32.6,Kritis,95760000,31177133,2027-04-10
+C02,TB Sinar Jaya,18.6,Tinggi,99750000,18508612,2027-03-01
+C34,Grosir Plastik Jaya,15.6,Tinggi,50400000,7878885,2027-08-28
+C35,Frozen Food Mama,15.5,Tinggi,87780000,13605900,2027-04-05
+C04,Roti Kenanga,14.5,Sedang,33600000,4872000,2026-11-05
+C20,Pet Shop Sahabat,13.5,Sedang,21000000,2844975,2027-04-21
+C32,Toko Herbal Alami,13.5,Sedang,58800000,7938000,2027-03-20
+C26,Ayam Geprek Mantul,12.7,Sedang,39900000,5076508,2026-12-30
+C36,Bakso Cak Man,11.6,Sedang,46200000,5369844,2026-11-25
+C19,Mie Ayam Gajah Mada,10.6,Rendah,30240000,3209195,2027-05-12
+C16,Toko Besi Makmur,10.5,Rendah,33600000,3528000,2026-11-24
+C24,Bengkel Motor Sentosa,10.5,Rendah,39900000,4189500,2026-11-28
+C33,Kopi Kenangan Desa,10.5,Rendah,16800000,1764785,2027-09-06
+C18,Fashion Outlet Anggun,9.7,Rendah,33600000,3270326,2027-06-14
+C11,Swalayan Sumber Rejeki,9.5,Rendah,92400000,8778000,2027-01-10
+C15,Kedai Teh Nusantara,9.5,Rendah,91770000,8718150,2027-05-12
+C23,Kafe Senja,9.4,Rendah,25200000,2375871,2027-09-08
+C10,Bakmi Jowo Pak Gondo,8.8,Rendah,79380000,6981602,2027-03-26
+C29,Roti Bakar 88,8.7,Rendah,50400000,4360540,2026-12-15
+C39,Es Teh Indonesia Lokal,8.5,Rendah,71820000,6094187,2027-07-23
+C30,Depot Rawon Setan,8.4,Rendah,67830000,5724852,2027-05-06
+C06,Saiyo Group,8.0,Rendah,113400000,9066047,2027-07-01
+C28,Toko Mainan Ceria,7.9,Rendah,50400000,3962521,2027-08-11
+C37,Toko Sepatu Langkah,7.7,Rendah,50400000,3894036,2027-07-25
+C09,Apotek Medika Farma,7.6,Rendah,63000000,4757856,2026-12-21
+C12,Toko Kue Delima,7.6,Rendah,95760000,7296912,2027-04-23
+C22,Toko Buku Pelita,7.5,Rendah,71820000,5386500,2026-12-05
+C27,Apotek Kimia Sejahtera,7.5,Rendah,92400000,6930000,2027-05-30
+C31,Material Bangunan Kokoh,7.5,Rendah,49140000,3685500,2027-05-05
+C14,Optik Prima Vision,6.6,Rendah,30240000,1992391,2027-05-28
+C25,Toko Sembako Maju,6.6,Rendah,56700000,3747211,2027-01-16
+C40,Toko Alat Tulis Cerdas,6.5,Rendah,37800000,2457000,2026-11-20
+C07,Warung Sambal Bu Tini,6.3,Rendah,79380000,5012846,2026-11-27
+C21,Martabak Bangka Jaya,6.0,Rendah,37800000,2273391,2027-09-07
+C08,Toko Elektronik Cahaya,4.8,Rendah,58800000,2801820,2026-12-18
+C13,Resto Seafood Bahari,4.7,Rendah,64260000,3020219,2027-05-12
+C17,Apotek Bunda Sehat,2.9,Rendah,37800000,1091137,2027-05-09
+C38,Laundry Bersih Kilat,1.1,Rendah,88200000,961380,2027-06-28
