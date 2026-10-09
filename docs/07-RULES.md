@@ -37,6 +37,7 @@ Nama script adalah kontrak setup. Sebelum scaffold tersedia, laporkan pemeriksaa
 - Mengarang hasil, biaya, akurasi, latency, data, kutipan, atau sumber.
 - Membocorkan answer/source label ke retrieval benchmark.
 - Menyebut risk score sebagai probabilitas churn atau nilai kontrak tertimbang sebagai kerugian pasti.
+- Mengubah parameter, skor, atau Decision otomatis berdasarkan Feedback; pendapat pengguna harus ditinjau terpisah.
 - Menyajikan overlay sintetis sebagai data dataset/real.
 - Mengirim email/outreach, deploy, push, atau memakai layanan berbayar tanpa izin.
 - Menaruh secret/API key di source, browser bundle, log, docs, screenshot, atau commit.
@@ -48,9 +49,11 @@ Pemeriksaan yang tidak dapat dijalankan harus menyebutkan perintah, alasan, dan 
 ## 6. Data, Keamanan, dan Privasi
 
 - SalesTranscriptQA hanya untuk hackathon/nonkomersial sesuai CC BY-NC 4.0; atribusi Salesforce + Endgame Labs.
+- Dataset KasirNusa sintetis dari ZIP lokal; ZIP dan folder ekstrak harus diabaikan Git dan tidak dimasukkan ke commit.
 - Data pelanggan nyata memerlukan izin; minimalkan, redaksi PII yang tidak dibutuhkan, jangan commit/upload tanpa persetujuan.
 - Semua request provider berjalan server-side. Validasi input dan respons. Retry hanya error sementara; jangan retry 401/403.
 - Approval Decision atomik, idempotent, append-only. Merge entitas tidak menghapus sumber.
+- Ingest dan approval hanya untuk pengguna aplikasi terautentikasi (CSM/admin). Feedback dua arah menyimpan penulis, waktu, konteks, dan tanggapan; akses tulis publik tidak dibuka tanpa identitas dan pembatasan laju.
 - Kutipan harus cocok dengan source span; jawaban tanpa bukti cukup abstain.
 
 ## 7. Nol Dead Code dan Ponytail

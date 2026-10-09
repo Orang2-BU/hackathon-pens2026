@@ -2,11 +2,14 @@
 
 > Sumber kebenaran aturan lomba dan study case. Prioritas: `07-RULES` > instruksi user > dokumen ini > dokumen lain.
 
+> Bagian TM/SalesTranscriptQA di bawah adalah catatan historis ide awal. Scope demo aktif adalah KasirNusa dalam `01-PRD.md` dan `09-BUILD-PLAN-KASIRNUSA.md`; jangan menjalankan rencana SalesTranscriptQA lama sebagai jalur utama.
+
 ## 1. Info Lomba
 
 | Item | Isi |
 |---|---|
-| Deadline submit | 10 Okt 2026, 09.00 [asumsi: default skill; tanya panitia] |
+| Target pertama | 9 Okt 2026, 22.00 [dari user; jenis deliverable perlu dipastikan] |
+| Deadline submit resmi | Belum terkonfirmasi; 10 Okt 09.00 adalah asumsi lama, bukan jadwal panitia |
 | Deliverable | Belum diberikan panitia: tanya apakah demo live, video, deck, dan/atau repo diwajibkan |
 | Durasi pitch + Q&A | Tanya panitia |
 | Tools/sponsor/data wajib | Jev/TypeSafe; tim maksimal 3; kredit Jev $5, top-up lewat mentor; SalesTranscriptQA direkomendasikan |
@@ -22,17 +25,17 @@
 > - Hasil diukur: akurasi & biaya menjawab pertanyaan, kegunaan bagi agent.
 > - Context graph = kompilasi data saat masuk (write time), bukan RAG saat ditanya.
 > - Jev pakai rubrik (score/noul), kode yang memutuskan; eval dinilai Jev, bukan LLM-as-judge.
-> - Dataset saran: SalesTranscriptQA (utama, B2B multi-call), EnronQA.
+> - Dataset saran pada TM awal: SalesTranscriptQA (B2B multi-call), EnronQA. Demo aktif kemudian berpindah ke KasirNusa.
 > - Tim 3 orang, kredit Jev $5 (top-up via mentor).
-> Deliverable & deadline: {{isi dari panitia; default 09.00 esok hari}}
+> Catatan historis TM awal; rencana KasirNusa yang lebih baru ada di `09-BUILD-PLAN-KASIRNUSA.md`. Target pertama dari user: 9 Okt 22.00; deadline submit resmi masih perlu konfirmasi.
 
 ## 3. Study Case — Ringkasan
 
 - **Masalah inti:** sinyal churn tersebar di percakapan; CSM melihatnya terlambat dan sulit menjelaskan alasan rekomendasi.
 - **Pihak terdampak:** CSM sebagai pengguna utama; VP CS sebagai pembeli dan pemantau risiko retensi.
-- **Data tersedia:** SalesTranscriptQA B2B; seed usage/invoice sintetis transparan yang ditempelkan ke akun dataset.
+- **Data tersedia untuk demo utama:** ZIP KasirNusa sintetis berisi 15 file data dan README; sudah diekstrak lokal ke `dataset_kasirnusa/` dan diabaikan Git. Histori operasional 1 Okt 2025–30 Sep 2026, snapshot 1 Okt 2026. SalesTranscriptQA hanya opsi benchmark retrieval terpisah.
 - **Batasan:** tim 3; kredit Jev $5; build waktu hackathon; Next.js sudah dipilih untuk dashboard.
-- **Ambigu / perlu ditanyakan:** deadline dan deliverable persis; format/versi quickstart Jev; apakah deployment wajib; durasi demo; aturan penggunaan dataset/LLM generatif.
+- **Ambigu / perlu ditanyakan:** jenis deliverable target 22.00 dan deadline submit resmi; identitas pengguna pemberi feedback (CSM atau pelanggan akhir); format/versi quickstart Jev; durasi demo.
 
 ## 3b. Referensi Panitia
 

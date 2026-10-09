@@ -19,18 +19,20 @@
 
 ## 3. Wajib Minta Izin
 
-- Dependency baru, pergantian Next.js/SQLite/Jev, graph schema yang mematahkan data, atau perubahan golden path.
+- Dependency baru, pergantian Next.js/PostgreSQL/Jev, graph schema yang mematahkan data, atau perubahan golden path.
 - Dataset/provider baru, biaya API di luar kredit, deploy, push, mengirim data/hasil ke layanan eksternal.
 - Outreach/email nyata, operasi destruktif, penghapusan dataset/cache besar, atau scope cut.
 - Penggunaan data pelanggan nyata; minta konfirmasi izin dan sanitasi dahulu.
 
+Dataset KasirNusa dalam ZIP adalah sintetis; ekstrak lokal dan ZIP tetap diabaikan Git. Target pertama 9 Okt 22.00 dari user adalah milestone kerja; jenis deliverable dan deadline submit resmi belum dipastikan.
+
 ## 4. Prioritas dan Timebox
 
 1. T1 setup + token.
-2. T2 compile write-time dengan bukti, review, eval kecil.
-3. T3 benchmark aktual sebelum UI penuh.
-4. T4 query/risk, T5 approval/write-back, T6 UI.
-5. T7 pitch/fallback; Should/Could hanya setelah seluruh Must stabil.
+2. T2 ingest KasirNusa, graph write-time, Jev, review, eval kecil.
+3. T3 parameter dan skor prioritas; uji C01–C06 dan 40 pelanggan.
+4. T4 peringkat/detail/tanya graph, T5 approval/feedback, T6 demo publik dan UI.
+5. T7 pitch/fallback dan benchmark aktual bila dibuat; fitur tambahan setelah Must stabil.
 
 Task 30–120 menit. Jika melewati timebox, pilih versi lebih sederhana yang tetap memenuhi kriteria; jangan menambah lapisan baru untuk menyelamatkan desain yang salah.
 
