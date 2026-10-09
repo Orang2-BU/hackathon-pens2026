@@ -2,7 +2,7 @@
 
 Sumber: Latent Space, "Why I couldn't build Jev at OpenAI — Diogo Almeida, TypeSafe Co-founder & CEO" (youtu.be/cFx9Z3ZXca0, 2:22). Panitia Track 3 meminta peserta menyimak video ini, jadi juri kemungkinan menilai apakah tim memahami cara berpikirnya. File ini berisi pemahaman dengan kata-kata sendiri, bukan transkrip.
 
-> Penerapan aktif Relasi memakai dataset sintetis KasirNusa dalam `dataset_kasirnusa/`. Rujukan SalesTranscriptQA di bawah adalah catatan riset/opsi benchmark retrieval terpisah, bukan demo utama atau validasi probabilitas churn. Kontrak implementasi terkini ada di `03-ARCHITECTURE.md` §4b.
+> Penerapan aktif Tessera memakai dataset sintetis KasirNusa dalam `dataset_kasirnusa/`. Rujukan SalesTranscriptQA di bawah adalah catatan riset/opsi benchmark retrieval terpisah, bukan demo utama atau validasi probabilitas churn. Kontrak implementasi terkini ada di `03-ARCHITECTURE.md` §4b.
 
 ## 0. Arahan mentor di Technical Meeting (9 Okt 2026) — prioritas tertinggi
 
@@ -38,7 +38,7 @@ AI paling banyak dipanggil oleh kode. Jev adalah "System One model": cepat, mura
 
 ## 2. Primitif AI sebagai kontrol alur
 
-| Primitif | Kode | Contoh Relasi |
+| Primitif | Kode | Contoh Tessera |
 |---|---|---|
 | `choice` | `switch` | kategori yang saling eksklusif; sinyal independen KasirNusa memakai noul terpisah |
 | `noul` + probabilitas | `if p >= threshold` | kutipan mengandung sinyal churn? |
@@ -58,7 +58,7 @@ Aturan:
 - Uji robustness: urutan field, sinonim, dan urutan pertanyaan berubah tanpa hasil material berubah.
 - Kunci versi model; jangan melatih data pelanggan tanpa izin.
 
-## 4. Penerapan untuk Relasi
+## 4. Penerapan untuk Tessera
 
 1. Pada write time, interaksi JSONL dan deskripsi tiket KasirNusa dipotong dengan offset sumber yang dapat diverifikasi.
 2. Jev menilai `is_champion_exit`, `mentions_competitor`, `negative_sentiment`, `is_urgent`, `is_expansion`, dan `entity_match`.

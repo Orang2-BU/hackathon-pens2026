@@ -3,7 +3,7 @@
 > Pivot dari Relasi/SalesTranscriptQA ke case KasirNusa: PT KasirNusa Teknologi. Dataset ZIP sudah tersedia lokal; seluruh isinya sintetis.
 > Baca `AGENTS.md` + `PRODUCT.md`, lalu file ini sebagai sumber eksekusi.
 > Prinsip: graph dikompilasi saat ingest (write time). Keputusan = kode deterministik.
-> LLM hanya untuk frasa jawaban & draft save plan — tidak pernah untuk skor/keputusan.
+> Tanpa LLM generatif di MVP (ADR-0003): jawaban dan draf save plan disusun template dari query graph; Jev memetakan pertanyaan ke intent dan menilai teks ambigu.
 
 ## 0. Konteks yang wajib dipegang
 
@@ -79,7 +79,7 @@ Bobot percobaan pertama: pemakaian 30%, gangguan layanan 25%, relasi champion 20
 Per akun risiko atas: hasilkan draft tindakan dari faktor terkuat (template deterministik),
 wajib cek preseden di `decision_log` (diskon/eskalasi/janji yang pernah disetujui untuk pola serupa)
 dan kutip `decision_id`-nya. Bila usulan menyimpang dari preseden, tulis alasan penyimpangannya.
-Draft boleh difrasa LLM; keputusan akhir: pengguna aplikasi terautentikasi (CSM/admin) approve/reject → tersimpan append-only.
+Draft disusun template (ADR-0003); keputusan akhir: pengguna aplikasi terautentikasi (CSM/admin) approve/reject → tersimpan append-only.
 
 ## 4. Layar aplikasi (Next.js, mode Operate: dark, padat data, satu layar satu tugas)
 
@@ -87,12 +87,12 @@ Draft boleh difrasa LLM; keputusan akhir: pengguna aplikasi terautentikasi (CSM/
    flag mismatch; filter per level.
 2. **Detail akun**: visualisasi sub-graph bukti (jalur per faktor bisa di-highlight), breakdown
    faktor + jalur buktinya, timeline (pindah champion, tiket, keputusan, interaksi).
-3. **Tanya graph**: input pertanyaan bebas → query terstruktur ke graph → jawaban difrasa LLM
+3. **Tanya graph**: input pertanyaan bebas → Jev memilih intent → query SQL template ke graph → jawaban template
    dengan sitasi node bukti. Ini senjata untuk pertanyaan live juri.
 4. **Save plan**: draft tindakan + sitasi preseden → approve/reject (append-only, tercatat siapa & kapan).
 5. **Feedback dua arah**: pengguna aplikasi terautentikasi menyampaikan pendapat/usulan pada akun atau rencana; admin/CSM menanggapi. Feedback tersimpan terpisah dari Decision dan tidak mengubah skor atau approval otomatis. Akses pelanggan akhir masih pertanyaan produk.
 
-Ingest dan approval dibatasi pada pengguna aplikasi terautentikasi berperan CSM atau admin. Demo publik dapat membaca data demo sesuai izin, dengan rate limit. LLM menyusun penjelasan dan draf dari paket fakta bersumber; kode memvalidasi angka/rujukan dan menentukan skor.
+Ingest dan approval dibatasi pada pengguna aplikasi terautentikasi berperan CSM atau admin. Demo publik dapat membaca data demo sesuai izin, dengan rate limit. Penjelasan dan draf disusun template dari paket fakta bersumber; kode memvalidasi angka/rujukan dan menentukan skor.
 
 ## 5. Langkah eksekusi (commit per langkah, jangan ditumpuk)
 

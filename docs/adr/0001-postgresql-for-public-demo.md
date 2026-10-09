@@ -1,4 +1,4 @@
-# ADR-0001: PostgreSQL untuk demo publik Relasi
+# ADR-0001: PostgreSQL untuk demo publik Tessera
 
 **Status:** Accepted
 **Tanggal:** 9 Oktober 2026

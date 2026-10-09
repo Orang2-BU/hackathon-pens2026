@@ -1,10 +1,10 @@
 # 02 — AGENT: Instruksi untuk AI
 
-> Konvensi minimum untuk developer dan AI pada Relasi.
+> Konvensi minimum untuk developer dan AI pada Tessera.
 
 ## 1. Konteks
 
-- **Aplikasi:** Relasi — context graph untuk membantu CSM memprioritaskan risiko, memeriksa bukti, dan menyetujui save plan.
+- **Aplikasi:** Tessera — context graph untuk membantu CSM memprioritaskan risiko, memeriksa bukti, dan menyetujui save plan.
 - **Stack:** Next.js App Router dipilih; PostgreSQL untuk demo publik diterima pada ADR-0001. TypeScript strict, Jev, Tailwind v4, React Flow, library DB, dan hosting masih keputusan implementasi.
 - **Sumber kebenaran:** `docs/07-RULES.md`, lalu instruksi user, `docs/00-BRIEF.md`, PRD dan arsitektur.
 

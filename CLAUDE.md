@@ -1,15 +1,15 @@
-# Relasi
+# Tessera
 
-> Dibuat oleh `project-setup-01` pada 9 Okt 2026. Ringkasan projek hackathon Track 3; status docs masih menunggu ACC.
+> Dibuat oleh `project-setup-01` pada 9 Okt 2026. Ringkasan projek hackathon Track 3; PRD ACC 9 Okt 2026 (QA).
 
 ## Aplikasi
 
-Relasi mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; LLM menjelaskan serta menyusun draf. Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
+Tessera mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; penjelasan dan draf save plan dirangkai template dari hasil query graph (tanpa LLM dulu, ADR-0003). Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
 
 ## Stack & Verifikasi
 
-- **Stack tetap:** Next.js. **Penyimpanan demo publik:** PostgreSQL (ADR-0001). **Usulan:** TypeScript, Jev, Tailwind v4, React Flow; library dan hosting belum dipilih.
-- Perintah dev/test/build/lint/typecheck/dead code dicatat di `docs/03-ARCHITECTURE.md`; belum bisa dijalankan sebelum scaffold T1.
+- **Stack:** Next.js 16 + TypeScript + pnpm di `frontend/`, Tailwind v4, lucide-react, @xyflow/react, Vitest, knip; PostgreSQL via postgres.js; Jev; VPS Docker Compose; satu akun demo (ADR-0001, ADR-0003).
+- Perintah dev/test/build/lint/typecheck/dead code ada di `docs/03-ARCHITECTURE.md` §2, dijalankan di `frontend/`.
 
 ## Aturan Wajib
 

@@ -1,6 +1,6 @@
-# Relasi
+# Tessera
 
-> Instruksi untuk AI coding assistant. Onboarding awal: 9 Okt 2026. Docs belum ACC.
+> Instruksi untuk AI coding assistant. Onboarding awal: 9 Okt 2026. PRD ACC 9 Okt 2026.
 
 ## Wajib sebelum ngoding
 
@@ -8,11 +8,11 @@ Baca `docs/00-BRIEF.md` sampai `docs/08-DESIGN.md` yang tersedia, lalu ikuti `do
 
 ## Aplikasi
 
-Relasi memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Next.js dipilih; PostgreSQL untuk demo publik diterima dalam ADR-0001, sedangkan library dan hosting belum dipilih. Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; LLM menjelaskan serta menyusun draf. SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
+Tessera memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Stack: Next.js 16 di `frontend/`, PostgreSQL via postgres.js, VPS Docker Compose, satu akun demo (ADR-0001, ADR-0003). Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; penjelasan dan draf dirangkai template dari query graph (tanpa LLM dulu). SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
 
 ## Verifikasi
 
-Perintah sesudah scaffold tercantum dalam `docs/03-ARCHITECTURE.md`; sebelum T1, test/build/typecheck/lint/dead-code belum tersedia. Jangan klaim sudah lolos.
+Perintah di `docs/03-ARCHITECTURE.md` §2, dijalankan di `frontend/`. Jangan klaim lolos tanpa menjalankannya.
 
 ## Aturan Ringkas
 

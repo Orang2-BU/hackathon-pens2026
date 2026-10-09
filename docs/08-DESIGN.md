@@ -299,8 +299,8 @@ Node color is always paired with a text label and Lucide icon, never color alone
 1. **Sidebar card (desktop ≥ 1200px: 248px wide, 16px inset from viewport edges, full height minus insets):**
    - Background `surface`, radius 16px, padding 16px, no border.
    - **Header:** Tessera wordmark with a symbol in `primary` (placeholder until a logo is chosen; no off-token colors). No collapse toggle until a collapsed layout exists.
-   - **Navigation:** One group, four destinations from PRD §5b: **Accounts, Review, Benchmark, Data**. Review shows a count chip of pending items. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
-   - **Bottom card:** workspace label and data source line in text (no avatar). Today: `Synthetic seed data · resets on refresh`; once SalesTranscriptQA is fetched: `SalesTranscriptQA · CC BY-NC 4.0`. This replaces the reference user dock and its ⋯ menu.
+   - **Navigation:** One group, three destinations from PRD §6: **Accounts** (risk ranking), **Review** (save plans), **Data**, and nothing else. Review shows a count chip of pending plans. Benchmark is not a screen: retrieval benchmark results, if run, live in the pitch, not the nav. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
+   - **Bottom card:** workspace label and data source line in text (no avatar). Text: `KasirNusa · synthetic dataset` with snapshot date `1 Oct 2026`; before ingest it reads `Synthetic seed data · resets on refresh`. This replaces the reference user dock and its ⋯ menu.
 2. **Header (on canvas, 64px tall):**
    - Left: page title (`headline-lg`).
    - Right: pill search (`input`, 320px) with placeholder `Search accounts, signals, or evidence`, then only the icon buttons the current screen uses (e.g., Accounts: renewal-window picker; Data: refresh compile status). No global notification bell.
@@ -320,11 +320,10 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 
 | Screen | Task | Reference Pattern | Primary Information | Supporting | Key Actions |
 |---|---|---|---|---|---|
-| **Accounts** | Prioritize at-risk renewals | Row of 3 KPI cards (first is featured) + risk trend chart (8 col) + 2 mini KPIs and risk-category bubbles (4 col) + account table | Risk index per account, risk-weighted contract value, renewal date | Data age, signal count, risk categories | Open account, filter by renewal window |
-| **Account Detail** | Inspect evidence and draft save plan | Left: graph neighborhood + evidence list; right: Q&A and plan editor | Graph path, source quotes, deterministic risk index | Ingest time, Jev confidence, call ID, speaker | Generate save plan, Approve plan (no email sent) |
-| **Review** | Adjudicate ambiguous signals and merges | Single decision card with before/after diff | Merge pair or borderline signal (p 0.50–0.85) | Rubric, quote, confidence | Approve, Reject, Edit signal |
-| **Benchmark** | Compare graph vs. baseline honestly | Paired arm table + cost/latency spark | Accuracy, query cost, cost incl. ingest, latency | Corpus hash, seed, N, errors | Run holdout eval, Export run |
-| **Data** | Ingest calls, watch write-time compile | Pipeline queue + ingest metrics card | Document, compile status, Jev call log, token cost | Duration, quote count, retries | Ingest sample call, Re-index |
+| **Accounts** (risk ranking) | Decide which of the 40 customers to review | KPI row (first featured) + ranking table; C01–C06 pinned on top | Priority score (0–100, labelled "priority score", never churn probability), level Low/Medium/High/Critical, top risk factor, data coverage, `mismatch` flag vs CRM health | Annual contract value, weighted value for priority (`annual value × score / 100`), days to renewal, NPS as context | Open account; filter by level |
+| **Account Detail** | Check evidence path, timeline, ask the graph, draft a plan | Left: factor breakdown, evidence subgraph, timeline; right: Ask-the-graph box + plan draft | Factors with their evidence paths (≥3 sources for a recommendation), cited nodes | Source file, row/interaction ID, snapshot period, Jev confidence | Ask a question (answer cites nodes or abstains); send plan to Review |
+| **Review** (save plans) | Decide plans and see precedent | Single plan card with cited `decision_log` precedent and deviation note; feedback thread below | Plan text, precedent `decision_id`, why it deviates | Author, time, prior Decisions | Approve or reject (signed-in only, append-only, no email sent); reply to feedback |
+| **Data** | See sources, ingest status, Jev status, errors, cost | Source table + compile stats card | 15 files with rows, hash, ingest status; node/edge counts per type | Jev calls written/reviewed/discarded, errors, actual cost | Run ingest (signed-in only) |
 
 ## Elevation & Depth
 
@@ -364,8 +363,8 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
    - Top row: 36px `icon-housing` (radius 8px) left, ⋯ menu right (only if it has real actions; otherwise omit).
    - Label (`label-md`, muted), then value (`display-number`) with trend pill on the baseline right of it.
    - Microcopy (`label-sm`, muted) names the driver, e.g. `Driven by champion departure in 3 accounts`.
-   - Metrics: **Risk-weighted contract value** (labelled weighted, never "loss"), **Accounts above risk threshold**, **Signals extracted this week**.
-7. **Mini KPI card:** half-width pair, icon housing, label, `display-number-sm` value, trend pill + `vs last week` muted. Used for **Accounts in review** and **Median risk index**.
+   - Metrics: **Weighted value for priority** (labelled weighted, never "loss"), **Accounts at High or Critical**, **Focus accounts C01–C06 flagged**.
+7. **Mini KPI card:** half-width pair, icon housing, label, `display-number-sm` value, trend pill + `vs last week` muted. Used for **Plans in review** and **Median priority score**.
 8. **Trend pill:** `trend-up` / `trend-down`, 4px × 6px padding, Lucide trend icon + signed value (`+12.5%`). Meaning never by color alone: icon and sign always present.
 9. **Evidence quote card:** `surface`, 1px `outline`, padding 16px, quote in `body-md` italic, call ID chip, timestamp, confidence badge, link to transcript offset.
 10. **Graph canvas (`@xyflow/react`):** background `neutral`, nodes as `surface-elevated` cards radius 12px with a 1px `outline` ring (`primary` when selected); type shown by semantic-colored Lucide icon and caps label, never by a thick side stripe. Evidence path edges `primary` 2px, other edges `outline-active` 1px. Keyboard-navigable list alternative always available.
@@ -378,7 +377,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 |---|---|---|
 | 1 | **Design for variation** | Layout handles 1 to 20 evidence items; empty states explain and offer ingest; graph has list fallback. |
 | 2 | **Consistency** | One warm graphite palette, one type family, Lucide 1.75px, 16px card radius everywhere. |
-| 3 | **Hierarchy** | Risk index and weighted contract value are the largest numbers; IDs and hashes are small and muted. |
+| 3 | **Hierarchy** | Priority score and weighted value are the largest numbers; IDs and hashes are small and muted. |
 | 4 | **Decision-point information** | Quote span, confidence, timestamp, and actor sit beside every approval. |
 | 5 | **Consequences before action** | Approval copy states `no email sent`; merge dialog shows the merged alias result. |
 | 6 | **Lower friction** | Approval action stays sticky; renewal-window filter in header; review goes item by item. |
@@ -392,7 +391,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 |---|---|
 | **A1 No emoji** | Lucide only, including trend arrows; no emoji or Unicode triangles. |
 | **A2 Deliberate palette** | Only tokens in this file; lime appears on the active nav icon, the primary button, positive trends, and data. The logo placeholder uses `primary`, not an off-token orange. |
-| **A3 One task per screen** | Accounts prioritizes; Detail investigates and plans; Review adjudicates; Benchmark measures; Data ingests. |
+| **A3 One task per screen** | Accounts ranks; Detail investigates, answers, and drafts; Review decides plans; Data ingests. |
 | **A4 Focused navigation** | Four menu items only. Bottom card shows CSM name and data source in text, no avatar portrait. |
 | **A5 Tidy density** | Numbers right-aligned and tabular; secondary actions in ⋯ menus; long chips become icon + tooltip. |
 | **A6 No dead surfaces** | Header icon buttons appear only on screens where they act; ⋯ menus omitted when empty. |
@@ -426,4 +425,5 @@ Components consume exported variables only; no hex values in component CSS.
 |---|---|
 | 2026-10-09 | Initial hackathon document setup. |
 | 2026-10-09 | Redesign to InsightX dark analytics reference. |
+| 2026-10-09 | KasirNusa pivot: screens follow PRD §6 (Accounts, Detail with Ask-the-graph, Review save plans with feedback, Data); Benchmark screen removed; product name Tessera. |
 | 2026-10-09 | Alignment pass: warm graphite neutrals sampled from the reference, radius 16/12/8, sidebar as floating card, tinted trend pills, olive/lime/sage chart tokens, mini KPI spec; navigation cut to PRD's four screens (no notifications, no settings, no avatar); churn-labelled metrics renamed; `on-danger` fixed from 2.8:1 to 7.3:1. |

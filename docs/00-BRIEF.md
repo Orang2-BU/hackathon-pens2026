@@ -1,4 +1,4 @@
-# 00 — BRIEF: Relasi · Track 3 Context Graphs in Customer Success & Sales
+# 00 — BRIEF: Tessera · Track 3 Context Graphs in Customer Success & Sales
 
 > Sumber kebenaran aturan lomba dan study case. Prioritas: `07-RULES` > instruksi user > dokumen ini > dokumen lain.
 
@@ -46,7 +46,7 @@
 
 ## 4. Kriteria Penilaian
 
-| Kriteria | Bobot | Cara Relasi memenuhinya |
+| Kriteria | Bobot | Cara Tessera memenuhinya |
 |---|---:|---|
 | Jev di stack | Belum diumumkan | Jev ekstraksi sinyal + entity resolution + relevansi bukti; kode memakai ambang/risk formula |
 | Akurasi | Belum diumumkan | Benchmark B2B multi-call: baseline versus graph pada subset/judge identik |

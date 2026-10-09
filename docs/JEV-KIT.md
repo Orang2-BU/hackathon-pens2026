@@ -52,7 +52,7 @@ export async function jev(state: unknown, questions: unknown) {
 
 Health-check: `state: { text: "hello world" }` dan `noul: "Is the text a greeting?"`.
 
-## 2. Pola implementasi Relasi
+## 2. Pola implementasi Tessera
 
 ### Kompilasi write time
 
