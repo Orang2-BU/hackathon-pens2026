@@ -61,10 +61,10 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-07 — Human review signal/alias
 
-- **Trace:** T2; TASK-007/010. **Prerequisite:** BE-05/06 dan write auth BE-09 saat integrasi. **Status:** In Progress; deterministic candidate/merge classification is implemented. Persistent review queue/actions wait on DB and BE-09.
+- **Trace:** T2; TASK-007/010. **Prerequisite:** BE-05/06 dan write auth BE-09 saat integrasi. **Status:** In Progress; persistent review queue, append-only decisions, idempotency, and protected review endpoints are implemented. PostgreSQL integration and signal-ingest enrichment remain unverified.
 - **Output:** daftar review beserta sumber/output model, keputusan review append-only dengan actor/reason.
 - **Kerja:** pisahkan active signal dari kandidat; approve/reject persisten; alias merge hanya jika hard-ID guard lolos dan source tetap ada.
-- **Lulus:** signal baru aktif hanya setelah approval valid; reject tidak menjadi skor; double submit aman; hard-ID conflict tak dapat diapprove sebagai merge; audit model output asli tetap dapat dibaca. Dampak scoring explicit/versioned, berbeda dari feedback.
+- **Lulus:** only `review` signals can transition to `active`/`discarded`; actor/reason are stored in append-only `signal_reviews`; repeated identical submission returns the original review while key reuse with a different payload conflicts. Admin-only HTTP boundary and unit tests pass. PostgreSQL behavior, Jev-run candidate ingestion, and score-run impact versioning remain blocked/unverified.
 
 ### BE-08 — Parameter, formula percobaan, ranking dan sensitivitas
 
@@ -286,3 +286,10 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - `backend/src/graph-compiler.js` mengkompilasi dataset lokal: relasi keras, employment temporal, usage bulanan, janji fitur, dan candidate BUG-412 dengan provenance empat sumber. Candidate tetap `review`; kesamaan versi bukan klaim kausal.
 - Preview read-only menghasilkan revision `revision:1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`, 14 file graph, 4.140 hard edges, 1.398 facts, dan lima candidate (T0521/T0523/T0526 di C03; T0563/T0580 di C05), semuanya BUG-412 dan empat sumber.
 - Backend test 44/44, static `check`, dan preview dataset pass. Integration test publish/compile/rerun disiapkan tetapi belum dijalankan karena PostgreSQL/`TEST_DATABASE_URL` belum tersedia. Preview bukan bukti persistence database.
+
+## 11. Eksekusi BE-07 (parsial)
+
+- Migration `004_signal-review-idempotency.sql` menambahkan unique key per actor dan payload hash untuk review yang dapat di-retry tanpa duplikasi.
+- `backend/src/signal-review.js` hanya mengizinkan kandidat berstatus `review` untuk diterima (`active`) atau ditolak (`discarded`), dalam satu transaksi; keputusan review tidak mengubah audit row sebelumnya.
+- `GET /api/signals/review` dan `POST /api/signals/:id/review` dibatasi sesi admin + Origin check, dengan aktor dari sesi, validasi request, dan rate limit write.
+- Backend unit 46/46 serta `check` dan syntax checks pass. PostgreSQL integration tidak berjalan karena `TEST_DATABASE_URL` tidak tersedia. Jev-run/signal candidate creation belum terintegrasi dan tidak diklaim selesai.

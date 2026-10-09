@@ -5,6 +5,7 @@ import { createDatabase } from './db.js';
 import { getReadiness } from './health.js';
 import { cookieValue, createRateLimiter } from './auth.js';
 import { createFeedbackService } from './feedback.js';
+import { createSignalReviewService } from './signal-review.js';
 
 function sendJson(response, status, body) {
   response.writeHead(status, {
@@ -82,9 +83,11 @@ export function createHttpServer({ database, auth = null, readService = null, wr
     }
 
     const feedbackReplyMatch = path.match(/^\/api\/feedback\/([A-Za-z0-9_-]{1,128})\/replies$/u);
+    const signalReviewMatch = path.match(/^\/api\/signals\/([A-Za-z0-9:_-]{1,160})\/review$/u);
     if (['/api/plans', '/api/decisions', '/api/feedback'].includes(path) && request.method === 'POST'
       || /^\/api\/plans\/[A-Za-z0-9_-]+$/u.test(path) && request.method === 'PATCH'
-      || feedbackReplyMatch && request.method === 'POST') {
+      || feedbackReplyMatch && request.method === 'POST'
+      || signalReviewMatch && request.method === 'POST') {
       if (!auth) { sendJson(response, 503, { error: 'AUTH_NOT_CONFIGURED' }); return; }
       if (!auth.originAllowed(request.headers.origin)) { sendJson(response, 403, { error: 'ORIGIN_FORBIDDEN' }); return; }
       const session = auth.readSession(cookieValue(request.headers.cookie));
@@ -100,7 +103,7 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       const operation = path === '/api/plans' ? 'createPlan'
         : path === '/api/decisions' ? 'decidePlan'
           : path === '/api/feedback' ? 'submitFeedback'
-            : feedbackReplyMatch ? 'replyToFeedback' : 'revisePlan';
+            : feedbackReplyMatch ? 'replyToFeedback' : signalReviewMatch ? 'reviewSignal' : 'revisePlan';
       if (!writeService?.[operation]) { sendJson(response, 503, { error: 'WRITE_UNAVAILABLE' }); return; }
       try {
         const payload = operation === 'createPlan'
@@ -111,7 +114,8 @@ export function createHttpServer({ database, auth = null, readService = null, wr
               ? { planRevisionId: body.planRevisionId, idempotencyKey: body.idempotencyKey, outcome: body.outcome, reason: body.reason }
               : operation === 'submitFeedback'
                 ? { accountNodeId: body.accountNodeId, planRevisionId: body.planRevisionId ?? null, body: body.body }
-                : { feedbackId: feedbackReplyMatch[1], body: body.body };
+                : feedbackReplyMatch ? { feedbackId: feedbackReplyMatch[1], body: body.body }
+                  : { signalId: signalReviewMatch[1], idempotencyKey: body.idempotencyKey, decision: body.decision, reason: body.reason ?? null };
         const result = await writeService[operation]({ ...payload, actorId: session.actorId });
         sendJson(response, ['createPlan', 'submitFeedback'].includes(operation) ? 201 : 200, result);
       } catch (error) {
@@ -142,6 +146,16 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       if (accountNodeId && !/^[A-Za-z0-9_-]{1,128}$/u.test(accountNodeId)) { sendJson(response, 400, { error: 'INVALID_QUERY' }); return; }
       if (!readService?.listFeedback) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
       try { sendJson(response, 200, await readService.listFeedback({ accountNodeId })); }
+      catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
+      return;
+    }
+
+    if (path === '/api/signals/review' && request.method === 'GET') {
+      const session = auth?.readSession(cookieValue(request.headers.cookie));
+      if (!session) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
+      if (session.role !== 'admin') { sendJson(response, 403, { error: 'FORBIDDEN' }); return; }
+      if (!readService?.listSignalReviews) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
+      try { sendJson(response, 200, await readService.listSignalReviews()); }
       catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
       return;
     }
@@ -220,7 +234,10 @@ if (import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
     });
   }
   const feedbackService = createFeedbackService(database);
-  const server = createHttpServer({ database, auth, readService: feedbackService, writeService: feedbackService });
+  const signalReviewService = createSignalReviewService(database);
+  const readService = Object.freeze({ ...feedbackService, ...signalReviewService });
+  const writeService = Object.freeze({ ...feedbackService, ...signalReviewService });
+  const server = createHttpServer({ database, auth, readService, writeService });
 
   server.listen(port, host, () => {
     process.stdout.write(`Tessera backend listening on http://${host}:${port}\n`);
