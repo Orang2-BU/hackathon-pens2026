@@ -4,10 +4,11 @@ import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, useRef } from "react";
-import { Database, Menu, Search, ShieldCheck, Users, Waypoints, X } from "lucide-react";
+import { Database, LayoutDashboard, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
 import { usePendingPlans } from "@/components/demo-state";
 
 const navigation = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Accounts", icon: Users },
   { href: "/review", label: "Review", icon: ShieldCheck },
   { href: "/data", label: "Data", icon: Database },
@@ -23,9 +24,11 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
 
   return (
     <div className="glass flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md">
-      <Link href="/accounts" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
+      <Link href="/dashboard" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
         <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-primary text-on-primary">
-          <Waypoints size={18} strokeWidth={2} aria-hidden />
+          <svg viewBox="56 56 144 144" className="size-4" aria-hidden>
+            <path fill="currentColor" d="M56 56H200V104H152V200L104 152V104Z" />
+          </svg>
         </span>
         <span className={fade}>Tessera</span>
       </Link>

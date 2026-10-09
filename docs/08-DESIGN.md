@@ -299,7 +299,7 @@ Node color is always paired with a text label and Lucide icon, never color alone
 1. **Sidebar card (desktop ≥ 1200px: collapsed rail 76px showing icons only; expands to 248px on hover or keyboard focus within, 200ms ease-out width transition that pushes the content; labels fade in; 16px inset from viewport edges, full height minus insets):**
    - Glass (`glass` utility: translucent `surface-elevated`, backdrop blur, hairline border, soft shadow), radius 16px, padding 16px.
    - **Header:** Tessera wordmark with a symbol in `primary` (placeholder until a logo is chosen; no off-token colors). No collapse toggle until a collapsed layout exists.
-   - **Navigation:** One group, three destinations from PRD §6: **Accounts** (risk ranking), **Review** (save plans), **Data**, and nothing else. Review shows a count chip of pending plans. Benchmark is not a screen: retrieval benchmark results, if run, live in the pitch, not the nav. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
+   - **Navigation:** One group, four destinations from PRD §6: **Dashboard** (portfolio overview, default route), **Accounts** (risk ranking), **Review** (save plans), **Data**, and nothing else. Review shows a count chip of pending plans. Benchmark is not a screen: retrieval benchmark results, if run, live in the pitch, not the nav. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
    - **Bottom card:** workspace label and data source line in text (no avatar). Text: `KasirNusa · synthetic dataset` with snapshot date `1 Oct 2026`; before ingest it reads `Synthetic seed data · resets on refresh`. This replaces the reference user dock and its ⋯ menu.
 2. **Header (on canvas, 64px tall):**
    - Left: page title (`headline-lg`).
@@ -320,7 +320,8 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 
 | Screen | Task | Reference Pattern | Primary Information | Supporting | Key Actions |
 |---|---|---|---|---|---|
-| **Accounts** (risk ranking) | Decide which of the 40 customers to review | KPI row (first featured) + ranking table; C01–C06 pinned on top | Priority score (0–100, labelled "priority score", never churn probability), level Low/Medium/High/Critical, top risk factor, data coverage, `mismatch` flag vs CRM health | Annual contract value, weighted value for priority (`annual value × score / 100`), days to renewal, NPS as context | Open account; filter by level |
+| **Dashboard** | See the portfolio at a glance | KPI row (first featured, 2 mini KPIs) + three cards: level distribution bar, renewals in the next 90 days from the snapshot, recent decisions | Weighted value for priority, accounts at High/Critical, plans in review, median priority score | Level counts, days to renewal, decision actor/date | Open account from a renewal or decision |
+| **Accounts** (risk ranking) | Decide which of the 40 customers to review | Ranking table with level filter and sort; C01–C06 pinned on top (KPIs live on Dashboard) | Priority score (0–100, labelled "priority score", never churn probability), level Low/Medium/High/Critical, top risk factor, data coverage, `mismatch` flag vs CRM health | Annual contract value, weighted value for priority (`annual value × score / 100`), days to renewal, NPS as context | Open account; filter by level |
 | **Account Detail** | Check evidence path, timeline, ask the graph, draft a plan | Left: factor breakdown, evidence subgraph, timeline; right: Ask-the-graph box + plan draft | Factors with their evidence paths (≥3 sources for a recommendation), cited nodes | Source file, row/interaction ID, snapshot period, Jev confidence | Ask a question (answer cites nodes or abstains); send plan to Review |
 | **Review** (save plans) | Decide plans and see precedent | Single plan card with cited `decision_log` precedent and deviation note; feedback thread below | Plan text, precedent `decision_id`, why it deviates | Author, time, prior Decisions | Approve or reject (signed-in only, append-only, no email sent); reply to feedback |
 | **Data** | See sources, ingest status, Jev status, errors, cost | Source table + compile stats card | 15 files with rows, hash, ingest status; node/edge counts per type | Jev calls written/reviewed/discarded, errors, actual cost | Run ingest (signed-in only) |
@@ -345,7 +346,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
   - `xl` 20px: modal dialogs.
   - `full`: search input, circular icon buttons, chart bubbles.
 - **Icons:** Lucide only, 1.75px stroke, 18–20px. Trend direction uses `TrendingUp` / `TrendingDown` (14px), not ▲▼ characters. Icon-only buttons carry `aria-label`.
-- **Logo:** not yet designed; placeholder symbol uses `primary`.
+- **Logo:** concept "Cut tile" in `docs/brand/` (see its README): T cut along tile edges and 45° diagonals. Lime `primary` mark on graphite; sidebar uses the mark inside the 32px lime square in `on-primary`; favicon is `frontend/src/app/icon.svg`.
 - **Charts:**
   - **Risk trend:** smooth monotone curve, current period `primary` 2px line with area fill `primary` 12% → 0%; prior period `chart-prior` 1.5px line with `chart-strong` area at 20%. Vertical dashed guide in `on-surface-muted` at the inspected month, dot markers on both series, tooltip in `surface-elevated` showing both periods side by side. Grid lines `outline`, axis labels `label-sm` muted. Accessible data table toggle below.
   - **Risk categories:** three bubbles sized by share (`chart-strong`, `primary`, `chart-soft`) with in-bubble percentage and a dot legend showing category, percent, and count.
@@ -391,7 +392,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 |---|---|
 | **A1 No emoji** | Lucide only, including trend arrows; no emoji or Unicode triangles. |
 | **A2 Deliberate palette** | Only tokens in this file; lime appears on the active nav icon, the primary button, positive trends, and data. The logo placeholder uses `primary`, not an off-token orange. |
-| **A3 One task per screen** | Accounts ranks; Detail investigates, answers, and drafts; Review decides plans; Data ingests. |
+| **A3 One task per screen** | Dashboard summarises (KPIs live only there); Accounts ranks; Detail investigates, answers, and drafts; Review decides plans; Data ingests. |
 | **A4 Focused navigation** | Four menu items only. Bottom card shows CSM name and data source in text, no avatar portrait. |
 | **A5 Tidy density** | Numbers right-aligned and tabular; secondary actions in ⋯ menus; long chips become icon + tooltip. |
 | **A6 No dead surfaces** | Header icon buttons appear only on screens where they act; ⋯ menus omitted when empty. |

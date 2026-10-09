@@ -57,6 +57,7 @@ SalesTranscriptQA boleh dipakai sebagai benchmark retrieval tambahan dengan izin
 
 | Layar | Tugas utama |
 |---|---|
+| Dashboard | Melihat kondisi portofolio sekilas: KPI, sebaran level, renewal 90 hari ke depan, keputusan terbaru (ditambah 9 Okt atas permintaan user, menunggu ACC tim) |
 | Peringkat risiko | Menentukan akun yang perlu ditinjau dari parameter, prioritas, dan cakupan |
 | Detail akun | Memeriksa jalur bukti, timeline, tanya graph, serta rencana tindakan |
 | Review/save plan | Mengedit dan memutuskan rencana, melihat preseden dan Decision |

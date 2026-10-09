@@ -3,68 +3,19 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { ClipboardCheck, Gauge, type LucideIcon, Scale, ShieldAlert } from "lucide-react";
-import { usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
 import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/demo-data";
 
 const riskOptions = ["All", "Critical", "High", "Medium", "Low"] as const;
-const weightedTotal = accounts.reduce((sum, account) => sum + account.weightedValue, 0);
-const elevatedCount = accounts.filter(account => account.riskLevel !== "Medium").length;
-const scores = accounts.map(account => account.priorityScore).sort((a, b) => a - b);
-const mid = Math.floor(scores.length / 2);
-const medianScore = scores.length % 2 ? scores[mid] : (scores[mid - 1] + scores[mid]) / 2;
-
-type KpiProps = { icon: LucideIcon; label: string; value: string; note: string; featured?: boolean; small?: boolean };
-
-function Kpi({ icon: Icon, label, value, note, featured, small }: KpiProps) {
-  // Muted gray fails contrast over the lime glow; featured text stays on-surface.
-  const secondary = featured ? "text-on-surface" : "text-on-surface-muted";
-  return (
-    <section className={`flex flex-col gap-md ${featured ? "card-featured" : "card"}`}>
-      <span className="grid size-9 place-items-center rounded-sm bg-surface-elevated">
-        <Icon size={18} strokeWidth={1.75} aria-hidden />
-      </span>
-      <div>
-        <h2 className={`text-label-md ${secondary}`}>{label}</h2>
-        <p className={`mt-xs font-bold ${small ? "text-display-number-sm tracking-display-number-sm" : "text-display-number tracking-display-number"}`}>
-          {value}
-        </p>
-      </div>
-      <p className={`mt-auto text-label-sm ${secondary}`}>{note}</p>
-    </section>
-  );
-}
 
 export default function AccountsPage() {
   const query = useSearchParams().get("q") ?? "";
   const [risk, setRisk] = useState<"All" | RiskLevel>("All");
   const [sort, setSort] = useState<"risk" | "weighted" | "renewal">("risk");
-  const pendingPlans = usePendingPlans().length;
   const visible = sortAccounts(filterAccounts(accounts, query, risk), sort);
 
   return (
     <div className="flex flex-col gap-md">
-      <div className="grid gap-md md:grid-cols-2 xl:grid-cols-3">
-        <Kpi
-          featured
-          icon={Scale}
-          label="Weighted value for priority"
-          value={formatMoney(weightedTotal, "IDR", true)}
-          note="Contract value × priority score ÷ 100. Orders work; it is not expected loss."
-        />
-        <Kpi
-          icon={ShieldAlert}
-          label="Accounts at High or Critical"
-          value={`${elevatedCount} of ${accounts.length}`}
-          note="Level set by the scoring formula in code."
-        />
-        <div className="grid grid-cols-2 gap-md md:col-span-2 xl:col-span-1">
-          <Kpi small icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Awaiting approve or reject" />
-          <Kpi small icon={Gauge} label="Median priority score" value={String(medianScore)} note={`Across ${accounts.length} accounts`} />
-        </div>
-      </div>
-
       <section className="card" aria-labelledby="watchlist-heading">
         <div className="flex flex-wrap items-center gap-sm">
           <div className="mr-auto">
