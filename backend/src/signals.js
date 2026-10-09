@@ -22,7 +22,14 @@ export function classifySignal(answer) {
     if (answer.confidence < SIGNAL_THRESHOLDS.scoreConfidenceWrite) return 'review';
     return answer.score >= SIGNAL_THRESHOLDS.scoreWrite ? 'active' : 'discarded';
   }
-  throw new TypeError('Only validated Jev noul and score outputs can create signals.');
+  if (answer.type === 'choice') {
+    if (typeof answer.choice !== 'string' || !Number.isFinite(answer.confidence) || answer.confidence < 0 || answer.confidence > 1) {
+      throw new RangeError('Choice and confidence are invalid.');
+    }
+    if (answer.confidence < SIGNAL_THRESHOLDS.scoreConfidenceWrite) return 'review';
+    return answer.choice === 'negative' ? 'active' : 'discarded';
+  }
+  throw new TypeError('Only validated Jev noul, score and choice outputs can create signals.');
 }
 
 export function buildSignalCandidate({ sourceText, chunk, sourceRecordId, sourceHash, label, answer, jevRunId, model, rubricVersion }) {

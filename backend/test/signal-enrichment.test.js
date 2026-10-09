@@ -24,7 +24,13 @@ function mockDatabase() {
 test('Jev signals retain exact source spans and remain review-only until human approval', async () => {
   const { database, state } = mockDatabase();
   const text = 'Kami mempertimbangkan pindah ke KompetitorX karena layanan lambat.';
-  const answers = Object.fromEntries(Object.keys(SIGNAL_QUESTIONS).map((name) => [name, { type: 'noul', noul: name === 'mentions_competitor' ? 0.97 : 0.02 }]));
+  const answers = Object.fromEntries(Object.entries(SIGNAL_QUESTIONS).map(([name, question]) => [name,
+    question.type === 'noul'
+      ? { type: 'noul', noul: name === 'mentions_competitor' ? 0.97 : 0.02 }
+      : question.type === 'score'
+        ? { type: 'score', score: 0, confidence: 0.95, probabilities: { '0': 0.95, '1': 0.02, '2': 0.02, '3': 0.01 } }
+        : { type: 'choice', choice: 'neutral', confidence: 0.95, probabilities: { positive: 0.02, neutral: 0.95, negative: 0.02, mixed: 0.01 } },
+  ]));
   const jevClient = { async evaluate(input) {
     assert.equal(input.state.text, text);
     return { model: 'jev-test', runId: 'run-1', answers, usage: { input_tokens: 30, output_tokens: 5 }, metrics: { cached: false, latencyMs: 8, inputTokens: 30, outputTokens: 5 } };

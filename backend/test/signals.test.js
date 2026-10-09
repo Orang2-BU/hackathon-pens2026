@@ -12,7 +12,13 @@ test('Score thresholds send uncertain labels to review before severity cutoff', 
   assert.equal(classifySignal({ type: 'score', score: 2, confidence: 0.8 }), 'active');
   assert.equal(classifySignal({ type: 'score', score: 3, confidence: 0.79 }), 'review');
   assert.equal(classifySignal({ type: 'score', score: 1.99, confidence: 0.9 }), 'discarded');
-  assert.throws(() => classifySignal({ type: 'choice', choice: 'yes' }), /Only validated/);
+  assert.throws(() => classifySignal({ type: 'choice', choice: 'yes' }), /Choice and confidence/);
+});
+
+test('Choice sentiment writes only high-confidence negative as a candidate and reviews ambiguous output', () => {
+  assert.equal(classifySignal({ type: 'choice', choice: 'negative', confidence: 0.8 }), 'active');
+  assert.equal(classifySignal({ type: 'choice', choice: 'negative', confidence: 0.79 }), 'review');
+  assert.equal(classifySignal({ type: 'choice', choice: 'neutral', confidence: 0.9 }), 'discarded');
 });
 
 test('signal candidate uses an exact UTF-16 source quote and stable provenance ID', () => {

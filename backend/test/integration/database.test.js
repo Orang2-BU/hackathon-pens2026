@@ -58,7 +58,14 @@ test('dataset publish, graph compile, Jev signal persistence, and human review a
       INSERT INTO jev_runs (id, input_hash, primitive, model, model_requested, rubric_version, status, response)
       VALUES (${jevRunId}, ${createHash('sha256').update(jevRunId).digest('hex')}, 'noul', ${model}, ${model}, ${SIGNAL_RUBRIC_VERSION}, 'succeeded', ${sql.json({ fixture: true })})
     `;
-    const answers = Object.fromEntries(Object.keys(SIGNAL_QUESTIONS).map((label) => [label, { type: 'noul', noul: label === 'mentions_competitor' ? 0.99 : 0.01 }]));
+    const answers = Object.fromEntries(Object.entries(SIGNAL_QUESTIONS).map(([label, question]) => [label,
+      question.type === 'noul'
+        ? { type: 'noul', noul: label === 'mentions_competitor' ? 0.99 : 0.01 }
+        : question.type === 'score'
+          ? { type: 'score', score: 0, confidence: 0.99, probabilities: { '0': 0.99, '1': 0.003, '2': 0.003, '3': 0.004 } }
+          : { type: 'choice', choice: 'neutral', confidence: 0.99, probabilities: { positive: 0.003, neutral: 0.99, negative: 0.003, mixed: 0.004 },
+          },
+    ]));
     const jevClient = { evaluate: async () => ({ runId: jevRunId, model, answers, usage: { input_tokens: 1, output_tokens: 1 }, metrics: { cached: false, latencyMs: 1, inputTokens: 1, outputTokens: 1 } }) };
     const enrichment = await enrichInteraction({ database: sql, jevClient, revisionId: first.revisionId, record: interaction });
     assert.equal(enrichment.signalCount, 1);

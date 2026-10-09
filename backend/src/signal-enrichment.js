@@ -5,15 +5,27 @@ export const SIGNAL_RUBRIC_VERSION = 'kasirnusa-signals-v1';
 export const SIGNAL_QUESTIONS = Object.freeze({
   is_champion_exit: { type: 'noul', instructions: 'Does this customer interaction explicitly say the champion/contact has left the customer organization or is leaving? Score yes only for explicit evidence in this text.' },
   mentions_competitor: { type: 'noul', instructions: 'Does this text explicitly mention a competing product or provider? Do not infer a competitor from generic dissatisfaction.' },
-  negative_sentiment: { type: 'noul', instructions: 'Does the customer express negative sentiment about the product or service in this text? Distinguish the customer voice from internal notes.' },
-  is_urgent: { type: 'noul', instructions: 'Does the customer express an urgent problem or time-sensitive escalation in this text? Do not infer urgency from a ticket label alone.' },
+  negative_sentiment: { type: 'choice', instructions: 'Classify the customer sentiment expressed in this text. Distinguish the customer voice from internal notes.', criteria: {
+    positive: 'Customer explicitly expresses satisfaction or positive sentiment.',
+    neutral: 'No clear positive or negative customer sentiment is expressed.',
+    negative: 'Customer explicitly expresses dissatisfaction or negative sentiment.',
+    mixed: 'Customer expresses meaningful positive and negative sentiment in the same interaction.',
+  } },
+  urgency_severity: { type: 'score', instructions: 'Score urgency of the customer issue using only this text. Do not infer urgency from a ticket priority field.', criteria: [
+    '0: No urgency or time-sensitive issue is expressed.',
+    '1: Mild concern without an explicit near-term deadline or escalation.',
+    '2: Clear urgent issue or explicit near-term need for action.',
+    '3: Critical/immediate escalation or serious operational impact requiring urgent action.',
+  ] },
   is_expansion: { type: 'noul', instructions: 'Does the customer explicitly express interest in additional outlets, users, or product capabilities? Do not treat a feature promise as customer expansion intent.' },
 });
 
 function answerValues(answer) {
   return answer.type === 'noul'
     ? { probability: answer.noul, score: null, confidence: null }
-    : { probability: null, score: answer.score, confidence: answer.confidence };
+    : answer.type === 'score'
+      ? { probability: null, score: answer.score, confidence: answer.confidence }
+      : { probability: null, score: null, confidence: answer.confidence };
 }
 
 export async function enrichInteraction({ database, jevClient, revisionId, record }) {
