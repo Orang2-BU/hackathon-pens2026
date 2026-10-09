@@ -1,10 +1,10 @@
-# 05 — PITCH & Demo: Relasi untuk KasirNusa
+# 05 — PITCH & Demo: Tessera untuk KasirNusa
 
 > Kerangka, bukan klaim hasil. Durasi pitch dan deadline resmi belum terkonfirmasi. Target pertama dari user: 9 Okt 2026 pukul 22.00, jenis deliverable belum jelas. Data KasirNusa dalam demo bersifat sintetis. Isi metrik aktual hanya setelah run terverifikasi.
 
 ## 1. Cerita singkat
 
-“Tim Customer Success KasirNusa perlu melihat sinyal dari CRM, transaksi, support, interaksi, kontrak, dan keputusan sebelumnya dalam satu tempat. Relasi mengompilasi hubungan itu saat data masuk. Jev menilai ungkapan yang ambigu; kode menghitung angka dan prioritas; LLM menjelaskan bukti serta menyiapkan draf tindakan. CSM tetap memutuskan, dan pengguna dapat menyampaikan pendapat yang ditanggapi.”
+“Tim Customer Success KasirNusa perlu melihat sinyal dari CRM, transaksi, support, interaksi, kontrak, dan keputusan sebelumnya dalam satu tempat. Tessera mengompilasi hubungan itu saat data masuk. Jev menilai ungkapan yang ambigu; kode menghitung angka dan prioritas; LLM menjelaskan bukti serta menyiapkan draf tindakan. CSM tetap memutuskan, dan pengguna dapat menyampaikan pendapat yang ditanggapi.”
 
 Klaim yang boleh dibuat sesudah diuji: graph menghubungkan minimal tiga sumber untuk rekomendasi, 40 pelanggan dapat ditinjau, pertanyaan baru mendapat jawaban bersitasi atau abstain, dan Decision approval dapat ditemukan pada query berikutnya. Jangan klaim penurunan churn, probabilitas terkalibrasi, profit promo, atau penghematan biaya tanpa data dan pengukuran.
 

@@ -4,12 +4,12 @@
 
 ## 1. Alur per Task
 
-1. Ambil task tertinggi yang tidak terblokir dari `04-TODO`; isi owner; ubah ke 🟦.
+1. Ambil task tertinggi yang tidak terblokir dari kanban. Kanban adalah sumber owner/status; `04-TODO.md` hanya peta milestone ke tiket.
 2. Baca bagian terkait di `03-ARCHITECTURE`, `01-PRD`, dan `08-DESIGN` untuk UI.
 3. Tulis kriteria selesai atau test yang gagal. Implementasikan jalur paling sederhana.
 4. Jalankan test terkait lebih dahulu, lalu seluruh pemeriksaan `07-RULES`.
 5. Jalankan golden demo path bila task menyentuh ingest, graph, benchmark, risk, approval, atau route utama.
-6. Update `04-TODO` dengan bukti aktual. Commit hanya bila user meminta/otorisasi workflow mengizinkan.
+6. Perbarui tiket kanban sesuai bukti aktual. Pemilik dokumentasi saja yang menyelaraskan `04-TODO.md`; worker lain melaporkan bukti pada hasil tiket. Commit hanya bila user meminta/otorisasi workflow mengizinkan.
 
 ## 2. Boleh Jalan Sendiri
 
@@ -28,11 +28,11 @@ Dataset KasirNusa dalam ZIP adalah sintetis; ekstrak lokal dan ZIP tetap diabaik
 
 ## 4. Prioritas dan Timebox
 
-1. T1 setup + token.
-2. T2 ingest KasirNusa, graph write-time, Jev, review, eval kecil.
+1. T1 kontrak backend/data dan scaffold minimal; UI/token ownership berjalan melalui jalur frontend terpisah.
+2. T2 skema/persistensi, ingest KasirNusa, graph write-time, Jev, review, dan eval kecil.
 3. T3 parameter dan skor prioritas; uji C01–C06 dan 40 pelanggan.
-4. T4 peringkat/detail/tanya graph, T5 approval/feedback, T6 demo publik dan UI.
-5. T7 pitch/fallback dan benchmark aktual bila dibuat; fitur tambahan setelah Must stabil.
+4. T4 peringkat/detail/tanya graph; T5 approval/feedback; T6 auth, rate limit, integrasi dan verifikasi demo. Frontend belum ditugaskan.
+5. T7 bukti pitch/fallback dan benchmark aktual bila dibuat; fitur tambahan setelah Must stabil.
 
 Task 30–120 menit. Jika melewati timebox, pilih versi lebih sederhana yang tetap memenuhi kriteria; jangan menambah lapisan baru untuk menyelamatkan desain yang salah.
 
