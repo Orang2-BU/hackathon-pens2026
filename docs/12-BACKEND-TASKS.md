@@ -61,7 +61,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-07 — Human review signal/alias
 
-- **Trace:** T2; TASK-007/010. **Prerequisite:** BE-05/06 dan write auth BE-09 saat integrasi. **Status:** Todo.
+- **Trace:** T2; TASK-007/010. **Prerequisite:** BE-05/06 dan write auth BE-09 saat integrasi. **Status:** In Progress; deterministic candidate/merge classification is implemented. Persistent review queue/actions wait on DB and BE-09.
 - **Output:** daftar review beserta sumber/output model, keputusan review append-only dengan actor/reason.
 - **Kerja:** pisahkan active signal dari kandidat; approve/reject persisten; alias merge hanya jika hard-ID guard lolos dan source tetap ada.
 - **Lulus:** signal baru aktif hanya setelah approval valid; reject tidak menjadi skor; double submit aman; hard-ID conflict tak dapat diapprove sebagai merge; audit model output asli tetap dapat dibaca. Dampak scoring explicit/versioned, berbeda dari feedback.
@@ -222,6 +222,14 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - `backend/src/jev-store.js` menyimpan hasil valid dan error code minimal; migration `002_jev_cache.sql` menambah cache response dan key model requested. Input teks mentah tidak disimpan di `jev_runs`.
 - Test fake response/retry/no-retry/cache/malformed answer/chunk offsets lulus. Keseluruhan backend `corepack pnpm test` lulus 19/19; `corepack pnpm check` lulus.
 - `JEV_API_KEY` dan `TEST_DATABASE_URL` tidak tersedia di environment, sehingga tidak ada request provider, live health-check, enrichment, token/cost/latency run, atau DB cache test. Nilai biaya aktual tetap NULL; test mock bukan hasil Jev live. Tidak ada data yang dikirim keluar.
+
+## 12. Eksekusi BE-07 (parsial)
+
+- `backend/src/signals.js` menerapkan batas Noul tepat `>=0.85` active, `0.50–<0.85` review, `<0.50` discarded; Score active hanya confidence `>=0.80` dan severity `>=2`, confidence rendah masuk review.
+- Candidate menyimpan model/rubric/run, source ID/hash, deterministik ID/input hash dan kutipan sebagai substring persis dari span UTF-16 sumber. Kutipan model tidak diterima/diciptakan.
+- Entity resolution: `>=0.95` merge hanya bila tidak ada konflik hard ID; `0.60–<0.95` review; di bawah terpisah; konflik hard ID selalu blocked.
+- Unit test batas, span, ID stabil, merge guard lulus; seluruh backend 23/23; syntax check lulus.
+- BE-07 belum Done: persistensi daftar review, append-only actor/reason, idempotency, transisi review, dan audit output provider memerlukan DB disposable serta auth BE-09. Tidak ada UI atau frontend changes.
 
 ## 10. Eksekusi BE-05 (parsial)
 
