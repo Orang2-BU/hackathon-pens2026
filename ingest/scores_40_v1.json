@@ -39,7 +39,7 @@
   "signals": [
    "Transaksi/hari turun 12% (90 hari terakhir vs 90 hari sebelumnya)",
    "6 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "6 tiket masih terbuka, 6 terkait BUG-412; 8 tiket dalam 90 hari terakhir"
+   "6 tiket masih terbuka, 6 terkait isu sinkron/BUG-412 (derived); 8 tiket dalam 90 hari terakhir"
   ]
  },
  {
@@ -59,7 +59,7 @@
   "renewal": "2027-04-10",
   "signals": [
    "5 outlet mode offline aktif (rawan isu sinkronisasi)",
-   "4 tiket masih terbuka, 4 terkait BUG-412; 6 tiket dalam 90 hari terakhir",
+   "4 tiket masih terbuka, 4 terkait isu sinkron/BUG-412 (derived); 6 tiket dalam 90 hari terakhir",
    "100 hari tanpa kontak masuk dari pelanggan"
   ]
  },
