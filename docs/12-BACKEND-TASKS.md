@@ -26,10 +26,10 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-02 — Runtime service, PostgreSQL, dan migrasi
 
-- **Trace:** T1/T2; TASK-005. **Prerequisite:** BE-01. **Status:** Todo.
+- **Trace:** T1/T2; TASK-005. **Prerequisite:** BE-01. **Status:** Blocked untuk acceptance PostgreSQL; service/schema/runner dan unit tests sudah dibuat. Perlu database disposable untuk membuktikan migrasi, checksum/no-op, privileges, dan rollback.
 - **Output:** keputusan runtime API, package service dalam `backend/`, endpoint health, koneksi PostgreSQL, migration runner, file SQL dan integration test DB sesuai 11 §5.
 - **Kerja:** pilih runtime API sederhana tanpa mengubah frontend; migrator/runtime roles, FK/CHECK/unique/index, SQL binding, advisory lock/checksum, append-only protection, transaksi atomik.
-- **Lulus:** service/command berjalan dari `backend/` tanpa import frontend; DB kosong dapat dimigrasikan; run ulang no-op; checksum mismatch gagal aman; runtime tidak bisa UPDATE/DELETE Decision; transaksi gagal rollback; migration tidak berjalan pada request publik. Test memakai DB disposable.
+- **Lulus:** service/command berjalan dari `backend/` tanpa import frontend; DB kosong dapat dimigrasikan; run ulang no-op; checksum mismatch gagal aman; runtime tidak bisa UPDATE/DELETE Decision; transaksi gagal rollback; migration tidak berjalan pada request publik. Test memakai DB disposable. Unit HTTP/migration-file checks pass; acceptance DB belum dibuktikan.
 
 ### BE-03 — Fixture kecil, QA oracle, eval sebelum model
 
@@ -191,3 +191,11 @@ Tabel §5 adalah checkpoint sebelum BE-01. Status task terbaru ada pada §2 dan 
 | Docs | Relative link check dokumen 11/12/13, ADR index, frontend README | 30 link valid; whitespace/diff check dijalankan |
 
 Catatan error selama task: typecheck awal menemukan code/status error union yang kehilangan korelasi akibat object spread; diperbaiki dengan typed error constants, tanpa cast/suppression. Knip pada run paralel dengan build sempat gagal `RangeError: Array buffer allocation failed` di parser dependency; rerun mandiri setelah build lulus tanpa mengubah/suppress pemeriksaan. Error ini dicatat, tidak disajikan sebagai run pertama yang sukses.
+
+## 7. Eksekusi BE-02 (parsial; blocker database)
+
+- ADR-0005/0006 memisahkan workspace dan menetapkan service mandiri `node:http`; storage tetap PostgreSQL/postgres.js. Runtime source berada sepenuhnya di `backend/`.
+- Implementasi: health live/readiness, koneksi postgres.js, migration CLI dengan advisory lock, SHA-256/checksum, fail closed bila applied migration hilang/berubah, schema inti, trigger append-only Decision, dan role SQL runtime/migrator.
+- Pemeriksaan: `corepack pnpm install` berhasil dengan postgres.js 3.4.9; `corepack pnpm test` lulus 6/6; `corepack pnpm check` lulus (syntax check Node).
+- `corepack pnpm test:integration` belum dapat berjalan: `TEST_DATABASE_URL` tidak tersedia; Docker, `psql`, dan PostgreSQL lokal tidak ditemukan. Karena itu migration execution/idempotency/checksum mismatch, privileges runtime, dan rollback belum terverifikasi; BE-02 tetap Blocked, bukan Done.
+- Typecheck/build/ESLint/dead-code checker belum dikonfigurasi pada package JavaScript backend; tidak diklaim lulus. Tidak ada perubahan pada source frontend.

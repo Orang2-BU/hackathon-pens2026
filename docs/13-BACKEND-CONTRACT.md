@@ -1,12 +1,12 @@
 # 13 — Kontrak backend v1 (BE-01)
 
-> Kontrak implementasi BE-01, 9 Oktober 2026. DTO dan boundary pertukaran ditulis di dokumen ini. Prototype awal ada di working tree frontend dari checkpoint sebelumnya; source canonical akan ada di root `backend/` setelah task pemindahan kontrak. Runtime/API/database belum dibuat. Keputusan storage tetap [ADR stack Accepted](adr/0003-stack-hosting-auth-llm.md); workspace ADR-0005 masih Proposed.
+> Kontrak implementasi BE-01, 9 Oktober 2026. DTO dan boundary pertukaran ditulis di dokumen ini. Prototype awal ada di working tree frontend dari checkpoint sebelumnya; source canonical service sekarang berada di root `backend/`. HTTP runtime diputuskan pada [ADR-0006](adr/0006-standalone-backend-service.md); PostgreSQL integration masih menunggu database disposable.
 
 ## 1. Runtime dan lokasi
 
-- UI tetap Next.js 16.4.0 di `frontend/`; package/runtime backend di root `backend/` akan ditetapkan pada BE-02.
+- UI tetap Next.js 16.4.0 di `frontend/`; service Node.js ESM terpisah di root `backend/`, memakai `node:http`.
 - Backend source dan tests berada di workspace backend; API bertukar DTO JSON dan tidak mengimpor source UI.
-- Driver `postgres` ditambahkan pada BE-02. Zod/`pg`/ORM/SDK bukan dependency yang dipilih. BE-01 menggunakan validasi stdlib; BE-02/04 membuktikan migrasi/ingest dalam container ketika file dan runtime tersebut tersedia.
+- Driver `postgres` digunakan pada backend. Zod/`pg`/ORM/SDK bukan dependency yang dipilih. Migrasi dijalankan CLI dengan role migrator; runtime memakai kredensial dan role terpisah. PostgreSQL checks perlu environment disposable.
 
 ## 2. Konteks dan provenance
 
@@ -72,4 +72,4 @@ Invariants query: graph traversal depth ≤4, cycle guard dan batas response; de
 
 ## 6. Bukti verifikasi
 
-Prototype boundary pada checkpoint BE-01 diverifikasi dan dicatat di [12-BACKEND-TASKS](12-BACKEND-TASKS.md) §6. Pemindahan source canonical ke workspace root dan checks mandiri menjadi tindak lanjut backend. Scaffold ini tidak membuat API, DB, migration, container, Jev call, atau perubahan UI.
+Prototype boundary pada checkpoint BE-01 diverifikasi dan dicatat di [12-BACKEND-TASKS](12-BACKEND-TASKS.md) §6. Service health, schema, dan migration runner dibuat pada BE-02; verifikasi PostgreSQL aktual menunggu database disposable. Tidak ada perubahan UI.

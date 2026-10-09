@@ -1,0 +1,19 @@
+{
+  "name": "tessera-backend",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "packageManager": "pnpm@10.15.0",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/health.test.js test/migrations.test.js",
+    "check": "node scripts/check.js",
+    "migrate": "node scripts/migrate.js",
+    "test:integration": "node --test test/integration/*.test.js"
+  },
+  "dependencies": {
+    "postgres": "^3.4.7"
+  }
+}

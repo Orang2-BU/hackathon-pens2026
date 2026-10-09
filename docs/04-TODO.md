@@ -10,7 +10,7 @@
 
 | ID | Task | Pemilik | Status | Bukti / kriteria selesai |
 |---|---|---|---|---|
-| T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | Frontend/token baseline sudah ada. BE-01 menulis kontrak v1 dan checks prototype lokal; workspace root `backend/` dibuat. Runtime backend, API, PostgreSQL/schema/migrasi masih BE-02; milestone T1 belum Done. UI dan folder frontend tidak dikerjakan pada commit ini. |
+| T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | BE-02 membuat service, schema, dan migration runner dalam `backend/`; unit 6/6. Integrasi aktual menunggu PostgreSQL disposable; milestone T1 belum Done. Frontend tidak diubah. |
 | T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | ⬜ | Statistik baris/node/edge, source/hash, kutipan valid, idempotensi, eval primitif berlabel |
 | T3 | Parameter dan skor prioritas deterministik | — | ⬜ | Bobot 30/25/20/15/10 diuji pada C01–C06 dan 40 pelanggan; data kosong/offline jelas; sensitivitas bobot; QA §6 dokumen 09 |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | ⬜ | Pertanyaan baru dijawab dari graph lewat router intent Jev; jalur bukti ≥3 sumber bila rekomendasi; abstain bila tidak cukup; eval routing 30 pertanyaan berlabel |
@@ -56,3 +56,4 @@
 | 9 Okt 2026 | Frozen install berhasil; test frontend 4/4, build, typecheck, lint, knip lulus. Production HTTP smoke lokal empat halaman → 200; `/api/health/ready` → 404 karena backend belum ada. Ini bukan hasil deploy/UAT backend; bukti di dokumen 12. |
 | 9 Okt 2026 | BE-01 selesai: kontrak DTO/API v1, validasi input/temporal/error dan native Node TS, Node engine/ESM, indeks ADR dan dokumen stack/Jev selaras. Test 47/47, build, typecheck, lint, knip (rerun mandiri sesudah allocation failure paralel), empat HTTP seed route →200. DB/Jev live/golden path/deploy belum diuji; bukti lengkap 12 §6. |
 | 9 Okt 2026 | Workspace root `backend/` diminta user agar backend dipisahkan dan frontend tidak dikerjakan. README workspace + ADR-0005 Proposed ditambahkan. Pilihan API runtime belum dibuat; folder frontend tidak masuk commit. |
+| 9 Okt 2026 | BE-02 parsial: Node HTTP service, health endpoints, PostgreSQL schema/migration runner dan role boundary dibuat; unit 6/6 + syntax check lulus. Integration DB terblokir karena tidak ada Docker/psql/PostgreSQL atau TEST_DATABASE_URL. Runtime diputuskan pada ADR-0006; source frontend tidak disentuh. |
