@@ -31,11 +31,13 @@ function makeStore() {
     async saveRun(run) {
       saved.push(run);
       if (run.status === 'succeeded') cache.set(JSON.stringify({ inputHash: run.inputHash, modelRequested: run.modelRequested, rubricVersion: run.rubricVersion, primitive: run.primitive }), {
+        id: run.id,
         response: run.response,
         latency_ms: run.latencyMs,
         input_tokens: run.inputTokens,
         output_tokens: run.outputTokens,
       });
+      return run.id;
     },
   };
 }
@@ -66,6 +68,8 @@ test('client batches typed questions and caches validated response by input/mode
   assert.equal(calls, 1);
   assert.equal(first.metrics.cached, false);
   assert.equal(second.metrics.cached, true);
+  assert.equal(first.runId, store.saved[0].id);
+  assert.equal(second.runId, first.runId);
   assert.equal(store.saved.length, 1);
   assert.equal(store.saved[0].primitive, 'mixed');
   assert.equal(store.saved[0].inputTokens, 120);

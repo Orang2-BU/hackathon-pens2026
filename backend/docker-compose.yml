@@ -41,6 +41,29 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  enrich:
+    profiles: ["enrichment"]
+    build: .
+    image: tessera-backend:local
+    command: ["node", "scripts/enrich-signals.js"]
+    environment:
+      DATABASE_URL: postgres://tessera_runtime_login:${TESSERA_RUNTIME_PASSWORD:?Set TESSERA_RUNTIME_PASSWORD in backend/.env}@db:5432/${POSTGRES_DB:-tessera}
+      JEV_API_KEY: ${JEV_API_KEY:?Set JEV_API_KEY in backend/.env before running enrichment}
+      JEV_MAX_REQUESTS: ${JEV_MAX_REQUESTS:-1000}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - private
+      - egress
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
   api:
     image: tessera-backend:local
     restart: unless-stopped

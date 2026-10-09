@@ -2,7 +2,7 @@ export function createJevRunStore(database) {
   return {
     async getCached({ inputHash, modelRequested, rubricVersion, primitive }) {
       const [row] = await database`
-        SELECT model, response, latency_ms, input_tokens, output_tokens
+        SELECT id, model, response, latency_ms, input_tokens, output_tokens
         FROM jev_runs
         WHERE input_hash = ${inputHash}
           AND model_requested = ${modelRequested}
@@ -16,7 +16,7 @@ export function createJevRunStore(database) {
     },
 
     async saveRun(run) {
-      await database`
+      const [stored] = await database`
         INSERT INTO jev_runs (
           id, input_hash, primitive, model, model_requested, rubric_version, status,
           latency_ms, input_tokens, output_tokens, error_code, response
@@ -36,7 +36,9 @@ export function createJevRunStore(database) {
           response = EXCLUDED.response,
           created_at = now()
         WHERE jev_runs.status <> 'succeeded' OR EXCLUDED.status = 'succeeded'
+        RETURNING id
       `;
+      return stored?.id ?? null;
     },
   };
 }

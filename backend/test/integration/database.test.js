@@ -1,16 +1,18 @@
 import assert from 'node:assert/strict';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 import postgres from 'postgres';
 import { ingestDataset } from '../../src/ingest.js';
 import { compilePublishedGraph } from '../../src/graph-compiler.js';
+import { enrichInteraction, SIGNAL_QUESTIONS, SIGNAL_RUBRIC_VERSION } from '../../src/signal-enrichment.js';
+import { reviewSignal } from '../../src/signal-review.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL is required for disposable PostgreSQL integration tests.');
 const datasetDirectory = process.env.TEST_DATASET_DIR;
 if (!datasetDirectory) throw new Error('TEST_DATASET_DIR must point to the local KasirNusa directory for ingest integration tests.');
 
-test('dataset publish and graph compile are repeatable by revision hash', async () => {
+test('dataset publish, graph compile, Jev signal persistence, and human review are repeatable', async () => {
   const sql = postgres(url, { max: 1 });
   try {
     const first = await ingestDataset({ database: sql, directory: datasetDirectory });
@@ -41,6 +43,33 @@ test('dataset publish and graph compile are repeatable by revision hash', async 
     assert.equal(repeated.factCount, compiled.factCount);
     const [candidateCount] = await sql`SELECT count(*)::integer AS count FROM edges WHERE dataset_revision_id = ${first.revisionId} AND type = 'bug_candidate' AND status = 'review'`;
     assert.equal(candidateCount.count, 5);
+
+    const [interaction] = await sql`
+      SELECT sr.id, sr.record_hash, sr.payload
+      FROM source_records sr JOIN sources s ON s.id = sr.source_id
+      WHERE s.dataset_revision_id = ${first.revisionId} AND s.file_name = 'interactions.jsonl'
+        AND NULLIF(sr.payload->>'isi', '') IS NOT NULL
+      ORDER BY sr.record_number LIMIT 1
+    `;
+    assert.ok(interaction);
+    const jevRunId = randomUUID();
+    const model = `integration-${randomUUID()}`;
+    await sql`
+      INSERT INTO jev_runs (id, input_hash, primitive, model, model_requested, rubric_version, status, response)
+      VALUES (${jevRunId}, ${createHash('sha256').update(jevRunId).digest('hex')}, 'noul', ${model}, ${model}, ${SIGNAL_RUBRIC_VERSION}, 'succeeded', ${sql.json({ fixture: true })})
+    `;
+    const answers = Object.fromEntries(Object.keys(SIGNAL_QUESTIONS).map((label) => [label, { type: 'noul', noul: label === 'mentions_competitor' ? 0.99 : 0.01 }]));
+    const jevClient = { evaluate: async () => ({ runId: jevRunId, model, answers, usage: { input_tokens: 1, output_tokens: 1 }, metrics: { cached: false, latencyMs: 1, inputTokens: 1, outputTokens: 1 } }) };
+    const enrichment = await enrichInteraction({ database: sql, jevClient, revisionId: first.revisionId, record: interaction });
+    assert.equal(enrichment.signalCount, 1);
+    const [signal] = await sql`SELECT id, status, jev_run_id, quote, span_start, span_end FROM signals WHERE jev_run_id = ${jevRunId}`;
+    assert.equal(signal.status, 'review');
+    assert.equal(signal.quote, interaction.payload.isi);
+    assert.equal(interaction.payload.isi.slice(signal.span_start, signal.span_end), signal.quote);
+    const decision = await reviewSignal({ database: sql, signalId: signal.id, actorId: 'integration', idempotencyKey: `review-${randomUUID()}`, decision: 'accepted', reason: 'Integration fixture review' });
+    assert.equal(decision.decision, 'accepted');
+    const [approved] = await sql`SELECT status FROM signals WHERE id = ${signal.id}`;
+    assert.equal(approved.status, 'active');
   } finally {
     await sql.end({ timeout: 5 });
   }

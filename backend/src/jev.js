@@ -162,7 +162,7 @@ export function createJevClient({ apiKey, store, fetchImpl = fetch, maxRequests 
       const primitive = primitiveFor(questions);
       const key = cacheKey(canonical, model, rubricVersion, primitive);
       const cached = await store.getCached(key);
-      if (cached) return { ...cached.response, metrics: { cached: true, latencyMs: cached.latency_ms, inputTokens: cached.input_tokens, outputTokens: cached.output_tokens } };
+      if (cached) return { ...cached.response, runId: cached.id, metrics: { cached: true, latencyMs: cached.latency_ms, inputTokens: cached.input_tokens, outputTokens: cached.output_tokens } };
       if (requestsStarted >= maxRequests) throw new JevError('request_budget_exceeded', 'Jev request budget is exhausted.');
       if (active >= maxConcurrent) throw new JevError('concurrency_limit', 'Jev concurrency limit is reached.', { retryable: true });
 
@@ -199,8 +199,9 @@ export function createJevClient({ apiKey, store, fetchImpl = fetch, maxRequests 
             const result = validateJevResponse(raw, questions);
             const latencyMs = Math.max(0, Math.round(now() - startedAt));
             const output = { ...result, metrics: { cached: false, latencyMs, inputTokens: result.usage.input_tokens, outputTokens: result.usage.output_tokens, estimatedCostUsd: null } };
-            await store.saveRun({ id: randomUUID(), ...key, model: result.model, status: 'succeeded', latencyMs, inputTokens: result.usage.input_tokens, outputTokens: result.usage.output_tokens, errorCode: null, response: result });
-            return output;
+            const requestedRunId = randomUUID();
+            const runId = await store.saveRun({ id: requestedRunId, ...key, model: result.model, status: 'succeeded', latencyMs, inputTokens: result.usage.input_tokens, outputTokens: result.usage.output_tokens, errorCode: null, response: result }) ?? requestedRunId;
+            return { ...output, runId };
           } catch (error) {
             finalError = error instanceof JevError ? error : new JevError('provider_network_error', 'Jev network request failed.', { retryable: true });
             if (!finalError.retryable || attempt === MAX_RETRIES || requestsStarted >= maxRequests) break;
