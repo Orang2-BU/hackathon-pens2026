@@ -1,45 +1,41 @@
 "use client";
 
 import Link from "next/link";
-import { CalendarClock, ClipboardCheck, Gauge, GitCommitHorizontal, type LucideIcon, Scale, ShieldAlert } from "lucide-react";
+import { ArrowRight, CalendarClock, ClipboardCheck, Database, GitCommitHorizontal, type LucideIcon, Scale, ShieldAlert, TriangleAlert } from "lucide-react";
 import { useDemoState, usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, formatMoney, type RiskLevel } from "@/lib/demo-data";
+import { accounts, formatMoney, isElevated, isMismatch, riskFactors, type RiskLevel } from "@/lib/demo-data";
 
 // Analysis snapshot from docs/10-DATA-PROFILE-KASIRNUSA.md; day counts are measured from it, not from today.
 const SNAPSHOT = "2026-10-01";
 const DAY_MS = 86_400_000;
-const levels: RiskLevel[] = ["Critical", "High", "Medium", "Low"];
-const levelBar: Record<RiskLevel, string> = { Critical: "bg-danger", High: "bg-warning", Medium: "bg-outline-active", Low: "bg-success" };
+const levelRank: Record<RiskLevel, number> = { Critical: 0, High: 1, Medium: 2, Low: 3 };
+const daysToRenewal = (date: string) => Math.round((Date.parse(date) - Date.parse(SNAPSHOT)) / DAY_MS);
 
 const weightedTotal = accounts.reduce((sum, account) => sum + account.weightedValue, 0);
-const elevatedCount = accounts.filter(account => account.riskLevel === "Critical" || account.riskLevel === "High").length;
-const scores = accounts.map(account => account.priorityScore).sort((a, b) => a - b);
-const mid = Math.floor(scores.length / 2);
-const medianScore = scores.length % 2 ? scores[mid] : (scores[mid - 1] + scores[mid]) / 2;
-const levelCounts = levels.map(level => ({ level, count: accounts.filter(account => account.riskLevel === level).length }));
-const renewals = accounts
-  .map(account => ({ account, days: Math.round((Date.parse(account.renewalDate) - Date.parse(SNAPSHOT)) / DAY_MS) }))
-  .filter(item => item.days >= 0 && item.days <= 90)
-  .sort((a, b) => a.days - b.days);
+const elevated = accounts.filter(isElevated);
+const attention = [...elevated]
+  .sort((a, b) => levelRank[a.riskLevel] - levelRank[b.riskLevel] || a.renewalDate.localeCompare(b.renewalDate))
+  .slice(0, 5);
+const mismatches = accounts.filter(isMismatch);
+const renewals90 = accounts.filter(account => daysToRenewal(account.renewalDate) <= 90).length;
+const factorCounts = riskFactors.map(factor => ({ factor, count: accounts.filter(account => account.factors.includes(factor)).length }));
 
-type KpiProps = { icon: LucideIcon; label: string; value: string; note: string; featured?: boolean; small?: boolean };
+type StatProps = { icon: LucideIcon; label: string; value: string; note: string; featured?: boolean };
 
-function Kpi({ icon: Icon, label, value, note, featured, small }: KpiProps) {
+function Stat({ icon: Icon, label, value, note, featured }: StatProps) {
   // Muted gray fails contrast over the lime glow; featured text stays on-surface.
   const secondary = featured ? "text-on-surface" : "text-on-surface-muted";
   return (
-    <section className={`flex flex-col gap-md ${featured ? "card-featured" : "card"}`}>
-      <span className="grid size-9 place-items-center rounded-sm bg-surface-elevated">
-        <Icon size={18} strokeWidth={1.75} aria-hidden />
-      </span>
-      <div>
+    <section className={`flex flex-col gap-sm ${featured ? "card-featured" : "card"}`}>
+      <div className="flex items-center gap-sm">
+        <span className="grid size-8 place-items-center rounded-sm bg-surface-elevated">
+          <Icon size={16} strokeWidth={1.75} aria-hidden />
+        </span>
         <h2 className={`text-label-md ${secondary}`}>{label}</h2>
-        <p className={`mt-xs font-bold ${small ? "text-display-number-sm tracking-display-number-sm" : "text-display-number tracking-display-number"}`}>
-          {value}
-        </p>
       </div>
-      <p className={`mt-auto text-label-sm ${secondary}`}>{note}</p>
+      <p className="text-display-number-sm font-bold tracking-display-number-sm">{value}</p>
+      <p className={`text-label-sm ${secondary}`}>{note}</p>
     </section>
   );
 }
@@ -52,71 +48,111 @@ export default function DashboardPage() {
     ...decisions,
   ]
     .sort((a, b) => b.decidedAt.localeCompare(a.decidedAt))
-    .slice(0, 5);
+    .slice(0, 4);
 
   return (
     <div className="flex flex-col gap-md">
-      <div className="grid gap-md md:grid-cols-2 xl:grid-cols-3">
-        <Kpi
-          featured
-          icon={Scale}
-          label="Weighted value for priority"
-          value={formatMoney(weightedTotal, "IDR", true)}
-          note="Contract value × priority score ÷ 100. Orders work; it is not expected loss."
-        />
-        <Kpi
-          icon={ShieldAlert}
-          label="Accounts at High or Critical"
-          value={`${elevatedCount} of ${accounts.length}`}
-          note="Level set by the scoring formula in code."
-        />
-        <div className="grid grid-cols-2 gap-md md:col-span-2 xl:col-span-1">
-          <Kpi small icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Awaiting approve or reject" />
-          <Kpi small icon={Gauge} label="Median priority score" value={String(medianScore)} note={`Across ${accounts.length} accounts`} />
-        </div>
-      </div>
-
-      <div className="grid items-start gap-md xl:grid-cols-3">
-        <section className="card" aria-labelledby="levels-heading">
-          <h2 id="levels-heading" className="card-title">Accounts by level</h2>
-          <div className="mt-md flex h-3 overflow-hidden rounded-full bg-neutral" aria-hidden>
-            {levelCounts.map(({ level, count }) => count > 0 && (
-              <span key={level} className={levelBar[level]} style={{ width: `${(count / accounts.length) * 100}%` }} />
-            ))}
+      <div className="grid gap-md xl:grid-cols-3">
+        <section className="card xl:col-span-2" aria-labelledby="attention-heading">
+          <div className="flex flex-wrap items-baseline gap-sm">
+            <h2 id="attention-heading" className="card-title mr-auto">Needs attention this week</h2>
+            <p className="text-label-sm text-on-surface-muted">High or Critical, nearest renewal first</p>
           </div>
-          <ul className="mt-md flex flex-col gap-sm">
-            {levelCounts.map(({ level, count }) => (
-              <li key={level} className="flex items-center gap-sm text-body-sm">
-                <span className={`size-2.5 rounded-full ${levelBar[level]}`} aria-hidden />
-                {level}
-                <span className="ml-auto font-semibold">{count}</span>
-              </li>
-            ))}
-          </ul>
+          {attention.length === 0 ? (
+            <p className="mt-md text-body-sm text-on-surface-muted">No account is at High or Critical.</p>
+          ) : (
+            <ul className="mt-md flex flex-col">
+              {attention.map(account => (
+                <li key={account.id} className="flex flex-col gap-sm border-b border-outline py-sm last:border-0 sm:flex-row sm:items-center sm:gap-md">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-sm">
+                      <Link href={`/accounts/${account.id}`} className="font-semibold underline-offset-4 hover:text-primary hover:underline">
+                        {account.name}
+                      </Link>
+                      <RiskBadge level={account.riskLevel} />
+                    </div>
+                    <p className="mt-xs text-body-sm text-on-surface-muted">{account.signals[0]}</p>
+                  </div>
+                  <div className="flex items-center justify-between gap-md">
+                    <p className="text-label-md">
+                      <span className="font-semibold">{daysToRenewal(account.renewalDate)}</span>
+                      <span className="text-on-surface-muted"> days to renewal</span>
+                    </p>
+                    <Link href={`/review?account=${account.id}`} className="btn btn-secondary">
+                      Plan <ArrowRight size={16} aria-hidden />
+                    </Link>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
-        <section className="card" aria-labelledby="renewals-heading">
-          <h2 id="renewals-heading" className="card-title">Renewals in the next 90 days</h2>
-          <p className="text-label-sm text-on-surface-muted">Counted from the {SNAPSHOT} snapshot</p>
-          {renewals.length === 0 ? (
-            <p className="mt-md text-body-sm text-on-surface-muted">No renewal falls inside the window.</p>
+        <section className="card" aria-labelledby="mismatch-heading">
+          <h2 id="mismatch-heading" className="card-title flex items-center gap-sm">
+            <TriangleAlert size={18} aria-hidden className="text-warning" /> CRM says healthy
+          </h2>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Green in the CRM dashboard, High or Critical in the graph.</p>
+          {mismatches.length === 0 ? (
+            <p className="mt-md text-body-sm text-on-surface-muted">No mismatch with the CRM dashboard.</p>
           ) : (
             <ul className="mt-md flex flex-col gap-sm">
-              {renewals.map(({ account, days }) => (
+              {mismatches.map(account => (
                 <li key={account.id}>
                   <Link
                     href={`/accounts/${account.id}`}
-                    className="flex min-h-11 items-center gap-sm rounded-md px-sm text-body-sm transition-colors hover:bg-surface-elevated"
+                    className="block rounded-md bg-surface-elevated p-sm text-body-sm transition-colors hover:bg-outline"
                   >
-                    <CalendarClock size={16} aria-hidden className="shrink-0 text-on-surface-muted" />
-                    <span className="truncate font-semibold">{account.name}</span>
-                    <RiskBadge level={account.riskLevel} />
-                    <span className="ml-auto shrink-0 text-on-surface-muted">{days} days</span>
+                    <span className="flex flex-wrap items-center gap-sm">
+                      <span className="font-semibold">{account.name}</span>
+                      <span className="badge text-success">CRM Green</span>
+                      <RiskBadge level={account.riskLevel} />
+                    </span>
+                    <span className="mt-xs block text-on-surface-muted">{account.signals.join(" · ")}</span>
+                    <span className="mt-sm flex items-center gap-xs text-label-md font-semibold">
+                      See evidence path <ArrowRight size={14} aria-hidden />
+                    </span>
                   </Link>
                 </li>
               ))}
             </ul>
           )}
+        </section>
+      </div>
+
+      <div className="grid gap-md md:grid-cols-2 xl:grid-cols-4">
+        <Stat
+          featured
+          icon={Scale}
+          label="Weighted value for priority"
+          value={formatMoney(weightedTotal, "IDR", true)}
+          note="Contract × priority score ÷ 100; not expected loss"
+        />
+        <Stat icon={ShieldAlert} label="Accounts at High/Critical" value={`${elevated.length} of ${accounts.length}`} note="Level set by the scoring formula" />
+        <Stat icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Drafts for every account, all levels" />
+        <Stat icon={CalendarClock} label="Renewals in 90 days" value={String(renewals90)} note={`From the ${SNAPSHOT} snapshot`} />
+      </div>
+
+      <div className="grid gap-md xl:grid-cols-3">
+        <section className="card" aria-labelledby="factors-heading">
+          <h2 id="factors-heading" className="card-title">Risk factors in the portfolio</h2>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Accounts where each parameter is active</p>
+          <ul className="mt-md flex flex-col gap-xs">
+            {factorCounts.map(({ factor, count }) => (
+              <li key={factor}>
+                <Link
+                  href={`/accounts?factor=${factor}`}
+                  className="flex min-h-11 items-center gap-sm rounded-md px-sm text-body-sm transition-colors hover:bg-surface-elevated"
+                >
+                  {factor}
+                  <span className="relative ml-auto h-1.5 w-24 overflow-hidden rounded-full bg-neutral" aria-hidden>
+                    <span className="absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${(count / accounts.length) * 100}%` }} />
+                  </span>
+                  <span className="w-6 text-right font-semibold">{count}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section className="card" aria-labelledby="decisions-heading">
@@ -141,6 +177,18 @@ export default function DashboardPage() {
               ))}
             </ul>
           )}
+        </section>
+
+        <section className="card" aria-labelledby="health-heading">
+          <div className="flex flex-wrap items-center gap-sm">
+            <h2 id="health-heading" className="card-title mr-auto">Data and Jev</h2>
+            <span className="badge text-warning">Not ingested</span>
+          </div>
+          <p className="mt-md text-body-sm">0 of 15 KasirNusa sources ingested. Jev signals, review queue, and call cost appear here after the first ingest.</p>
+          <p className="mt-sm text-label-sm text-on-surface-muted">Every figure on this page uses synthetic seed data until then.</p>
+          <Link href="/data" className="btn btn-secondary mt-md">
+            <Database size={16} aria-hidden /> Open data sources
+          </Link>
         </section>
       </div>
     </div>

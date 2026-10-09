@@ -3,16 +3,20 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { X } from "lucide-react";
 import { RiskBadge } from "@/components/risk-badge";
 import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/demo-data";
 
 const riskOptions = ["All", "Critical", "High", "Medium", "Low"] as const;
 
 export default function AccountsPage() {
-  const query = useSearchParams().get("q") ?? "";
+  const params = useSearchParams();
+  const query = params.get("q") ?? "";
+  const factor = params.get("factor");
   const [risk, setRisk] = useState<"All" | RiskLevel>("All");
   const [sort, setSort] = useState<"risk" | "weighted" | "renewal">("risk");
-  const visible = sortAccounts(filterAccounts(accounts, query, risk), sort);
+  const matched = filterAccounts(accounts, query, risk).filter(account => !factor || account.factors.some(item => item === factor));
+  const visible = sortAccounts(matched, sort);
 
   return (
     <div className="flex flex-col gap-md">
@@ -23,6 +27,11 @@ export default function AccountsPage() {
             <p className="text-body-sm text-on-surface-muted">
               {visible.length} of {accounts.length} accounts{query && <> matching “{query}”</>}
             </p>
+            {factor && (
+              <Link href="/accounts" className="badge mt-xs gap-xs text-on-surface hover:bg-outline" aria-label={`Clear factor filter ${factor}`}>
+                Factor: {factor} <X size={12} aria-hidden />
+              </Link>
+            )}
           </div>
           <div role="group" aria-label="Filter by risk level" className="flex rounded-md bg-neutral p-xs">
             {riskOptions.map(option => (

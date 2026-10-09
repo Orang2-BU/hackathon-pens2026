@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accounts, filterAccounts, formatMoney, sortAccounts } from "./demo-data";
+import { accounts, filterAccounts, formatMoney, isMismatch, sortAccounts } from "./demo-data";
 
 describe("account list helpers", () => {
   it("filters by query and risk without mutating source", () => {
@@ -12,6 +12,10 @@ describe("account list helpers", () => {
   it("matches signal and evidence text", () => {
     expect(filterAccounts(accounts, "competitor", "All").map(account => account.id)).toEqual(["nusa-retail"]);
     expect(filterAccounts(accounts, "branches", "All").map(account => account.id)).toEqual(["arca-logistics", "selaras-health"]);
+  });
+
+  it("flags mismatch only when CRM is Green and the level is High or Critical", () => {
+    expect(accounts.filter(isMismatch).map(account => account.id)).toEqual(["arca-logistics"]);
   });
 
   it("sorts by weighted value descending", () => {

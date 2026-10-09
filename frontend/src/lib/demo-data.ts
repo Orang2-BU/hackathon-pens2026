@@ -1,5 +1,9 @@
 export type RiskLevel = "Critical" | "High" | "Medium" | "Low";
 
+// Risk parameters from docs/10-DATA-PROFILE-KASIRNUSA.md (weights 30/25/20/15/10).
+export const riskFactors = ["Usage", "Service", "Champion", "Commitments", "Payment"] as const;
+type RiskFactor = (typeof riskFactors)[number];
+
 type Evidence = {
   id: string;
   kind: "Conversation" | "Signal" | "Decision";
@@ -29,6 +33,8 @@ export type Account = {
   renewalDate: string;
   sourceCoverage: string;
   signals: string[];
+  factors: RiskFactor[];
+  crmHealth: "Green" | "Yellow" | "Red";
   answer: string;
   evidence: Evidence[];
   decisions: Decision[];
@@ -48,6 +54,8 @@ export const accounts: Account[] = [
     renewalDate: "2026-11-14",
     sourceCoverage: "4 calls · 2 tickets · 30-day usage",
     signals: ["Champion changed role", "Competitor mentioned", "Usage down 28%"],
+    factors: ["Champion", "Usage", "Commitments"],
+    crmHealth: "Yellow",
     answer:
       "The main champion moved roles after procurement asked for a re-evaluation. On the next call the account named a competitor and requested a migration plan before renewal.",
     evidence: [
@@ -102,6 +110,8 @@ export const accounts: Account[] = [
     renewalDate: "2026-12-02",
     sourceCoverage: "3 calls · 5 tickets · 30-day usage",
     signals: ["Repeated ticket escalation", "Slow time-to-value"],
+    factors: ["Service", "Usage"],
+    crmHealth: "Green",
     answer:
       "Two integration escalations are still open and the operations team has not reached its adoption target. The sponsor remains engaged but wants a concrete recovery timeline.",
     evidence: [
@@ -140,6 +150,8 @@ export const accounts: Account[] = [
     renewalDate: "2027-01-21",
     sourceCoverage: "2 calls · 1 ticket · 30-day usage",
     signals: ["Uneven adoption in new team"],
+    factors: ["Usage"],
+    crmHealth: "Green",
     answer:
       "No strong churn signal. Risk comes from uneven adoption in the new team, while the sponsor and core usage remain stable.",
     evidence: [
@@ -190,3 +202,8 @@ export const sortAccounts = (
     if (sort === "renewal") return a.renewalDate.localeCompare(b.renewalDate);
     return b.priorityScore - a.priorityScore;
   });
+
+export const isElevated = (account: Account) => account.riskLevel === "Critical" || account.riskLevel === "High";
+
+// The CRM dashboard says Green while the graph scores the account High or Critical.
+export const isMismatch = (account: Account) => account.crmHealth === "Green" && isElevated(account);
