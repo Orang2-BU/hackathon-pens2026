@@ -47,7 +47,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-05 — Hard graph, derivasi, temporal evidence
 
-- **Trace:** T2/T4; TASK-006/010. **Prerequisite:** BE-04. **Status:** Todo.
+- **Trace:** T2/T4; TASK-006/010. **Prerequisite:** BE-04. **Status:** In Progress; bounded sourced traversal and temporal oracle implemented. Dataset graph compilation/query integration waits on BE-04 publication.
 - **Output:** node/edge per tipe, source refs, temporal query, bounded evidence path.
 - **Kerja:** semua relasi minimum 09 §1; employment/champion/owner/reply/feature/precedent; competitor mention hanya pola atau Jev berlabel; BUG-412 derived dengan waktu, versi, offline dan gejala; email historis unresolved masuk laporan.
 - **Lulus:** C01/K017/P01 dan janji fitur bisa ditelusuri; C03/C05 berbagi kandidat bug bersumber; versi 4.12 saja tidak menyebabkan false edge; hard-ID conflict tak di-merge. Query Oct 1 tidak memasukkan future events; import Oct 9 tetap terbaca. Cycles/node limit/depth≤4 diuji.
@@ -214,3 +214,10 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Run aktual pada dataset lokal mencocokkan semua profil baris: 45 akun, 160 kontak, 217 employment, 22 deal, 10 employee, 350 interaction, 620 outlet, 226.300 usage, 1.178 feature usage, 640 ticket, 4 bug, 3 release, 8 feature, 40 kontrak, 30 decision log. `issueCount=0`, `orphanCount=0`; agregat SHA-256 `1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`.
 - Test backend lulus 11/11; syntax check lulus. Tidak ada isi dataset yang dimasukkan Git.
 - BE-04 belum Done: belum ada staging/publish transaksional atau re-ingest idempotency aktual karena PostgreSQL disposable belum tersedia. Tidak ada Jev call.
+
+## 10. Eksekusi BE-05 (parsial)
+
+- `backend/src/graph.js` menyediakan traversal terbatas depth 1–4, edge aktif pada `businessAsOf` dengan rentang valid `[validFrom, validTo)`, hop dua arah, cycle guard, status review/rejected tidak aktif, serta provenance/reason untuk edge turunan.
+- Batas jumlah jalur maksimum 100; rekomendasi dapat memeriksa cakupan kelompok sumber tanpa menghitung beberapa source dari kelompok yang sama berulang.
+- Test synthetic graph mencakup C05→outlet→ticket→BUG-412, edge masa depan, reverse traversal, cycle/depth guard dan derived tanpa provenance; `corepack pnpm test` lulus 14/14; syntax check lulus.
+- BE-05 belum Done: belum dikompilasi terhadap seluruh relational dataset, query PostgreSQL, temporal source-facts, atau C01/C03/C05 karena BE-04 belum publish database. Fixture tidak mengklaim hubungan nyata di luar sumber dataset.
