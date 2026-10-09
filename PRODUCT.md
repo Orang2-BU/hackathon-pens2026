@@ -1,11 +1,20 @@
 # Product
 
-## Relasi
+## Churn Early Warning Graph (KasirNusa)
 
-Relasi adalah dashboard Customer Success yang mengompilasi call, tiket, usage, dan invoice ke context graph agar CSM mendeteksi risiko churn lebih awal, melihat bukti lintas percakapan, lalu menyetujui save plan.
+Dashboard Customer Success untuk PT KasirNusa Teknologi (SaaS POS B2B, fiktif):
+mengompilasi 6 sumber data yang tersebar (CRM, email/meeting, product usage, tiket support,
+kontrak & billing, log keputusan) menjadi context graph, agar Account Manager mendeteksi
+risiko churn lebih awal, melihat jalur bukti lintas sumber, lalu menyetujui tindakan retensi.
 
-- **Pengguna utama:** CSM; pembeli: VP Customer Success.
-- **Tugas utama:** prioritaskan akun berisiko, pahami bukti/uang yang berisiko, lalu setujui tindakan yang aman.
-- **MVP:** ingest sinyal Jev, context graph, jawaban multi-call dengan bukti, save plan berapproval, benchmark versus baseline.
-- **Di luar scope:** outreach otomatis, CRM production sync, lookalike/strategi promosi (slide/roadmap).
+- **Pengguna utama:** Account Manager / Customer Success; pembeli: VP Customer Success.
+- **Tugas utama:** prioritaskan akun berisiko (fokus C01–C06), pahami bukti dan rupiah yang
+  dipertaruhkan, lalu setujui tindakan retensi yang bisa ditelusuri.
+- **MVP:** ingest 6 sumber → graph terkompilasi → scoring risiko deterministik → peringkat
+  risiko + jalur bukti per akun → tanya-jawab bebas di atas graph (pertanyaan juri live) →
+  save plan dengan approval manusia.
+- **Di luar scope:** outreach otomatis ke pelanggan, sinkronisasi CRM produksi, fitur di luar
+  pertanyaan inti tim (ekspansi/sales) — cukup disebut sebagai keterkaitan lintas track.
 - **Mode UI:** Operate — dashboard B2B dark, padat data, fokus tindakan.
+
+Dokumen eksekusi: `docs/09-BUILD-PLAN-KASIRNUSA.md`.
