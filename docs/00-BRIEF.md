@@ -1,8 +1,8 @@
-# 00 — BRIEF: Tessera (sebelumnya Relasi) · Track 3 Context Graphs in Customer Success & Sales
+# 00 — BRIEF: Tessera · Track 3 Context Graphs in Customer Success & Sales
 
 > Sumber kebenaran aturan lomba dan study case. Prioritas: `07-RULES` > instruksi user > dokumen ini > dokumen lain.
 
-> Nama kerja Relasi adalah riwayat proyek; nama produk aktif Tessera. Bagian TM/SalesTranscriptQA di bawah adalah catatan historis ide awal. Scope demo aktif adalah KasirNusa dalam `01-PRD.md` dan `09-BUILD-PLAN-KASIRNUSA.md`; jangan menjalankan rencana SalesTranscriptQA lama sebagai jalur utama.
+> Bagian TM/SalesTranscriptQA di bawah adalah catatan historis ide awal. Scope demo aktif adalah KasirNusa dalam `01-PRD.md` dan `09-BUILD-PLAN-KASIRNUSA.md`; jangan menjalankan rencana SalesTranscriptQA lama sebagai jalur utama.
 
 ## 1. Info Lomba
 
@@ -39,7 +39,7 @@
 
 ## 3b. Referensi Panitia
 
-- **Video Jev**: AI dipanggil kode sebagai primitif kecil; masukan JSON kecil; kode memakai probabilitas `noul` atau skor dan confidence dari `score` untuk control flow write/review/discard; evaluasi Jev bukan LLM-as-judge; graph adalah memori terstruktur yang dikompilasi saat write time. Lihat `docs/JEV-LENS.md`.
+- **Video Jev**: AI dipanggil kode sebagai primitif kecil; masukan JSON kecil; confidence dan threshold menentukan write/review/discard; evaluasi Jev bukan LLM-as-judge; graph adalah memori terstruktur yang dikompilasi saat write time. Lihat `docs/JEV-LENS.md`.
 - **Arahan TM 9 Okt 2026:** nilai utama: Jev di control flow, akurasi/biaya jawaban, dan kegunaan agent. Lihat `docs/JEV-KIT.md`.
 - **Akun Jev/TypeSafe:** kredit $5 disebut tersedia; status pendaftaran tim: **tanya tim**. Top-up: hubungi mentor di chat grup.
 - **Dataset:** SalesTranscriptQA, CC BY-NC 4.0; CLI MIT; atributkan Salesforce + Endgame Labs.
@@ -64,7 +64,7 @@
 
 ## 6. Keputusan Ide
 
-- **Ide finalis:** Tessera (nama kerja sebelumnya: Relasi) — context graph untuk membantu meninjau risiko retensi melalui relasi customer, kontak, call/tiket, usage, dan invoice.
+- **Ide finalis:** Relasi — context graph untuk mencegah churn melalui relasi customer, kontak, call/tiket, usage, dan invoice.
 - **Keputusan:** **Integrasi**.
 
 | Dimensi | Skor / 5 | Catatan |

@@ -1,9 +1,11 @@
-# ADR-0002: Kontrak parameter, skenario, dan penjelasan Relasi
+# ADR-0002: Kontrak parameter, skenario, dan penjelasan Tessera
 
 **Status:** Proposed
 **Tanggal:** 9 Oktober 2026
 
 ## Context
+
+> Catatan 9 Okt 2026: bagian LLM pada ADR ini ditangguhkan oleh ADR-0003 (MVP tanpa LLM generatif; penjelasan dan draf dari template). Kontrak parameter tetap berlaku.
 
 Tim ingin Jev dan LLM bekerja bersama untuk menunjukkan risiko akun, alasan, skenario dampak, dan usulan tindakan. `dataset_kasirnusa.zip` tersedia dan telah diekstrak lokal: 15 file data dan README, semuanya sintetis dan diabaikan Git. README menyebut histori operasional 1 Oktober 2025–30 September 2026 dan snapshot 1 Oktober 2026. Kolom transaksi, kontrak, tiket, interaksi, dan keputusan tersedia; validasi isi tiap file serta cakupan per akun masih diperlukan. PRD, arsitektur, dan rencana KasirNusa kini memakai istilah parameter risiko/prioritas; teks lama `probabilitas` tidak lagi menjadi kontrak aplikasi.
 

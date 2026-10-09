@@ -1,6 +1,6 @@
 # Tessera — Product
 
-## Churn Early Warning Graph (KasirNusa)
+## Tessera — Churn Early Warning Graph (KasirNusa)
 
 Dashboard Customer Success Tessera untuk PT KasirNusa Teknologi (SaaS POS B2B, fiktif):
 mengompilasi 6 sumber data yang tersebar (CRM, email/meeting, product usage, tiket support,
@@ -12,7 +12,7 @@ risiko churn lebih awal, melihat jalur bukti lintas sumber, lalu menyetujui tind
   pahami nilai kontrak sebagai konteks, lalu setujui tindakan retensi yang bisa ditelusuri.
 - **MVP:** ingest 15 file data sintetis dari 6 kelompok sumber → graph terkompilasi → skor prioritas deterministik → peringkat
   risiko + jalur bukti per akun → tanya-jawab bebas di atas graph (pertanyaan juri live) →
-  save plan dengan approval manusia. Jev menilai teks ambigu; LLM menjelaskan dan membuat draf, tanpa memutuskan skor atau approval.
+  save plan dengan approval manusia. Jev menilai teks ambigu dan memetakan pertanyaan ke intent; jawaban dan draf disusun template dari query graph (tanpa LLM generatif di MVP, ADR-0003).
 - **Akses:** pengguna terautentikasi (CSM/admin) dapat ingest dan approve. Pengguna aplikasi dapat memberi pendapat/usulan perbaikan; admin/CSM menanggapi. Feedback tidak otomatis mengubah skor atau Decision. Akses pelanggan akhir masih perlu keputusan produk.
 - **Bahasa angka:** tampilkan parameter risiko dan prioritas; bobot awal 30/25/20/15/10 hanya percobaan, bukan probabilitas churn terkalibrasi.
 - **Data/demo:** `dataset_kasirnusa.zip` dan `dataset_kasirnusa/` lokal diabaikan Git; demo publik hanya memakai data yang diizinkan. Target pertama yang disampaikan user: 9 Okt 2026 pukul 22.00, jenis deliverable belum jelas; deadline submit resmi belum terkonfirmasi.

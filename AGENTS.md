@@ -1,6 +1,6 @@
 # Tessera
 
-> Instruksi untuk AI coding assistant. Onboarding awal: 9 Okt 2026. PRD ACC pada 9 Okt; ADR-0002 masih Proposed dan keputusan teknis lain mengikuti status masing-masing.
+> Instruksi untuk AI coding assistant. Onboarding awal: 9 Okt 2026. PRD ACC 9 Okt 2026.
 
 ## Wajib sebelum ngoding
 
@@ -8,11 +8,11 @@ Baca `docs/00-BRIEF.md` sampai `docs/08-DESIGN.md` yang tersedia, lalu ikuti `do
 
 ## Aplikasi
 
-Tessera (nama kerja sebelumnya: Relasi) memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Next.js dipilih; PostgreSQL untuk demo publik diterima dalam ADR-0001, sedangkan library dan hosting belum dipilih. Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; LLM menjelaskan serta menyusun draf. SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
+Tessera memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Stack: Next.js 16 di `frontend/`, PostgreSQL via postgres.js, VPS Docker Compose, satu akun demo (ADR-0001, ADR-0003). Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; penjelasan dan draf dirangkai template dari query graph (tanpa LLM dulu). SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
 
 ## Verifikasi
 
-Perintah sesudah scaffold tercantum dalam `docs/03-ARCHITECTURE.md`; sebelum scaffold tersedia, test/build/typecheck/lint/dead-code belum tersedia. Jangan klaim sudah lolos.
+Perintah di `docs/03-ARCHITECTURE.md` §2, dijalankan di `frontend/`. Jangan klaim lolos tanpa menjalankannya.
 
 ## Aturan Ringkas
 
@@ -23,7 +23,7 @@ Perintah sesudah scaffold tercantum dalam `docs/03-ARCHITECTURE.md`; sebelum sca
 - AI calls untuk ekstraksi/klasifikasi/skor/agent: ikuti §4b `docs/03-ARCHITECTURE.md`, `docs/JEV-LENS.md`, dan klien/pola `docs/JEV-KIT.md`. Jev memberi output bertipe; kode memutuskan.
 - Tidak ada outreach/email nyata; approval pengguna terautentikasi (CSM/admin) ditulis sebagai append-only Decision. Feedback dua arah terpisah dari approval dan tidak mengubah skor otomatis.
 - Jangan commit secret/API key/dataset penuh; ZIP dan ekstraknya harus tetap diabaikan Git. Semua data KasirNusa sintetis. Jika SalesTranscriptQA dipakai, ikuti CC BY-NC 4.0 dan atribusi.
-- Kanban adalah sumber owner/status tiket; `docs/04-TODO.md` hanya peta milestone ke tiket dan diperbarui pemilik dokumentasi. Laporan akhir mengikuti `docs/07-RULES.md`.
+- Update `docs/04-TODO.md` saat progres berubah; laporan akhir mengikuti `docs/07-RULES.md`.
 
 ## Baca sesuai kebutuhan
 

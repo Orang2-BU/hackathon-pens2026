@@ -8,7 +8,7 @@ Kerjakan sampai kriteria selesai terpenuhi. Jangan menyerahkan pekerjaan setenga
 
 ## 2. Verifikasi Wajib
 
-Setelah scaffold, jalankan:
+Jalankan di `frontend/`:
 
 | Cek | Perintah |
 |---|---|
@@ -19,9 +19,9 @@ Setelah scaffold, jalankan:
 | Dead code | `pnpm exec knip` |
 | Design tokens jika 08 berubah | `npx -p @google/design.md designmd lint docs/08-DESIGN.md` |
 | Golden demo path | `pnpm dev`, jalankan `docs/01-PRD.md` §5 end-to-end |
-| Benchmark jika data/retrieval/model berubah | `pnpm exec tsx scripts/benchmark.ts` dan simpan output aktual |
+| Benchmark jika data/retrieval/model berubah | `node scripts/benchmark.ts` (belum ada; dibuat bila benchmark dijalankan) dan simpan output aktual |
 
-Nama script adalah kontrak setup. Sebelum scaffold tersedia, laporkan pemeriksaan sebagai belum tersedia; jangan mengarang hasil.
+Script test/build/typecheck/lint/knip sudah ada. Script yang belum ada dilaporkan sebagai belum tersedia; jangan mengarang hasil.
 
 ## 3. Siklus Error
 

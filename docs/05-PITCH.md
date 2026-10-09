@@ -4,7 +4,7 @@
 
 ## 1. Cerita singkat
 
-“Tim Customer Success KasirNusa perlu melihat sinyal dari CRM, transaksi, support, interaksi, kontrak, dan keputusan sebelumnya dalam satu tempat. Tessera mengompilasi hubungan itu saat data masuk. Jev menilai ungkapan yang ambigu; kode menghitung angka dan prioritas; LLM menjelaskan bukti serta menyiapkan draf tindakan. CSM tetap memutuskan, dan pengguna dapat menyampaikan pendapat yang ditanggapi.”
+“Tim Customer Success KasirNusa perlu melihat sinyal dari CRM, transaksi, support, interaksi, kontrak, dan keputusan sebelumnya dalam satu tempat. Tessera mengompilasi hubungan itu saat data masuk. Jev menilai ungkapan yang ambigu dan memetakan pertanyaan ke intent; kode menghitung angka dan prioritas, lalu menyusun jawaban dan draf tindakan dari graph dengan sitasi. CSM tetap memutuskan, dan pengguna dapat menyampaikan pendapat yang ditanggapi.”
 
 Klaim yang boleh dibuat sesudah diuji: graph menghubungkan minimal tiga sumber untuk rekomendasi, 40 pelanggan dapat ditinjau, pertanyaan baru mendapat jawaban bersitasi atau abstain, dan Decision approval dapat ditemukan pada query berikutnya. Jangan klaim penurunan churn, probabilitas terkalibrasi, profit promo, atau penghematan biaya tanpa data dan pengukuran.
 
@@ -37,12 +37,17 @@ SalesTranscriptQA boleh dipakai hanya sebagai benchmark retrieval terpisah bila 
 | Pertanyaan | Jawaban |
 |---|---|
 | Mengapa graph? | Akun, outlet, kontak, tiket, bug, interaksi, kontrak, dan Decision terkait melalui ID/waktu/sumber. Jalur itu dapat diperiksa pada pertanyaan baru. |
-| Peran Jev dan LLM? | Jev menilai properti teks kecil dengan rubrik; kode menentukan ambang, aritmetika, dan prioritas; LLM memfrasa penjelasan/draf dari fakta bersumber. |
+| Peran Jev, dan kenapa tanpa LLM? | Jev menilai properti teks kecil dan memetakan pertanyaan ke intent; kode menentukan ambang, aritmetika, prioritas, dan menyusun jawaban bersitasi dari template. Tanpa LLM generatif tidak ada angka yang dikarang, dan biaya per pertanyaan nyaris nol. |
+| Momen wow? | C05: dashboard CRM Hijau, Tessera level Tinggi + `mismatch`; jalur Tiket → Outlet offline → v4.12 → BUG-412, lalu C03 terdampak bug yang sama. |
 | Apakah prioritas berarti kemungkinan churn? | Tidak. Skor 0–100 adalah indeks heuristik untuk urutan tinjau. Probabilitas memerlukan outcome historis dan kalibrasi yang belum tersedia. |
 | Mengapa transaksi turun belum tentu churn? | Outlet offline/gagal sinkron dapat membuat transaksi server tidak lengkap. Itu ditandai sebagai kualitas data dan gangguan layanan agar tidak dihitung ganda. |
 | Siapa boleh menyetujui? | Pengguna aplikasi terautentikasi berperan CSM atau admin; approval append-only dan tidak mengirim outreach. |
 | Bagaimana opini pengguna masuk? | Feedback terkait akun/rencana diberi tanggapan oleh CSM/admin; keputusan tetap melalui approval terpisah. Akses pelanggan akhir masih perlu diputuskan. |
 | Apakah dampak finansial terbukti? | Nilai kontrak ada dalam dataset sintetis; nilai tertimbang hanya konteks prioritas. Profit promo/referral tidak diklaim tanpa biaya, margin, outcome, dan relasi terkait. |
+
+## 4b. Slide masalah
+
+Agent CRM terbaik di benchmark CRMArena-Pro (Salesforce) hanya sekitar 58% benar pada tugas satu giliran dan sekitar 35% pada multi-giliran `[riset: CRMArena-Pro, dikutip mentor TM 9 Okt; verifikasi angka dari paper sebelum slide final]`. Kalimat pitch: "Tessera menunjukkan akun mana yang perlu ditangani lebih dulu dan kenapa, dan setiap alasannya bisa ditelusuri ke sumbernya." Jangan memakai "uang yang akan hilang".
 
 ## 5. Deliverable dan fallback
 

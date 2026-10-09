@@ -1,11 +1,11 @@
 # 02 — AGENT: Instruksi untuk AI
 
-> Konvensi minimum untuk developer dan AI pada Tessera (nama kerja sebelumnya: Relasi).
+> Konvensi minimum untuk developer dan AI pada Tessera.
 
 ## 1. Konteks
 
-- **Aplikasi:** Tessera — context graph untuk membantu CSM memprioritaskan akun, memeriksa bukti, dan menyetujui save plan.
-- **Stack:** Next.js App Router dipilih; PostgreSQL untuk demo publik diterima pada ADR-0001. TypeScript strict, Jev, Tailwind v4, React Flow, library DB, dan hosting masih usulan/keputusan terbuka sesuai `03-ARCHITECTURE.md` dan backlog.
+- **Aplikasi:** Tessera — context graph untuk membantu CSM memprioritaskan risiko, memeriksa bukti, dan menyetujui save plan.
+- **Stack:** Next.js App Router dipilih; PostgreSQL untuk demo publik diterima pada ADR-0001. TypeScript strict, Jev, Tailwind v4, React Flow, library DB, dan hosting masih keputusan implementasi.
 - **Sumber kebenaran:** `docs/07-RULES.md`, lalu instruksi user, `docs/00-BRIEF.md`, PRD dan arsitektur.
 
 ## 2. Struktur Folder
@@ -30,7 +30,7 @@ tests/                  # integration/golden-path tests
 data/                   # gitignored dataset/cache; fixtures kecil boleh dilacak
 ```
 
-Path dan folder pada peta ini adalah target rencana, belum diverifikasi sebagai file yang ada karena scaffold aplikasi belum tersedia. Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori kosong.
+Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori kosong.
 
 ## 3. Gaya Koding
 
@@ -47,7 +47,7 @@ Path dan folder pada peta ini adalah target rencana, belum diverifikasi sebagai 
 
 ## 4. Komentar
 
-- Bahasa Inggris untuk code/comment; UI dan dokumentasi Indonesia.
+- Bahasa Inggris untuk code/comment dan **seluruh teks UI web (wajib)**; dokumentasi di `docs/` boleh Indonesia.
 - Komentar menjelaskan alasan, batas, atau provenance. Jangan mengulang kode.
 - Gunakan `ponytail:` hanya untuk simplifikasi sengaja dengan ceiling dan upgrade path.
 - Jangan simpan kode commented-out atau debug log.
@@ -75,7 +75,7 @@ Path dan folder pada peta ini adalah target rencana, belum diverifikasi sebagai 
 ## 8. UI, Data, Keamanan
 
 - Ikuti `docs/08-DESIGN.md` termasuk Standar UI A1–A8. Tidak ada emoji sebagai ikon.
-- Bahasa UI Indonesia; ID/model/error teknis tetap aslinya.
+- **Bahasa UI wajib Inggris** (label, tombol, pesan, empty/error state, metadata, `lang="en"`); format angka/mata uang tetap IDR via `Intl` locale `en-US`/`id-ID` sesuai konteks. ID/model/error teknis tetap aslinya.
 - Semua synthetic overlay diberi label dekat nilai, bukan hanya di footer.
 - Kutipan hanya berasal dari source span valid. Jawaban tanpa bukti cukup harus abstain.
 - Approval tidak mengirim email; label tombol menyebut konsekuensinya.

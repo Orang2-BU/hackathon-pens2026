@@ -1,0 +1,68 @@
+@import "tailwindcss";
+@import "./theme.css";
+
+/* Desktop starts at 1200px per docs/08-DESIGN.md Layout. */
+@theme {
+  --breakpoint-xl: 75rem;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scrollbar-color: var(--color-outline-active) var(--color-neutral);
+  }
+  body {
+    @apply bg-neutral text-on-surface antialiased;
+    font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums;
+    caret-color: var(--color-primary);
+  }
+  body:has(dialog[open]) {
+    overflow: hidden;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 3px;
+  }
+  ::selection {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+}
+
+@utility label-caps {
+  @apply text-label-caps font-semibold uppercase tracking-label-caps;
+}
+
+@layer components {
+  .card {
+    @apply rounded-lg bg-surface p-md;
+  }
+  .card-featured {
+    @apply rounded-lg p-md;
+    background:
+      radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--color-glow-lime) 28%, transparent) 0%, transparent 70%),
+      var(--color-surface-featured);
+  }
+  .card-title {
+    @apply text-title font-semibold tracking-title;
+  }
+  .badge {
+    @apply label-caps inline-flex items-center rounded-sm bg-surface-elevated px-1.5 py-0.5;
+  }
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-sm rounded-md px-md text-label-md font-semibold transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-primary text-on-primary hover:brightness-110;
+  }
+  .btn-secondary {
+    @apply bg-secondary text-on-secondary ring-1 ring-outline ring-inset hover:bg-outline;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
