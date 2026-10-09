@@ -3,7 +3,7 @@
 > Pivot dari Relasi/SalesTranscriptQA ke case KasirNusa: PT KasirNusa Teknologi. Dataset ZIP sudah tersedia lokal; seluruh isinya sintetis.
 > Baca `AGENTS.md` + `PRODUCT.md`, lalu file ini sebagai sumber eksekusi.
 > Prinsip: graph dikompilasi saat ingest (write time). Keputusan = kode deterministik.
-> Tanpa LLM generatif di MVP (ADR-0003): jawaban dan draf save plan disusun template dari query graph; Jev memetakan pertanyaan ke intent dan menilai teks ambigu.
+> Tanpa LLM generatif di MVP (ADR-0005): jawaban dan draf save plan disusun template dari query graph; Jev memetakan pertanyaan ke intent dan menilai teks ambigu.
 
 ## 0. Konteks yang wajib dipegang
 
@@ -79,7 +79,7 @@ Bobot percobaan pertama: pemakaian 30%, gangguan layanan 25%, relasi champion 20
 Per akun risiko atas: hasilkan draft tindakan dari faktor terkuat (template deterministik),
 wajib cek preseden di `decision_log` (diskon/eskalasi/janji yang pernah disetujui untuk pola serupa)
 dan kutip `decision_id`-nya. Bila usulan menyimpang dari preseden, tulis alasan penyimpangannya.
-Draft disusun template (ADR-0003); keputusan akhir: pengguna aplikasi terautentikasi (CSM/admin) approve/reject → tersimpan append-only.
+Draft disusun template (ADR-0005); keputusan akhir: pengguna aplikasi terautentikasi (CSM/admin) approve/reject → tersimpan append-only.
 
 ## 4. Layar aplikasi (Next.js, mode Operate: dark, padat data, satu layar satu tugas)
 

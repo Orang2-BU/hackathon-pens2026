@@ -4,29 +4,33 @@ import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, useRef } from "react";
-import { Activity, Database, Menu, Search, ShieldCheck, Users, Waypoints, X } from "lucide-react";
-import { useDemoState } from "@/components/demo-state";
-import { reviewItems } from "@/lib/demo-data";
+import { Database, LayoutDashboard, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
+import { usePendingPlans } from "@/components/demo-state";
 
 const navigation = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Accounts", icon: Users },
   { href: "/review", label: "Review", icon: ShieldCheck },
-  { href: "/benchmark", label: "Benchmark", icon: Activity },
   { href: "/data", label: "Data", icon: Database },
 ];
 
-function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+// Desktop rail: labels fade out while the aside is collapsed and fade in on hover or keyboard focus.
+const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opacity-100 group-has-[:focus-visible]/rail:opacity-100";
+
+function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?: boolean }) {
   const pathname = usePathname();
-  const { resolvedReviewIds } = useDemoState();
-  const pending = reviewItems.filter(item => !resolvedReviewIds.includes(item.id)).length;
+  const pending = usePendingPlans().length;
+  const fade = rail ? railFade : "";
 
   return (
-    <div className="flex h-full flex-col gap-lg rounded-lg bg-surface p-md">
-      <Link href="/accounts" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
-        <span className="grid size-8 place-items-center rounded-sm bg-primary text-on-primary">
-          <Waypoints size={18} strokeWidth={2} aria-hidden />
+    <div className="glass flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md">
+      <Link href="/dashboard" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
+        <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-primary text-on-primary">
+          <svg viewBox="56 56 144 144" className="size-4" aria-hidden>
+            <path fill="currentColor" d="M56 56H200V104H152V200L104 152V104Z" />
+          </svg>
         </span>
-        Tessera
+        <span className={fade}>Tessera</span>
       </Link>
 
       <nav aria-label="Main" className="flex flex-col gap-xs">
@@ -37,17 +41,18 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               key={href}
               href={href}
               onClick={onNavigate}
+              title={rail ? label : undefined}
               aria-current={active ? "page" : undefined}
               className={`flex min-h-11 items-center gap-sm rounded-md px-1.5 text-label-md transition-colors xl:min-h-10 ${
                 active ? "bg-on-surface font-semibold text-neutral" : "text-on-surface-muted hover:bg-surface-elevated hover:text-on-surface"
               }`}
             >
-              <span className={`grid size-7 place-items-center rounded-sm ${active ? "bg-primary text-on-primary" : ""}`}>
+              <span className={`grid size-7 shrink-0 place-items-center rounded-sm ${active ? "bg-primary text-on-primary" : ""}`}>
                 <Icon size={18} strokeWidth={1.75} aria-hidden />
               </span>
-              {label}
+              <span className={fade}>{label}</span>
               {href === "/review" && pending > 0 && (
-                <span className="ml-auto mr-1.5 rounded-sm bg-neutral px-1.5 text-label-sm text-on-surface">
+                <span className={`ml-auto mr-1.5 rounded-sm bg-neutral px-1.5 text-label-sm text-on-surface ${fade}`}>
                   {pending}<span className="sr-only"> pending</span>
                 </span>
               )}
@@ -56,9 +61,14 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="mt-auto rounded-md bg-surface-elevated p-sm">
-        <p className="text-label-md font-semibold">Demo workspace</p>
-        <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic seed data · resets on refresh</p>
+      <div className="mt-auto flex items-center gap-sm rounded-md bg-surface-elevated p-sm">
+        <span className="grid size-7 shrink-0 place-items-center rounded-sm text-on-surface-muted">
+          <Database size={18} strokeWidth={1.75} aria-hidden />
+        </span>
+        <div className={fade}>
+          <p className="text-label-md font-semibold">KasirNusa</p>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic dataset · 1 Oct 2026</p>
+        </div>
       </div>
     </div>
   );
@@ -74,16 +84,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Tessera";
 
   return (
-    <div className="min-h-dvh xl:grid xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-md xl:p-md">
-      <aside className="sticky top-md hidden h-[calc(100dvh-2rem)] xl:block">
-        <Sidebar />
+    <div className="min-h-dvh xl:grid xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-md xl:p-md">
+      <aside className="group/rail sticky top-md hidden h-[calc(100dvh-2rem)] w-[76px] transition-[width] duration-200 ease-out hover:w-[248px] has-[:focus-visible]:w-[248px] xl:block">
+        <Sidebar rail />
       </aside>
 
       <dialog
         ref={drawer}
         aria-label="Navigation"
         onClick={event => event.target === event.currentTarget && closeDrawer()}
-        className="m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-transparent p-sm text-on-surface backdrop:bg-black/60"
+        className="m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-transparent p-sm text-on-surface backdrop:bg-black/40 backdrop:backdrop-blur-sm"
       >
         <Sidebar onNavigate={closeDrawer} />
         <button

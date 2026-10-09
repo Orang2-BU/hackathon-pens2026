@@ -38,7 +38,7 @@
 - Jenis deliverable pada target 9 Okt 22.00 dan deadline submit resmi.
 - Apakah pemberi feedback adalah pengguna aplikasi (CSM) atau pelanggan akhir yang memerlukan akses tersendiri.
 - Apakah API Jev punya tipe `choice` selain `score`/`noul` (cek quickstart typesafe.ai). Jika ada, router intent cukup satu panggilan, bukan ±10 `noul`.
-- Batas biaya Jev aktual (hosting, auth, library DB, dan LLM sudah di ADR-0003).
+- Batas biaya Jev aktual (hosting, auth, library DB, dan LLM sudah di ADR-0005).
 - Bobot final, ambang level, dan perlakuan data kosong setelah uji dataset.
 
 ## Log
@@ -48,8 +48,9 @@
 | 9 Okt 2026 | ZIP KasirNusa ditemukan (15 file data + README), diekstrak ke `dataset_kasirnusa/`; ZIP dan ekstrak diabaikan Git, ZIP lama dilepas dari indeks tanpa menghapus file lokal. |
 | 9 Okt 2026 | Bobot 30/25/20/15/10 dicatat sebagai percobaan; parameter risiko dan prioritas dipisahkan dari probabilitas churn; feedback dua arah dipisahkan dari Decision. |
 | 9 Okt 2026 | Dokumen utama diperbarui ke KasirNusa. Belum ada scaffold atau pemeriksaan build; task T1–T7 belum dikerjakan. |
+| 9 Okt 2026 | Frontend membaca `ingest/scores_40_v1.json` (scoring_v1, 40 akun) lewat `frontend/src/lib/accounts.ts`; seed sintetis lama dihapus. Test: C03 tiga besar, BUG-412 → C03/C05, C01–C06 dipin. Belum ada di ekspor: `health_score_dashboard` (flag mismatch), `decision_log` (preseden), kutipan sumber. |
 | 9 Okt 2026 | Mode Update: PRD §10 Startup Canvas, momen wow C05, router intent Jev menggantikan LLM, 03 §4c backend detail. Blocker lokal: Docker/PostgreSQL belum terpasang dan `dataset_kasirnusa/` belum ada di laptop dewaaa. |
-| 9 Okt 2026 | Nama produk Tessera di semua docs. Stack final ADR-0003: postgres.js, VPS Docker Compose, satu akun demo, tanpa LLM dulu (jawaban/draf dari template query graph). 08-DESIGN mengikuti PRD §6: layar Benchmark dihapus. Frontend masih punya halaman `/benchmark` dan seed non-KasirNusa: dibereskan di T4/T6. |
+| 9 Okt 2026 | Nama produk Tessera di semua docs. Stack final ADR-0005: postgres.js, VPS Docker Compose, satu akun demo, tanpa LLM dulu (jawaban/draf dari template query graph). 08-DESIGN mengikuti PRD §6: layar Benchmark dihapus. Frontend masih punya halaman `/benchmark` dan seed non-KasirNusa: dibereskan di T4/T6. |
 | 9 Okt 2026 | `git diff --check` lulus. Lint `08-DESIGN.md` belum tersedia: `npx --no-install` melaporkan `@google/design.md` tidak terpasang; belum memasang dependency tanpa izin. |
 | 9 Okt 2026 | Profil read-only seluruh 15 file data selesai; peta kolom→parameter, periode 90 hari, batasan NPS/invoice/bug/promo/referral, dan SHA-256 arsip dicatat di `10-DATA-PROFILE-KASIRNUSA.md`. Skor dan benchmark belum dijalankan. |
 | 9 Okt 2026 | Rencana backend dan BE-01–BE-16 ditulis dari dokumen/kode/dataset aktual, termasuk deployment VPS dan pengujian organik O01–O15. Seluruh task implementasi masih Todo; target VPS/env belum tersedia. Counts/hash dataset diverifikasi ulang; `DL-006` adalah deal, Decision terkait `D-2025-02`. |

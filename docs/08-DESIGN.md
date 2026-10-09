@@ -296,10 +296,10 @@ Node color is always paired with a text label and Lucide icon, never color alone
 
 ### App Shell
 
-1. **Sidebar card (desktop ≥ 1200px: 248px wide, 16px inset from viewport edges, full height minus insets):**
-   - Background `surface`, radius 16px, padding 16px, no border.
+1. **Sidebar card (desktop ≥ 1200px: collapsed rail 76px showing icons only; expands to 248px on hover or keyboard focus within, 200ms ease-out width transition that pushes the content; labels fade in; 16px inset from viewport edges, full height minus insets):**
+   - Glass (`glass` utility: translucent `surface-elevated`, backdrop blur, hairline border, soft shadow), radius 16px, padding 16px.
    - **Header:** Tessera wordmark with a symbol in `primary` (placeholder until a logo is chosen; no off-token colors). No collapse toggle until a collapsed layout exists.
-   - **Navigation:** One group, three destinations from PRD §6: **Accounts** (risk ranking), **Review** (save plans), **Data**, and nothing else. Review shows a count chip of pending plans. Benchmark is not a screen: retrieval benchmark results, if run, live in the pitch, not the nav. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
+   - **Navigation:** One group, four destinations from PRD §6: **Dashboard** (portfolio overview, default route), **Accounts** (risk ranking), **Review** (save plans), **Data**, and nothing else. Review shows a count chip of pending plans. Benchmark is not a screen: retrieval benchmark results, if run, live in the pitch, not the nav. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
    - **Bottom card:** workspace label and data source line in text (no avatar). Text: `KasirNusa · synthetic dataset` with snapshot date `1 Oct 2026`; before ingest it reads `Synthetic seed data · resets on refresh`. This replaces the reference user dock and its ⋯ menu.
 2. **Header (on canvas, 64px tall):**
    - Left: page title (`headline-lg`).
@@ -320,7 +320,8 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 
 | Screen | Task | Reference Pattern | Primary Information | Supporting | Key Actions |
 |---|---|---|---|---|---|
-| **Accounts** (risk ranking) | Decide which of the 40 customers to review | KPI row (first featured) + ranking table; C01–C06 pinned on top | Priority score (0–100, labelled "priority score", never churn probability), level Low/Medium/High/Critical, top risk factor, data coverage, `mismatch` flag vs CRM health | Annual contract value, weighted value for priority (`annual value × score / 100`), days to renewal, NPS as context | Open account; filter by level |
+| **Dashboard** | Know who to handle this week, why, and whether the data is trustworthy | Row 1: "Needs attention this week" list (2 col: High/Critical, nearest renewal first, strongest graph reason, days to renewal, Plan button) + "CRM says healthy" mismatch card. Row 2: 4 stat tiles, the first (weighted value) featured with the lime glow. Row 3: risk factors in the portfolio (links to Accounts filtered by factor), recent decisions, data and Jev health | Accounts needing action and their top reason; CRM Green vs graph High/Critical | Weighted value for priority, plans in review, renewals in 90 days, ingest/Jev status | Open plan in Review; open account; filter Accounts by factor |
+| **Accounts** (risk ranking) | Decide which of the 40 customers to review | Ranking table with level filter and sort; C01–C06 pinned on top (KPIs live on Dashboard) | Priority score (0–100, labelled "priority score", never churn probability), level Low/Medium/High/Critical, top risk factor, data coverage, `mismatch` flag vs CRM health | Annual contract value, weighted value for priority (`annual value × score / 100`), days to renewal, NPS as context | Open account; filter by level |
 | **Account Detail** | Check evidence path, timeline, ask the graph, draft a plan | Left: factor breakdown, evidence subgraph, timeline; right: Ask-the-graph box + plan draft | Factors with their evidence paths (≥3 sources for a recommendation), cited nodes | Source file, row/interaction ID, snapshot period, Jev confidence | Ask a question (answer cites nodes or abstains); send plan to Review |
 | **Review** (save plans) | Decide plans and see precedent | Single plan card with cited `decision_log` precedent and deviation note; feedback thread below | Plan text, precedent `decision_id`, why it deviates | Author, time, prior Decisions | Approve or reject (signed-in only, append-only, no email sent); reply to feedback |
 | **Data** | See sources, ingest status, Jev status, errors, cost | Source table + compile stats card | 15 files with rows, hash, ingest status; node/edge counts per type | Jev calls written/reviewed/discarded, errors, actual cost | Run ingest (signed-in only) |
@@ -333,7 +334,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
    background: radial-gradient(ellipse at 50% -10%, rgb(141 224 44 / 0.28) 0%, rgb(21 28 16 / 0) 70%), #151C10;
    ```
    Text on it stays `on-surface` / `on-surface-muted`; the glow sits behind the label row, never behind the value.
-3. **Popovers, tooltips, dropdowns:** `surface-elevated`, 1px `outline`, radius 12px, shadow `0 12px 32px rgb(0 0 0 / 0.5)`.
+3. **Popovers, dropdowns, mobile drawer (glass):** `surface-elevated` at 62% opacity, `backdrop-filter: blur(24px) saturate(180%)`, 1px border `on-surface` at 12%, inset top highlight `on-surface` 8%, shadow `0 16px 40px rgb(0 0 0 / 0.5)`, radius 12px (drawer 16px). Implemented as the `glass` utility. Native `<select>` uses customizable select (`appearance: base-select`, Chrome 135+) with the same glass picker; other browsers keep the native picker. Drawer scrim: black 40% + small backdrop blur.
 4. **Interactive cards:** on hover, 1px `outline-active` inset ring appears; no lift, no transform. Transition 150ms ease-out. Respect `prefers-reduced-motion`.
 
 ## Shapes & Geometry
@@ -345,7 +346,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
   - `xl` 20px: modal dialogs.
   - `full`: search input, circular icon buttons, chart bubbles.
 - **Icons:** Lucide only, 1.75px stroke, 18–20px. Trend direction uses `TrendingUp` / `TrendingDown` (14px), not ▲▼ characters. Icon-only buttons carry `aria-label`.
-- **Logo:** not yet designed; placeholder symbol uses `primary`.
+- **Logo:** concept "Cut tile" in `docs/brand/` (see its README): T cut along tile edges and 45° diagonals. Lime `primary` mark on graphite; sidebar uses the mark inside the 32px lime square in `on-primary`; favicon is `frontend/src/app/icon.svg`.
 - **Charts:**
   - **Risk trend:** smooth monotone curve, current period `primary` 2px line with area fill `primary` 12% → 0%; prior period `chart-prior` 1.5px line with `chart-strong` area at 20%. Vertical dashed guide in `on-surface-muted` at the inspected month, dot markers on both series, tooltip in `surface-elevated` showing both periods side by side. Grid lines `outline`, axis labels `label-sm` muted. Accessible data table toggle below.
   - **Risk categories:** three bubbles sized by share (`chart-strong`, `primary`, `chart-soft`) with in-bubble percentage and a dot legend showing category, percent, and count.
@@ -391,7 +392,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 |---|---|
 | **A1 No emoji** | Lucide only, including trend arrows; no emoji or Unicode triangles. |
 | **A2 Deliberate palette** | Only tokens in this file; lime appears on the active nav icon, the primary button, positive trends, and data. The logo placeholder uses `primary`, not an off-token orange. |
-| **A3 One task per screen** | Accounts ranks; Detail investigates, answers, and drafts; Review decides plans; Data ingests. |
+| **A3 One task per screen** | Dashboard summarises (KPIs live only there); Accounts ranks; Detail investigates, answers, and drafts; Review decides plans; Data ingests. |
 | **A4 Focused navigation** | Four menu items only. Bottom card shows CSM name and data source in text, no avatar portrait. |
 | **A5 Tidy density** | Numbers right-aligned and tabular; secondary actions in ⋯ menus; long chips become icon + tooltip. |
 | **A6 No dead surfaces** | Header icon buttons appear only on screens where they act; ⋯ menus omitted when empty. |

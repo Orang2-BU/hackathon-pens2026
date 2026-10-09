@@ -3,69 +3,23 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { ClipboardCheck, Gauge, type LucideIcon, Scale, ShieldAlert } from "lucide-react";
-import { useDemoState } from "@/components/demo-state";
+import { X } from "lucide-react";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, filterAccounts, formatMoney, reviewItems, sortAccounts, type RiskLevel } from "@/lib/demo-data";
+import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/accounts";
 
-const riskOptions = ["All", "Critical", "High", "Medium"] as const;
-const weightedTotal = accounts.reduce((sum, account) => sum + account.weightedValue, 0);
-const elevatedCount = accounts.filter(account => account.riskLevel !== "Medium").length;
-const riskIndexes = accounts.map(account => account.riskIndex).sort((a, b) => a - b);
-const mid = Math.floor(riskIndexes.length / 2);
-const medianRisk = riskIndexes.length % 2 ? riskIndexes[mid] : (riskIndexes[mid - 1] + riskIndexes[mid]) / 2;
-
-type KpiProps = { icon: LucideIcon; label: string; value: string; note: string; featured?: boolean; small?: boolean };
-
-function Kpi({ icon: Icon, label, value, note, featured, small }: KpiProps) {
-  // Muted gray fails contrast over the lime glow; featured text stays on-surface.
-  const secondary = featured ? "text-on-surface" : "text-on-surface-muted";
-  return (
-    <section className={`flex flex-col gap-md ${featured ? "card-featured" : "card"}`}>
-      <span className="grid size-9 place-items-center rounded-sm bg-surface-elevated">
-        <Icon size={18} strokeWidth={1.75} aria-hidden />
-      </span>
-      <div>
-        <h2 className={`text-label-md ${secondary}`}>{label}</h2>
-        <p className={`mt-xs font-bold ${small ? "text-display-number-sm tracking-display-number-sm" : "text-display-number tracking-display-number"}`}>
-          {value}
-        </p>
-      </div>
-      <p className={`mt-auto text-label-sm ${secondary}`}>{note}</p>
-    </section>
-  );
-}
+const riskOptions = ["All", "Critical", "High", "Medium", "Low"] as const;
 
 export default function AccountsPage() {
-  const query = useSearchParams().get("q") ?? "";
+  const params = useSearchParams();
+  const query = params.get("q") ?? "";
+  const factor = params.get("factor");
   const [risk, setRisk] = useState<"All" | RiskLevel>("All");
   const [sort, setSort] = useState<"risk" | "weighted" | "renewal">("risk");
-  const { resolvedReviewIds } = useDemoState();
-  const pendingReview = reviewItems.filter(item => !resolvedReviewIds.includes(item.id)).length;
-  const visible = sortAccounts(filterAccounts(accounts, query, risk), sort);
+  const matched = filterAccounts(accounts, query, risk).filter(account => !factor || account.factors.some(item => item === factor));
+  const visible = sortAccounts(matched, sort);
 
   return (
     <div className="flex flex-col gap-md">
-      <div className="grid gap-md md:grid-cols-2 xl:grid-cols-3">
-        <Kpi
-          featured
-          icon={Scale}
-          label="Risk-weighted contract value"
-          value={formatMoney(weightedTotal, "IDR", true)}
-          note="Contract value × risk index ÷ 100. A priority index, not expected loss."
-        />
-        <Kpi
-          icon={ShieldAlert}
-          label="Accounts above risk threshold"
-          value={`${elevatedCount} of ${accounts.length}`}
-          note="Accounts at High or Critical risk level."
-        />
-        <div className="grid grid-cols-2 gap-md md:col-span-2 xl:col-span-1">
-          <Kpi small icon={ClipboardCheck} label="In review" value={String(pendingReview)} note="Awaiting a human decision" />
-          <Kpi small icon={Gauge} label="Median risk index" value={String(medianRisk)} note={`Across ${accounts.length} accounts`} />
-        </div>
-      </div>
-
       <section className="card" aria-labelledby="watchlist-heading">
         <div className="flex flex-wrap items-center gap-sm">
           <div className="mr-auto">
@@ -73,6 +27,11 @@ export default function AccountsPage() {
             <p className="text-body-sm text-on-surface-muted">
               {visible.length} of {accounts.length} accounts{query && <> matching “{query}”</>}
             </p>
+            {factor && (
+              <Link href="/accounts" className="badge mt-xs gap-xs text-on-surface hover:bg-outline" aria-label={`Clear factor filter ${factor}`}>
+                Factor: {factor} <X size={12} aria-hidden />
+              </Link>
+            )}
           </div>
           <div role="group" aria-label="Filter by risk level" className="flex rounded-md bg-neutral p-xs">
             {riskOptions.map(option => (
@@ -96,22 +55,22 @@ export default function AccountsPage() {
             onChange={event => setSort(event.target.value as typeof sort)}
             className="h-11 rounded-md bg-secondary px-sm text-label-md ring-1 ring-outline ring-inset"
           >
-            <option value="risk">Sort: Risk index</option>
-            <option value="weighted">Sort: Risk-weighted value</option>
+            <option value="risk">Sort: Priority score</option>
+            <option value="weighted">Sort: Weighted value</option>
             <option value="renewal">Sort: Renewal date</option>
           </select>
         </div>
 
         <div className="-mx-md mt-md overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-body-sm">
+          <table className="w-full min-w-[880px] text-left text-body-sm">
             <thead className="label-caps text-on-surface-muted">
               <tr className="border-b border-outline">
                 <th scope="col" className="px-md py-sm">Account</th>
-                <th scope="col" className="px-md py-sm">Risk index</th>
+                <th scope="col" className="px-md py-sm">Priority score</th>
                 <th scope="col" className="px-md py-sm">Signals</th>
                 <th scope="col" className="px-md py-sm">Renewal</th>
                 <th scope="col" className="px-md py-sm text-right">Contract</th>
-                <th scope="col" className="px-md py-sm text-right">Risk-weighted</th>
+                <th scope="col" className="px-md py-sm text-right">Weighted value</th>
               </tr>
             </thead>
             <tbody>
@@ -129,16 +88,19 @@ export default function AccountsPage() {
                       <Link href={`/accounts/${account.id}`} className="inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:text-primary hover:underline xl:min-h-0">
                         {account.name}
                       </Link>
-                      <div className="text-label-sm text-on-surface-muted">{account.domain}</div>
+                      <div className="flex items-center gap-xs text-label-sm text-on-surface-muted">
+                        {account.id}
+                        {account.focus && <span className="badge text-on-surface">Focus</span>}
+                      </div>
                     </td>
                     <td className="px-md py-sm">
                       <span className="flex items-center gap-sm">
-                        <span className="text-title font-bold">{account.riskIndex}</span>
+                        <span className="text-title font-bold">{account.priorityScore}</span>
                         <RiskBadge level={account.riskLevel} />
                       </span>
                     </td>
-                    <td className="px-md py-sm" title={account.signals.join(", ")}>
-                      {account.signals[0]}
+                    <td className="max-w-80 px-md py-sm" title={account.signals.join(", ")}>
+                      {account.signals[0] ?? <span className="text-on-surface-muted">No signal</span>}
                       {account.signals.length > 1 && <span className="text-on-surface-muted"> +{account.signals.length - 1}</span>}
                     </td>
                     <td className="px-md py-sm">{account.renewalDate}</td>
