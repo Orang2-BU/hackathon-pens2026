@@ -1,0 +1,375 @@
+{
+ "meta": {
+  "sumber": "dataset_kasirnusa (15 file), snapshot 2026-10-01",
+  "dibuat": "2026-10-09",
+  "catatan": "link=hard berarti eksplisit di data; link=derived berarti kandidat hasil komputasi (basis disebut di detail). Tidak ada kutipan yang dibuat-buat; judul/detail diringkas dari record sumber.",
+  "bug412_hard_links_total": 0,
+  "tickets_dengan_bug_id": 16,
+  "total_tiket": 640
+ },
+ "accounts": {
+  "C01": {
+   "nama": "Kopi Lintas Nusantara",
+   "skor": 40.2,
+   "level": "Kritis",
+   "renewal": "2026-12-15",
+   "nilai_tahunan": 149940000,
+   "evidence": [
+    {
+     "kind": "champion",
+     "title": "Champion Rina Hapsari now at Grup Ritel Mandala",
+     "detail": "CRM still lists Rina Hapsari as champion of Kopi Lintas Nusantara; employment history places them at Grup Ritel Mandala since 2026-09-01.",
+     "date": "2026-09-01",
+     "source": "contact_employment_history:K017",
+     "link": "hard"
+    },
+    {
+     "kind": "commitment",
+     "title": "Unkept commitment: FEAT-07",
+     "detail": "Commitment logged 2025-11-28 with status 'Belum ditepati'.",
+     "date": "2025-11-28",
+     "source": "decision_log:D-2025-11",
+     "link": "hard"
+    },
+    {
+     "kind": "tickets",
+     "title": "3 support tickets still open",
+     "detail": "1 tickets created in the last 90 days.",
+     "date": "2026-08-03",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 48 days",
+     "detail": "Last inbound interaction 2026-08-14; snapshot 2026-10-01.",
+     "date": "2026-08-14",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    },
+    {
+     "kind": "outlets",
+     "title": "1 outlets run in active offline mode",
+     "detail": "Offline-mode outlets are exposed to sync issues after app updates.",
+     "date": "2026-10-01",
+     "source": "outlets",
+     "link": "hard"
+    }
+   ],
+   "edges": [
+    {
+     "from": "C01",
+     "rel": "champion_moved_to",
+     "to": "P01",
+     "link": "hard"
+    },
+    {
+     "from": "C01",
+     "rel": "promised_feature",
+     "to": "FEAT-07",
+     "link": "hard"
+    }
+   ]
+  },
+  "C02": {
+   "nama": "TB Sinar Jaya",
+   "skor": 18.6,
+   "level": "Tinggi",
+   "renewal": "2027-03-01",
+   "nilai_tahunan": 99750000,
+   "evidence": [
+    {
+     "kind": "tickets",
+     "title": "3 support tickets still open",
+     "detail": "9 tickets created in the last 90 days.",
+     "date": "2026-08-31",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 79 days",
+     "detail": "Last inbound interaction 2026-07-14; snapshot 2026-10-01.",
+     "date": "2026-07-14",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C03": {
+   "nama": "Apotek Sehat Sentosa",
+   "skor": 33.2,
+   "level": "Kritis",
+   "renewal": "2027-01-20",
+   "nilai_tahunan": 68040000,
+   "evidence": [
+    {
+     "kind": "bug_candidate",
+     "title": "8 tickets match the offline-sync pattern (BUG-412 candidate)",
+     "detail": "Offline outlets with sync/discrepancy wording since 3 Jul 2026 (e.g. T0521, T0523, T0526, T0562). No ticket is hard-linked to BUG-412; this link is derived from outlet mode, timing, and wording.",
+     "date": "2026-07-03+",
+     "source": "support_tickets:T0521, T0523, T0526, T0562",
+     "link": "derived"
+    },
+    {
+     "kind": "tickets",
+     "title": "6 support tickets still open",
+     "detail": "8 tickets created in the last 90 days.",
+     "date": "2026-09-13",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "usage",
+     "title": "Transactions per day down 12%",
+     "detail": "Last 90 days vs the previous 90 days, from daily product usage.",
+     "date": "2026-07-03/2026-09-30",
+     "source": "product_usage_daily",
+     "link": "hard"
+    },
+    {
+     "kind": "outlets",
+     "title": "6 outlets run in active offline mode",
+     "detail": "Offline-mode outlets are exposed to sync issues after app updates.",
+     "date": "2026-10-01",
+     "source": "outlets",
+     "link": "hard"
+    }
+   ],
+   "edges": [
+    {
+     "from": "C03",
+     "rel": "suspected_bug",
+     "to": "BUG-412",
+     "link": "derived"
+    }
+   ]
+  },
+  "C04": {
+   "nama": "Roti Kenanga",
+   "skor": 14.5,
+   "level": "Sedang",
+   "renewal": "2026-11-05",
+   "nilai_tahunan": 33600000,
+   "evidence": [
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 176 days",
+     "detail": "Last inbound interaction 2026-04-08; snapshot 2026-10-01.",
+     "date": "2026-04-08",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C05": {
+   "nama": "Minimarket Berkah",
+   "skor": 32.6,
+   "level": "Kritis",
+   "renewal": "2027-04-10",
+   "nilai_tahunan": 95760000,
+   "evidence": [
+    {
+     "kind": "bug_candidate",
+     "title": "5 tickets match the offline-sync pattern (BUG-412 candidate)",
+     "detail": "Offline outlets with sync/discrepancy wording since 3 Jul 2026 (e.g. T0502, T0554, T0563, T0580). No ticket is hard-linked to BUG-412; this link is derived from outlet mode, timing, and wording.",
+     "date": "2026-07-03+",
+     "source": "support_tickets:T0502, T0554, T0563, T0580",
+     "link": "derived"
+    },
+    {
+     "kind": "tickets",
+     "title": "4 support tickets still open",
+     "detail": "6 tickets created in the last 90 days.",
+     "date": "2026-08-19",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 100 days",
+     "detail": "Last inbound interaction 2026-06-23; snapshot 2026-10-01.",
+     "date": "2026-06-23",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    },
+    {
+     "kind": "outlets",
+     "title": "5 outlets run in active offline mode",
+     "detail": "Offline-mode outlets are exposed to sync issues after app updates.",
+     "date": "2026-10-01",
+     "source": "outlets",
+     "link": "hard"
+    }
+   ],
+   "edges": [
+    {
+     "from": "C05",
+     "rel": "suspected_bug",
+     "to": "BUG-412",
+     "link": "derived"
+    }
+   ]
+  },
+  "C06": {
+   "nama": "Saiyo Group",
+   "skor": 8.0,
+   "level": "Rendah",
+   "renewal": "2027-07-01",
+   "nilai_tahunan": 113400000,
+   "evidence": [
+    {
+     "kind": "tickets",
+     "title": "1 support tickets still open",
+     "detail": "3 tickets created in the last 90 days.",
+     "date": "2026-09-28",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "outlets",
+     "title": "1 outlets run in active offline mode",
+     "detail": "Offline-mode outlets are exposed to sync issues after app updates.",
+     "date": "2026-10-01",
+     "source": "outlets",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C20": {
+   "nama": "Pet Shop Sahabat",
+   "skor": 13.5,
+   "level": "Sedang",
+   "renewal": "2027-04-21",
+   "nilai_tahunan": 21000000,
+   "evidence": [
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 136 days",
+     "detail": "Last inbound interaction 2026-05-18; snapshot 2026-10-01.",
+     "date": "2026-05-18",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C26": {
+   "nama": "Ayam Geprek Mantul",
+   "skor": 12.7,
+   "level": "Sedang",
+   "renewal": "2026-12-30",
+   "nilai_tahunan": 39900000,
+   "evidence": [
+    {
+     "kind": "tickets",
+     "title": "1 support tickets still open",
+     "detail": "5 tickets created in the last 90 days.",
+     "date": "2026-09-30",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 175 days",
+     "detail": "Last inbound interaction 2026-04-09; snapshot 2026-10-01.",
+     "date": "2026-04-09",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C32": {
+   "nama": "Toko Herbal Alami",
+   "skor": 13.5,
+   "level": "Sedang",
+   "renewal": "2027-03-20",
+   "nilai_tahunan": 58800000,
+   "evidence": [
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 196 days",
+     "detail": "Last inbound interaction 2026-03-19; snapshot 2026-10-01.",
+     "date": "2026-03-19",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C34": {
+   "nama": "Grosir Plastik Jaya",
+   "skor": 15.6,
+   "level": "Tinggi",
+   "renewal": "2027-08-28",
+   "nilai_tahunan": 50400000,
+   "evidence": [
+    {
+     "kind": "tickets",
+     "title": "2 support tickets still open",
+     "detail": "5 tickets created in the last 90 days.",
+     "date": "2026-09-28",
+     "source": "support_tickets",
+     "link": "hard"
+    },
+    {
+     "kind": "engagement",
+     "title": "No inbound customer contact for 301 days",
+     "detail": "Last inbound interaction 2025-12-04; snapshot 2026-10-01.",
+     "date": "2025-12-04",
+     "source": "interactions.jsonl",
+     "link": "hard"
+    },
+    {
+     "kind": "outlets",
+     "title": "1 outlets run in active offline mode",
+     "detail": "Offline-mode outlets are exposed to sync issues after app updates.",
+     "date": "2026-10-01",
+     "source": "outlets",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C35": {
+   "nama": "Frozen Food Mama",
+   "skor": 15.5,
+   "level": "Tinggi",
+   "renewal": "2027-04-05",
+   "nilai_tahunan": 87780000,
+   "evidence": [
+    {
+     "kind": "outlets",
+     "title": "2 outlets run in active offline mode",
+     "detail": "Offline-mode outlets are exposed to sync issues after app updates.",
+     "date": "2026-10-01",
+     "source": "outlets",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  },
+  "C36": {
+   "nama": "Bakso Cak Man",
+   "skor": 11.6,
+   "level": "Sedang",
+   "renewal": "2026-11-25",
+   "nilai_tahunan": 46200000,
+   "evidence": [
+    {
+     "kind": "tickets",
+     "title": "1 support tickets still open",
+     "detail": "4 tickets created in the last 90 days.",
+     "date": "2026-09-29",
+     "source": "support_tickets",
+     "link": "hard"
+    }
+   ],
+   "edges": []
+  }
+ }
+}
