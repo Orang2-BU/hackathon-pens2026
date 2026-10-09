@@ -1,0 +1,81 @@
+services:
+  db:
+    image: postgres:16.15-alpine3.24
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tessera}
+      POSTGRES_USER: ${POSTGRES_USER:-tessera_bootstrap}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in backend/.env}
+      TESSERA_RUNTIME_PASSWORD: ${TESSERA_RUNTIME_PASSWORD:?Set TESSERA_RUNTIME_PASSWORD in backend/.env}
+      TESSERA_MIGRATOR_PASSWORD: ${TESSERA_MIGRATOR_PASSWORD:?Set TESSERA_MIGRATOR_PASSWORD in backend/.env}
+    volumes:
+      - tessera_pgdata:/var/lib/postgresql/data
+      - ./db/00-bootstrap-roles.sh:/docker-entrypoint-initdb.d/00-bootstrap-roles.sh:ro
+      - ./db/00-bootstrap-roles.sql:/docker-entrypoint-initdb.d/00-bootstrap-roles.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - private
+    security_opt:
+      - no-new-privileges:true
+
+  migrate:
+    build: .
+    image: tessera-backend:local
+    command: ["node", "scripts/migrate.js"]
+    environment:
+      MIGRATION_DATABASE_URL: postgres://tessera_migrator_login:${TESSERA_MIGRATOR_PASSWORD:?Set TESSERA_MIGRATOR_PASSWORD in backend/.env}@db:5432/${POSTGRES_DB:-tessera}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - private
+    restart: "no"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+
+  api:
+    image: tessera-backend:local
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://tessera_runtime_login:${TESSERA_RUNTIME_PASSWORD:?Set TESSERA_RUNTIME_PASSWORD in backend/.env}@db:5432/${POSTGRES_DB:-tessera}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:?Set DEMO_PASSWORD in backend/.env}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in backend/.env}
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:?Set PUBLIC_ORIGIN in backend/.env}
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8080
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      - private
+      - egress
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/health/live').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+
+networks:
+  private:
+    internal: true
+  egress:
+
+volumes:
+  tessera_pgdata:

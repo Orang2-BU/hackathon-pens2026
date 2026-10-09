@@ -21,11 +21,12 @@ async function makeDirectory() {
 test('migration discovery sorts valid versioned files and hashes exact bytes', async () => {
   const directory = await makeDirectory();
   await writeFile(join(directory, '002_second.sql'), 'SELECT 2;\n');
+  await writeFile(join(directory, '003_jev_cache.sql'), 'SELECT 3;\n');
   await writeFile(join(directory, '001_first.sql'), 'SELECT 1;\n');
   await writeFile(join(directory, 'README.md'), 'ignored');
 
   const migrations = await discoverMigrations(directory);
-  assert.deepEqual(migrations.map(({ version }) => version), ['001_first', '002_second']);
+  assert.deepEqual(migrations.map(({ version }) => version), ['001_first', '002_second', '003_jev_cache']);
   assert.equal(migrations[0].checksum.length, 64);
 });
 

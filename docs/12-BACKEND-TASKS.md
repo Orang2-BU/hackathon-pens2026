@@ -103,28 +103,28 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-13 — Sambungkan UI ke backend
 
-- **Trace:** T4/T5/T6; TASK-013. **Prerequisite:** BE-08–12. **Status:** Todo.
+- **Trace:** T4/T5/T6; TASK-013. **Prerequisite:** BE-08–12. **Status:** Blocked/out of current scope: this task changes the frontend, explicitly excluded by the user’s backend-only instruction. No frontend files will be modified in this work.
 - **Output:** Accounts/Detail/Review/Data memakai DTO/database; action forms dan API calls nyata.
 - **Kerja:** ganti tiga akun seed, jawaban hardcode, React-state approval; synthetic label/coverage/source; loading/error/empty/partial; flow draft→review→Decision; perbaiki fitur/nav yang tidak cocok PRD seperti Benchmark melalui task frontend terkait.
 - **Lulus:** tepat 40 customer; C01–C06 fokus tanpa memalsukan urutan skor global; public read/signed-in write; keputusan/feedback persisten; API failure terlihat. Browser 375/768/1440, keyboard/drawer dan copy English sesuai 08. Ini pekerjaan integrasi frontend, bukan desain ulang.
 
 ### BE-14 — Packaging dan deploy ke VPS
 
-- **Trace:** T6; TASK-013/016. **Prerequisite:** backend dan quality gates BE-13; packaging dapat dimulai lebih awal. **Status:** Todo; eksekusi publik Blocked target VPS/env.
+- **Trace:** T6; TASK-013/016. **Prerequisite:** backend and quality gates; packaging may begin earlier. **Status:** In Progress (container scaffold/runbook added; build/Compose/deployment blocked by missing Docker and target VPS/env).
 - **Output:** Dockerfile/.dockerignore/Compose/.env.example/docs/DEPLOY.md, pinned release image/URL, health dan persistence proof.
 - **Kerja:** langkah 11 §9; private dataset read-only mount, DB persistent/internal, role/backup, migration job, HTTPS/reverse proxy, env dan trusted host/IP; release SHA/tag dan rollback non-destructive.
 - **Lulus:** image build, Compose validation, migration/ingest di server, readiness 200 hanya saat DB+revision siap; URL diakses dari luar host; Secure cookie/auth/429; restart tidak kehilangan data; port DB/dataset/secrets tidak publik. Jangan menandai Done karena `next dev` atau seed frontend tampil.
 
 ### BE-15 — QA release dan bukti golden path
 
-- **Trace:** T6/T7; TASK-014/015. **Prerequisite:** tiap BE task diuji sejak awal; final gate sesudah BE-14. **Status:** Todo.
+- **Trace:** T6/T7; TASK-014/015. **Prerequisite:** tiap BE task diuji sejak awal; final gate sesudah BE-14. **Status:** In Progress (backend unit/syntax checks pass; DB, build image, provider, security deployment and end-to-end gates blocked).
 - **Output:** actual command output ringkas, test database reconciliation, golden path, defect report; timestamp/SHA/runtime/data/formula/rubric/model.
 - **Kerja:** test/build/typecheck/lint/knip; parser/graph/temporal/security/concurrency; source paths; auth and DB/provider failure; readiness; duplicate ingest dan offline double count. Untuk change UI jalankan browser matrix. Benchmark opsional tetap terpisah.
 - **Lulus:** semua Must acceptance terverifikasi; tidak ada data loss, unauthorized writes atau unsupported factual claim; tiap error diperbaiki pada root cause dan cek relevan diulang; manual checks yang belum dilakukan ditandai Blocked, bukan diasumsikan lulus.
 
 ### BE-16 — Testing organik dan handoff
 
-- **Trace:** T6/T7; TASK-016. **Prerequisite:** BE-14/15. **Status:** Todo.
+- **Trace:** T6/T7; TASK-016. **Prerequisite:** BE-14/15. **Status:** Blocked until deploy is healthy and a CSM/judge/operator is available; no organic-user session can be claimed from unit tests.
 - **Output:** `docs/qa/backend-organic-YYYYMMDD.md` dibuat saat actual run; tester/URL/commit; O01–O15 di 11 §10; issues dan release decision.
 - **Kerja:** CSM/operator memakai aplikasi, juri/public mencoba pertanyaan baru dan urutan bebas; real forms/actions; reload/restart/dua tab; tidak mengubah fixture untuk menyamakan expected dengan actual.
 - **Lulus:** tiap kasus memiliki expected/actual/PASS-FAIL-BLOCKED dan bukti aman; ≥5 pertanyaan baru didukung, ≥3 unsupported; Decision baru ditemukan sesudah refresh/query; feedback dibalas; persistence restart; tidak ada outreach. User menjalankan sesi manusia bila operator/browser belum tersedia. Temuan ditutup dan regression yang relevan diulang sebelum final demo.
@@ -267,6 +267,14 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Service membaca list maksimal 100 item dan thread beserta replies. `GET /api/feedback*`, `POST /api/feedback`, dan `POST /api/feedback/:id/replies` tersedia; baca/write butuh sesi, write juga Origin tepat, ukuran/rate limit, dan actor dari sesi.
 - Unit HTTP/validasi lulus; backend `corepack pnpm test` 38/38 dan `corepack pnpm check` lulus. Tidak ada konten feedback user dimasukkan Git.
 - BE-12 belum Done: transaksi/FK/status/reload/restart perlu uji PostgreSQL; login hanya demo-admin, belum ada akun CSM/user terpisah atau provisioning/role mapping; endpoint belum dikonsumsi client karena scope tetap backend-only. Feedback tidak mengubah scoring/Decision.
+
+## 18. Eksekusi BE-13 sampai BE-16 (status batas dan gate)
+
+- BE-13 tidak dikerjakan karena integrasi UI adalah perubahan frontend dan user secara eksplisit membatasi scope ke backend. Tidak ada source/frontend file diubah dalam rangkaian task backend ini.
+- BE-14 scaffold dibuat di `backend/Dockerfile`, `backend/docker-compose.yml`, `.dockerignore`, role bootstrap dan `backend/DEPLOY.md`. Image berbasis Node `22.23.3-bookworm-slim` dan PostgreSQL `16.15-alpine3.24`; runtime non-root/read-only, DB tanpa port publik, API bind loopback, volume DB bernama. Migrasi `003_runtime-privileges.sql` memberi runtime akses tabel dan tetap menolak UPDATE/DELETE Decision. Pemeriksaan daftar migrasi menemukan dan memperbaiki regex discovery yang sebelumnya melewatkan `002_jev_cache.sql` karena underscore; daftar aktual kini 001/002/003.
+- BE-14 belum deploy/Done: Docker/Compose tidak tersedia pada laptop; tidak ada VPS/SSH/domain/HTTPS/secrets. Belum ada backend ingest/publish, jadi readiness diharapkan `503` walau container hidup. Tag image diperiksa terhadap image resmi saat pembuatan, tetapi build/scan/compose config tidak dijalankan.
+- BE-15 checkpoint terakhir backend `corepack pnpm test` 38/38, `corepack pnpm check` dan `git diff --check` pass. Itu unit/syntax/whitespace saja; bukan typecheck/lint/dead-code/build/PostgreSQL/provider/security/Golden path. Perintah DB integration membutuhkan `TEST_DATABASE_URL`; CI/release gates belum ada.
+- BE-16 belum dijalankan: memerlukan backend terdeploy dan ready, endpoint operasional, serta CSM/juri/operator untuk kasus O01–O15. Tidak ada user/browser session atau feedback/Decision live yang diklaim.
 
 ## 10. Eksekusi BE-05 (parsial)
 

@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
-const MIGRATION_NAME = /^([0-9]{3}_[a-z0-9-]+)\.sql$/;
+const MIGRATION_NAME = /^([0-9]{3}_[a-z0-9_-]+)\.sql$/;
 
 export async function discoverMigrations(directory) {
   const files = (await readdir(directory))
