@@ -1,16 +1,16 @@
 # 04 — TODO: Progres Build KasirNusa
 
-> Perbarui saat status berubah. ID mengikuti `03-ARCHITECTURE.md`. Semua task aplikasi belum dimulai; dokumen dan dataset lokal sudah disiapkan.
+> Perbarui saat status berubah. ID mengikuti `03-ARCHITECTURE.md`. Frontend seed dan kontrak backend BE-01 tersedia; operasi DB dan alur persisten belum diimplementasikan. Rencana backend: [11-BACKEND-PLAN.md](11-BACKEND-PLAN.md); task, dependensi, acceptance dan bukti: [12-BACKEND-TASKS.md](12-BACKEND-TASKS.md); kontrak v1: [13-BACKEND-CONTRACT.md](13-BACKEND-CONTRACT.md).
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, profil dataset dan parameter terukur ditambahkan
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-01 selesai dengan kontrak v1 dan quality gates lokal
 
 ## Task
 
 | ID | Task | Pemilik | Status | Bukti / kriteria selesai |
 |---|---|---|---|---|
-| T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | Dev/test/build/typecheck/lint/knip tersedia; pilih library/hosting/identitas sebelum dependency berbayar/baru. 9 Okt: `frontend/` Next.js + token export dari 08-DESIGN (`src/app/theme.css`), test/typecheck/lint/knip/build hijau. PostgreSQL dan kontrak data belum. |
+| T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | Frontend/token baseline sudah ada. BE-01 menulis kontrak v1 dan checks prototype lokal; workspace root `backend/` dibuat. Runtime backend, API, PostgreSQL/schema/migrasi masih BE-02; milestone T1 belum Done. UI dan folder frontend tidak dikerjakan pada commit ini. |
 | T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | ⬜ | Statistik baris/node/edge, source/hash, kutipan valid, idempotensi, eval primitif berlabel |
 | T3 | Parameter dan skor prioritas deterministik | — | ⬜ | Bobot 30/25/20/15/10 diuji pada C01–C06 dan 40 pelanggan; data kosong/offline jelas; sensitivitas bobot; QA §6 dokumen 09 |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | ⬜ | Pertanyaan baru dijawab dari graph lewat router intent Jev; jalur bukti ≥3 sumber bila rekomendasi; abstain bila tidak cukup; eval routing 30 pertanyaan berlabel |
@@ -52,3 +52,7 @@
 | 9 Okt 2026 | Nama produk Tessera di semua docs. Stack final ADR-0003: postgres.js, VPS Docker Compose, satu akun demo, tanpa LLM dulu (jawaban/draf dari template query graph). 08-DESIGN mengikuti PRD §6: layar Benchmark dihapus. Frontend masih punya halaman `/benchmark` dan seed non-KasirNusa: dibereskan di T4/T6. |
 | 9 Okt 2026 | `git diff --check` lulus. Lint `08-DESIGN.md` belum tersedia: `npx --no-install` melaporkan `@google/design.md` tidak terpasang; belum memasang dependency tanpa izin. |
 | 9 Okt 2026 | Profil read-only seluruh 15 file data selesai; peta kolom→parameter, periode 90 hari, batasan NPS/invoice/bug/promo/referral, dan SHA-256 arsip dicatat di `10-DATA-PROFILE-KASIRNUSA.md`. Skor dan benchmark belum dijalankan. |
+| 9 Okt 2026 | Rencana backend dan BE-01–BE-16 ditulis dari dokumen/kode/dataset aktual, termasuk deployment VPS dan pengujian organik O01–O15. Seluruh task implementasi masih Todo; target VPS/env belum tersedia. Counts/hash dataset diverifikasi ulang; `DL-006` adalah deal, Decision terkait `D-2025-02`. |
+| 9 Okt 2026 | Frozen install berhasil; test frontend 4/4, build, typecheck, lint, knip lulus. Production HTTP smoke lokal empat halaman → 200; `/api/health/ready` → 404 karena backend belum ada. Ini bukan hasil deploy/UAT backend; bukti di dokumen 12. |
+| 9 Okt 2026 | BE-01 selesai: kontrak DTO/API v1, validasi input/temporal/error dan native Node TS, Node engine/ESM, indeks ADR dan dokumen stack/Jev selaras. Test 47/47, build, typecheck, lint, knip (rerun mandiri sesudah allocation failure paralel), empat HTTP seed route →200. DB/Jev live/golden path/deploy belum diuji; bukti lengkap 12 §6. |
+| 9 Okt 2026 | Workspace root `backend/` diminta user agar backend dipisahkan dan frontend tidak dikerjakan. README workspace + ADR-0005 Proposed ditambahkan. Pilihan API runtime belum dibuat; folder frontend tidak masuk commit. |
