@@ -96,7 +96,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-12 — Feedback dua arah persisten
 
-- **Trace:** T5; TASK-012. **Prerequisite:** BE-09/11. **Status:** Todo.
+- **Trace:** T5; TASK-012. **Prerequisite:** BE-09/11. **Status:** In Progress (feedback service/routes implemented; database verification and distinct CSM/user provisioning remain).
 - **Output:** feedback/reply dengan actor, waktu, account/plan context, status tanggapan.
 - **Kerja:** plain text escaping/length checks; authenticated submit/reply; context FK dan authorization; tidak menulis ulang skor/fakta/Decision.
 - **Lulus:** thread survive refresh/restart; actor dari sesi; invalid context/unauthenticated write ditolak; sebelum/sesudah feedback memiliki score dan Decision identik. Akses pelanggan akhir belum masuk implementasi.
@@ -260,6 +260,13 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Decision menurunkan actor dari sesi, hash payload stabil, mengunci revision, mengembalikan hasil yang sama untuk retry idempotency key/payload identik, menolak key/payload berbeda, dan menolak Decision kedua pada revision yang sudah diputus. Context membawa `origin=app_decision`, evidence hash dan `outreachSent=false`; tidak ada kode pengiriman outreach.
 - HTTP boundary `POST /api/plans`, `PATCH /api/plans/:id`, `POST /api/decisions` mewajibkan sesi admin + Origin tepat, membatasi body/rate, membuang actor/context client dan memetakan error aman. Unit test actor spoof, no-session, origin, context dan validasi invalid lulus; backend `corepack pnpm test` 36/36 dan `corepack pnpm check` lulus setelah patch concurrency.
 - BE-11 belum Done: context/evidence harus disusun repository server-side; komposisi service belum tersambung; PostgreSQL transaksi, concurrency, idempotency, trigger append-only, role privilege dan restart persistence tidak dapat diuji tanpa DB disposable. No outreach.
+
+## 17. Eksekusi BE-12 (parsial; feedback dua arah)
+
+- `backend/src/feedback.js` memvalidasi teks 1–4.000 karakter dan ID; submit memastikan account ada dan plan revision (jika diberikan) memang milik account tersebut. Balasan mengunci thread, menambah row `feedback_replies`, lalu menandai status responded pada satu transaksi. Tidak ada penulisan ulang account factor, skor, graph, atau Decision.
+- Service membaca list maksimal 100 item dan thread beserta replies. `GET /api/feedback*`, `POST /api/feedback`, dan `POST /api/feedback/:id/replies` tersedia; baca/write butuh sesi, write juga Origin tepat, ukuran/rate limit, dan actor dari sesi.
+- Unit HTTP/validasi lulus; backend `corepack pnpm test` 38/38 dan `corepack pnpm check` lulus. Tidak ada konten feedback user dimasukkan Git.
+- BE-12 belum Done: transaksi/FK/status/reload/restart perlu uji PostgreSQL; login hanya demo-admin, belum ada akun CSM/user terpisah atau provisioning/role mapping; endpoint belum dikonsumsi client karena scope tetap backend-only. Feedback tidak mengubah scoring/Decision.
 
 ## 10. Eksekusi BE-05 (parsial)
 

@@ -4,6 +4,7 @@ import { pathToFileURL } from 'node:url';
 import { createDatabase } from './db.js';
 import { getReadiness } from './health.js';
 import { cookieValue, createRateLimiter } from './auth.js';
+import { createFeedbackService } from './feedback.js';
 
 function sendJson(response, status, body) {
   response.writeHead(status, {
@@ -80,8 +81,10 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       return;
     }
 
-    if (['/api/plans', '/api/decisions'].includes(path) && request.method === 'POST'
-      || /^\/api\/plans\/[A-Za-z0-9_-]+$/u.test(path) && request.method === 'PATCH') {
+    const feedbackReplyMatch = path.match(/^\/api\/feedback\/([A-Za-z0-9_-]{1,128})\/replies$/u);
+    if (['/api/plans', '/api/decisions', '/api/feedback'].includes(path) && request.method === 'POST'
+      || /^\/api\/plans\/[A-Za-z0-9_-]+$/u.test(path) && request.method === 'PATCH'
+      || feedbackReplyMatch && request.method === 'POST') {
       if (!auth) { sendJson(response, 503, { error: 'AUTH_NOT_CONFIGURED' }); return; }
       if (!auth.originAllowed(request.headers.origin)) { sendJson(response, 403, { error: 'ORIGIN_FORBIDDEN' }); return; }
       const session = auth.readSession(cookieValue(request.headers.cookie));
@@ -94,16 +97,23 @@ export function createHttpServer({ database, auth = null, readService = null, wr
         sendJson(response, error.message === 'BODY_TOO_LARGE' ? 413 : 400, { error: error.message === 'BODY_TOO_LARGE' ? 'BODY_TOO_LARGE' : 'INVALID_JSON' });
         return;
       }
-      const operation = path === '/api/plans' ? 'createPlan' : path === '/api/decisions' ? 'decidePlan' : 'revisePlan';
+      const operation = path === '/api/plans' ? 'createPlan'
+        : path === '/api/decisions' ? 'decidePlan'
+          : path === '/api/feedback' ? 'submitFeedback'
+            : feedbackReplyMatch ? 'replyToFeedback' : 'revisePlan';
       if (!writeService?.[operation]) { sendJson(response, 503, { error: 'WRITE_UNAVAILABLE' }); return; }
       try {
         const payload = operation === 'createPlan'
           ? { accountNodeId: body.accountNodeId, body: body.body }
           : operation === 'revisePlan'
             ? { planId: path.split('/').at(-1), expectedRevision: body.expectedRevision, body: body.body, deviationReason: body.deviationReason }
-            : { planRevisionId: body.planRevisionId, idempotencyKey: body.idempotencyKey, outcome: body.outcome, reason: body.reason };
+            : operation === 'decidePlan'
+              ? { planRevisionId: body.planRevisionId, idempotencyKey: body.idempotencyKey, outcome: body.outcome, reason: body.reason }
+              : operation === 'submitFeedback'
+                ? { accountNodeId: body.accountNodeId, planRevisionId: body.planRevisionId ?? null, body: body.body }
+                : { feedbackId: feedbackReplyMatch[1], body: body.body };
         const result = await writeService[operation]({ ...payload, actorId: session.actorId });
-        sendJson(response, operation === 'createPlan' ? 201 : 200, result);
+        sendJson(response, ['createPlan', 'submitFeedback'].includes(operation) ? 201 : 200, result);
       } catch (error) {
         const mapping = { INVALID_INPUT: 400, INVALID_CONTEXT: 400, NOT_FOUND: 404, CONFLICT: 409 };
         const status = mapping[error.code] ?? 503;
@@ -123,6 +133,28 @@ export function createHttpServer({ database, auth = null, readService = null, wr
       if (!readService?.listAccounts) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
       try { sendJson(response, 200, await readService.listAccounts({ search, sort })); }
       catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
+      return;
+    }
+
+    if (path === '/api/feedback' && request.method === 'GET') {
+      if (!auth?.readSession(cookieValue(request.headers.cookie))) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
+      const accountNodeId = new URL(request.url ?? '/', 'http://localhost').searchParams.get('accountNodeId');
+      if (accountNodeId && !/^[A-Za-z0-9_-]{1,128}$/u.test(accountNodeId)) { sendJson(response, 400, { error: 'INVALID_QUERY' }); return; }
+      if (!readService?.listFeedback) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
+      try { sendJson(response, 200, await readService.listFeedback({ accountNodeId })); }
+      catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
+      return;
+    }
+
+    const feedbackReadMatch = path.match(/^\/api\/feedback\/([A-Za-z0-9_-]{1,128})$/u);
+    if (feedbackReadMatch && request.method === 'GET') {
+      if (!auth?.readSession(cookieValue(request.headers.cookie))) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
+      if (!readService?.getFeedback) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
+      try {
+        const thread = await readService.getFeedback(feedbackReadMatch[1]);
+        if (!thread) { sendJson(response, 404, { error: 'NOT_FOUND' }); return; }
+        sendJson(response, 200, thread);
+      } catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
       return;
     }
 
@@ -187,7 +219,8 @@ if (import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
       secureCookies: process.env.NODE_ENV !== 'development',
     });
   }
-  const server = createHttpServer({ database, auth });
+  const feedbackService = createFeedbackService(database);
+  const server = createHttpServer({ database, auth, readService: feedbackService, writeService: feedbackService });
 
   server.listen(port, host, () => {
     process.stdout.write(`Tessera backend listening on http://${host}:${port}\n`);
