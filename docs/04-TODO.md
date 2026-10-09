@@ -15,7 +15,7 @@
 | T3 | Parameter dan skor prioritas deterministik | — | 🟦 | Eksperimen formula risiko 30/25/20/15/10 dan sensitivitas ±10 diuji pada 40 akun; C03 di tiga besar, renewal C04 35 hari. Belum disetujui, belum ada level/mismatch, sinyal Jev dan hasil DB-persisted; rincian 12 §13. |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | 🟦 | Query boundary, katalog 10 intent/threshold dan evidence gate tersedia; repository PostgreSQL, Jev live, graph sitasi dan eval reviewed masih pending. Bukti 12 §15. |
 | T5 | Save plan, Decision append-only, feedback dua arah | — | 🟦 | Plan/revision/Decision + protected boundary dan feedback thread service ada; DB verification dan akun user/CSM terpisah pending. Tidak ada outreach. Bukti 12 §16–17. |
-| T6 | Demo publik dan verifikasi UI/golden path | — | 🟦 | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD. 9 Okt: shell + 5 layar sesuai 08-DESIGN, browser 375/768/1440 tanpa scroll horizontal, drawer lulus; data masih seed sintetis (belum KasirNusa). Backend login/session prototype ada, belum deploy atau terhubung ke frontend. |
+| T6 | Demo publik dan verifikasi UI/golden path | — | 🟦 | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD. 9 Okt: shell + 5 layar sesuai 08-DESIGN, browser 375/768/1440 tanpa scroll horizontal, drawer lulus; data masih seed sintetis (belum KasirNusa). Backend container scaffold ada, belum build/deploy atau terhubung ke frontend. |
 | T7 | Pitch, demo assets, benchmark bila dijalankan | — | ⬜ | Angka aktual dan klaim bersumber; PPT/GitHub/video sesuai jadwal resmi; SalesTranscriptQA hanya benchmark terpisah bila dipakai |
 
 | T8 | Bandingkan dua akun berdampingan | — | ⬜ | Could (A9): faktor dan jalur bukti dua akun dalam satu tampilan |
@@ -67,3 +67,4 @@
 | 9 Okt 2026 | BE-10 parsial: API read/query boundary, intent threshold, entity ambiguity dan citation abstain diuji; total backend 33/33 + syntax check. Jev live/DB query belum berjalan. Bukti 12 §15. |
 | 9 Okt 2026 | BE-11 parsial: plan revision, Decision idempotency/context dan protected write boundary; backend 36/36 + syntax check. Transaction/concurrency DB gate belum dijalankan. Bukti 12 §16. |
 | 9 Okt 2026 | BE-12 parsial: submit/reply/list feedback berbasis sesi; total backend 38/38 + syntax check. DB persistence dan akun CSM/user terpisah belum terverifikasi. Bukti 12 §17. |
+| 9 Okt 2026 | BE-13 tidak disentuh sesuai scope backend-only. BE-14 Docker/Compose/runbook ditambahkan; Docker/target VPS tak tersedia, BE-04 ingest/publish belum ada, jadi tidak deploy. BE-15 unit/syntax checks saja (38/38); BE-16 organik belum mungkin tanpa deploy dan tester. Bukti 12 §18. |
