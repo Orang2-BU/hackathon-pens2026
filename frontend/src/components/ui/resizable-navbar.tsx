@@ -41,6 +41,38 @@ export function ResizableNavbar({ items, workspaceHref }: { items: NavItem[]; wo
     return () => window.removeEventListener("hashchange", syncHash);
   }, [items]);
 
+  // Scrollspy: the underline follows the section currently under the header,
+  // not only the last clicked link. Clicking still sets it immediately.
+  useEffect(() => {
+    const targets = items
+      .map(item => ({ href: item.href, el: item.href.startsWith("#") ? document.querySelector(item.href) : null }))
+      .filter((t): t is { href: string; el: Element } => t.el !== null);
+    if (!targets.length) return;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8) {
+        setActiveHref(targets[targets.length - 1].href);
+        return;
+      }
+      const line = 128; // just below the fixed header
+      let current = targets[0].href;
+      for (const t of targets) {
+        if (t.el.getBoundingClientRect().top <= line) current = t.href;
+      }
+      setActiveHref(current);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [items]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
