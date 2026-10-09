@@ -56,6 +56,8 @@ test('login enforces origin and password, session endpoint reads signed cookie, 
   const sessionBody = await session.json();
   assert.equal(sessionBody.authenticated, true);
   assert.equal(sessionBody.role, 'admin');
+  assert.equal(sessionBody.actorId, 'demo-admin');
+  assert.equal(sessionBody.displayName, 'Demo Admin');
   assert.ok(Number.isInteger(sessionBody.expiresAt));
   const logout = await fetch(`${baseUrl}/api/auth/logout`, { method: 'POST', headers: { origin: config.publicOrigin } });
   assert.equal(logout.status, 200);

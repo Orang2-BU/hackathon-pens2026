@@ -14,9 +14,10 @@ function sendJson(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
-export function createHttpServer({ database, auth = null, readService = null }) {
+export function createHttpServer({ database, auth = null, readService = null, writeService = null }) {
   const loginLimit = createRateLimiter({ limit: 5, windowMs: 5 * 60 * 1000 });
   const queryLimit = createRateLimiter({ limit: 20, windowMs: 60 * 1000 });
+  const writeLimit = createRateLimiter({ limit: 30, windowMs: 60 * 1000 });
   return createNodeServer(async (request, response) => {
     const path = new URL(request.url ?? '/', 'http://localhost').pathname;
     if (path === '/api/auth/login' && request.method === 'POST') {
@@ -49,7 +50,7 @@ export function createHttpServer({ database, auth = null, readService = null }) 
 
     if (path === '/api/auth/session' && request.method === 'GET') {
       const session = auth?.readSession(cookieValue(request.headers.cookie));
-      sendJson(response, 200, session ? { authenticated: true, role: session.role, expiresAt: session.exp } : { authenticated: false });
+      sendJson(response, 200, session ? { authenticated: true, actorId: session.actorId, displayName: session.displayName, role: session.role, expiresAt: session.exp } : { authenticated: false });
       return;
     }
 
@@ -75,6 +76,38 @@ export function createHttpServer({ database, auth = null, readService = null }) 
         sendJson(response, 200, answer);
       } catch {
         sendJson(response, 503, { error: 'GRAPH_UNAVAILABLE' });
+      }
+      return;
+    }
+
+    if (['/api/plans', '/api/decisions'].includes(path) && request.method === 'POST'
+      || /^\/api\/plans\/[A-Za-z0-9_-]+$/u.test(path) && request.method === 'PATCH') {
+      if (!auth) { sendJson(response, 503, { error: 'AUTH_NOT_CONFIGURED' }); return; }
+      if (!auth.originAllowed(request.headers.origin)) { sendJson(response, 403, { error: 'ORIGIN_FORBIDDEN' }); return; }
+      const session = auth.readSession(cookieValue(request.headers.cookie));
+      if (!session) { sendJson(response, 401, { error: 'UNAUTHENTICATED' }); return; }
+      if (session.role !== 'admin') { sendJson(response, 403, { error: 'FORBIDDEN' }); return; }
+      const limit = writeLimit(request.socket.remoteAddress ?? 'unknown');
+      if (!limit.allowed) { response.setHeader('retry-after', String(limit.retryAfterSeconds)); sendJson(response, 429, { error: 'RATE_LIMITED' }); return; }
+      let body;
+      try { body = await readJson(request, 16_384); } catch (error) {
+        sendJson(response, error.message === 'BODY_TOO_LARGE' ? 413 : 400, { error: error.message === 'BODY_TOO_LARGE' ? 'BODY_TOO_LARGE' : 'INVALID_JSON' });
+        return;
+      }
+      const operation = path === '/api/plans' ? 'createPlan' : path === '/api/decisions' ? 'decidePlan' : 'revisePlan';
+      if (!writeService?.[operation]) { sendJson(response, 503, { error: 'WRITE_UNAVAILABLE' }); return; }
+      try {
+        const payload = operation === 'createPlan'
+          ? { accountNodeId: body.accountNodeId, body: body.body }
+          : operation === 'revisePlan'
+            ? { planId: path.split('/').at(-1), expectedRevision: body.expectedRevision, body: body.body, deviationReason: body.deviationReason }
+            : { planRevisionId: body.planRevisionId, idempotencyKey: body.idempotencyKey, outcome: body.outcome, reason: body.reason };
+        const result = await writeService[operation]({ ...payload, actorId: session.actorId });
+        sendJson(response, operation === 'createPlan' ? 201 : 200, result);
+      } catch (error) {
+        const mapping = { INVALID_INPUT: 400, INVALID_CONTEXT: 400, NOT_FOUND: 404, CONFLICT: 409 };
+        const status = mapping[error.code] ?? 503;
+        sendJson(response, status, { error: mapping[error.code] ? error.code : 'WRITE_UNAVAILABLE' });
       }
       return;
     }

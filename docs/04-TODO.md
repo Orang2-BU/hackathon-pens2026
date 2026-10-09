@@ -14,7 +14,7 @@
 | T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | 🟦 | BE-04 parser/dry-run memvalidasi semua 15 file; 0 issue/orphan dan hash aktual tercatat di 12 §9. Publish PostgreSQL, graph, Jev dan review masih belum selesai; BE-02 DB gate belum tersedia. |
 | T3 | Parameter dan skor prioritas deterministik | — | 🟦 | Eksperimen formula risiko 30/25/20/15/10 dan sensitivitas ±10 diuji pada 40 akun; C03 di tiga besar, renewal C04 35 hari. Belum disetujui, belum ada level/mismatch, sinyal Jev dan hasil DB-persisted; rincian 12 §13. |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | 🟦 | Query boundary, katalog 10 intent/threshold dan evidence gate tersedia; repository PostgreSQL, Jev live, graph sitasi dan eval reviewed masih pending. Bukti 12 §15. |
-| T5 | Save plan, Decision append-only, feedback dua arah | — | ⬜ | Preseden dikutip; approval atomik/idempotent; reply feedback tercatat; tidak ada outreach |
+| T5 | Save plan, Decision append-only, feedback dua arah | — | 🟦 | Domain plan/revision/Decision + protected HTTP boundary ada; DB verification pending. Feedback service belum dikerjakan; tidak ada outreach. Bukti 12 §16. |
 | T6 | Demo publik dan verifikasi UI/golden path | — | 🟦 | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD. 9 Okt: shell + 5 layar sesuai 08-DESIGN, browser 375/768/1440 tanpa scroll horizontal, drawer lulus; data masih seed sintetis (belum KasirNusa). Backend login/session prototype ada, belum deploy atau terhubung ke frontend. |
 | T7 | Pitch, demo assets, benchmark bila dijalankan | — | ⬜ | Angka aktual dan klaim bersumber; PPT/GitHub/video sesuai jadwal resmi; SalesTranscriptQA hanya benchmark terpisah bila dipakai |
 

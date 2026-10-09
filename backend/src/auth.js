@@ -26,7 +26,7 @@ export function createAuth({ demoPassword, sessionSecret, publicOrigin, secureCo
     verifyPassword: (candidate) => typeof candidate === 'string' && constantTimeTextEqual(candidate, demoPassword),
     issueSession() {
       const exp = Math.floor(now() / 1000) + SESSION_TTL_SECONDS;
-      const payload = base64url(JSON.stringify({ role: 'admin', exp }));
+      const payload = base64url(JSON.stringify({ actorId: 'demo-admin', displayName: 'Demo Admin', role: 'admin', exp }));
       return `${payload}.${sign(payload)}`;
     },
     readSession(token) {
@@ -38,8 +38,8 @@ export function createAuth({ demoPassword, sessionSecret, publicOrigin, secureCo
       if (expected.length !== actual.length || !timingSafeEqual(expected, actual)) return null;
       try {
         const claims = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
-        if (claims.role !== 'admin' || !Number.isInteger(claims.exp) || claims.exp <= Math.floor(now() / 1000)) return null;
-        return Object.freeze({ role: claims.role, exp: claims.exp });
+        if (claims.role !== 'admin' || claims.actorId !== 'demo-admin' || !Number.isInteger(claims.exp) || claims.exp <= Math.floor(now() / 1000)) return null;
+        return Object.freeze({ actorId: claims.actorId, displayName: claims.displayName, role: claims.role, exp: claims.exp });
       } catch { return null; }
     },
     cookie(token) {

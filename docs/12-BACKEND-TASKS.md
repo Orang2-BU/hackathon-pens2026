@@ -89,7 +89,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-11 — Draft bersumber, revisi plan, Decision atomik
 
-- **Trace:** T5; TASK-011. **Prerequisite:** BE-09/10. **Status:** Todo.
+- **Trace:** T5; TASK-011. **Prerequisite:** BE-09/10. **Status:** In Progress (domain transaction functions + protected HTTP boundary implemented; PostgreSQL verification and plan-context repository missing).
 - **Output:** template draft, preseden, plan revisions, approve/reject transaction dan query Decision.
 - **Kerja:** evidence/graph/formula hash; reason deviation; policy diskon >10% diarahkan VP Sales, akun demo tidak berpretensi punya role itu; Decision immutable dan no outreach; key unique actor+idempotency.
 - **Lulus:** approve/reject persisten, stale revision/conflicting payload 409, retry same key same Decision, concurrent double submit satu keputusan, forced transaction failure rollback. Reload/restart tidak hilang; query berikutnya menemukan keputusan actual meski snapshot bisnis Oct 1.
@@ -253,6 +253,13 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Read API backend menyediakan `GET /api/accounts` dengan sort allowlist, `GET /api/accounts/:id` dan `POST /api/graph/answer` dengan batas body/question, rate limit query, error aman dan status `DATA_UNAVAILABLE`/`GRAPH_UNAVAILABLE` saat repository/provider tidak dikonfigurasi. Repository disuntikkan, bukan SQL dinamis dari pertanyaan.
 - Test ambang/gap, entity ambiguity, evidence gate, query validation, abstain dan route terkonfigurasi/tidak terkonfigurasi lulus; total `corepack pnpm test` 33/33 dan `corepack pnpm check` lulus.
 - BE-10 belum Done: read repository PostgreSQL, query graph temporal, pemetaan public DTO, Jev live routing, held-out eval yang direview, timeout/DB limit, serta sitasi dari data ter-publish menunggu BE-02/04/05/06 dan rubrik tim. Tidak ada frontend changes atau klaim jawaban live.
+
+## 16. Eksekusi BE-11 (parsial; Decision append-only boundary)
+
+- `backend/src/plans.js` memvalidasi context revision/snapshot/formula dan SHA-256 evidence; pembuatan plan menulis plan+revision dalam satu transaksi; revisi mengunci parent plan, memeriksa `expectedRevision`, dan menambah revision immutable; stale revision menghasilkan conflict.
+- Decision menurunkan actor dari sesi, hash payload stabil, mengunci revision, mengembalikan hasil yang sama untuk retry idempotency key/payload identik, menolak key/payload berbeda, dan menolak Decision kedua pada revision yang sudah diputus. Context membawa `origin=app_decision`, evidence hash dan `outreachSent=false`; tidak ada kode pengiriman outreach.
+- HTTP boundary `POST /api/plans`, `PATCH /api/plans/:id`, `POST /api/decisions` mewajibkan sesi admin + Origin tepat, membatasi body/rate, membuang actor/context client dan memetakan error aman. Unit test actor spoof, no-session, origin, context dan validasi invalid lulus; backend `corepack pnpm test` 36/36 dan `corepack pnpm check` lulus setelah patch concurrency.
+- BE-11 belum Done: context/evidence harus disusun repository server-side; komposisi service belum tersambung; PostgreSQL transaksi, concurrency, idempotency, trigger append-only, role privilege dan restart persistence tidak dapat diuji tanpa DB disposable. No outreach.
 
 ## 10. Eksekusi BE-05 (parsial)
 
