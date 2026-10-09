@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { useState } from "react";
-import { ArrowLeft, CheckCircle2, GitCommitHorizontal } from "lucide-react";
-import { useDemoState } from "@/components/demo-state";
+import { ArrowLeft, GitCommitHorizontal, Search } from "lucide-react";
+import { planDecisionId, useDemoState } from "@/components/demo-state";
 import { EvidenceGraph } from "@/components/evidence-graph";
 import { RiskBadge } from "@/components/risk-badge";
 import { accounts, formatMoney } from "@/lib/demo-data";
@@ -12,19 +12,18 @@ import { accounts, formatMoney } from "@/lib/demo-data";
 export default function AccountDetailPage() {
   const { id } = useParams<{ id: string }>();
   const account = accounts.find(item => item.id === id);
-  const { decisions, addDecision } = useDemoState();
+  const { decisions } = useDemoState();
   const [selected, setSelected] = useState(account?.evidence[0]?.id ?? "");
-  const [planDraft, setPlanDraft] = useState(account?.plan ?? "");
+  const [asked, setAsked] = useState("");
 
   if (!account) notFound();
 
   const history = [...account.decisions, ...decisions.filter(decision => decision.accountId === account.id)];
-  const approvalId = `dec-session-${account.id}`;
-  const approved = decisions.some(decision => decision.id === approvalId);
+  const decided = decisions.some(decision => decision.id === planDecisionId(account.id));
   const figures = [
-    ["Risk index", String(account.riskIndex)],
+    ["Priority score", String(account.priorityScore)],
     ["Contract", formatMoney(account.contractValue, account.currency)],
-    ["Risk-weighted", formatMoney(account.weightedValue, account.currency)],
+    ["Weighted value", formatMoney(account.weightedValue, account.currency)],
   ];
 
   return (
@@ -99,45 +98,37 @@ export default function AccountDetailPage() {
 
         <div className="flex flex-col gap-md xl:sticky xl:top-md">
           <section className="card">
-            <h3 className="card-title">Save plan</h3>
-            <p className="mt-xs text-label-sm text-on-surface-muted">
-              Approving records a decision in this session. No email is sent.
-            </p>
-            <label htmlFor="plan" className="sr-only">Save plan draft</label>
-            <textarea
-              id="plan"
-              rows={7}
-              value={planDraft}
-              onChange={event => setPlanDraft(event.target.value)}
-              disabled={approved}
-              className="mt-sm w-full resize-y rounded-md bg-neutral p-sm text-body-sm ring-1 ring-outline ring-inset focus-visible:ring-primary disabled:opacity-60"
-            />
-            <div className="mt-sm flex flex-wrap gap-sm">
-              <button
-                type="button"
-                className="btn btn-primary"
-                disabled={approved || !planDraft.trim()}
-                onClick={() =>
-                  addDecision({
-                    id: approvalId,
-                    accountId: account.id,
-                    action: "Save plan approved",
-                    rationale: planDraft,
-                    decidedAt: new Date().toISOString().slice(0, 10),
-                  })
-                }
-              >
-                {approved ? "Save plan approved" : "Approve save plan — no email sent"}
+            <h3 className="card-title">Ask the graph</h3>
+            <form
+              className="relative mt-sm"
+              onSubmit={event => {
+                event.preventDefault();
+                setAsked(String(new FormData(event.currentTarget).get("question") ?? "").trim());
+              }}
+            >
+              <label htmlFor="question" className="sr-only">Question about this account</label>
+              <input
+                id="question"
+                name="question"
+                required
+                placeholder="Which tickets link this account to a bug?"
+                className="h-11 w-full rounded-md bg-neutral pl-sm pr-11 text-body-sm ring-1 ring-outline ring-inset placeholder:text-on-surface-muted focus-visible:ring-primary"
+              />
+              <button type="submit" aria-label="Ask" className="absolute right-0 top-0 grid size-11 place-items-center text-on-surface-muted hover:text-on-surface">
+                <Search size={18} aria-hidden />
               </button>
-              {!approved && planDraft !== account.plan && (
-                <button type="button" className="btn btn-secondary" onClick={() => setPlanDraft(account.plan)}>
-                  Reset draft
-                </button>
-              )}
-            </div>
-            <p role="status" className="mt-sm flex items-center gap-xs text-label-md text-success">
-              {approved && <><CheckCircle2 size={16} aria-hidden /> Recorded in decision history.</>}
+            </form>
+            <p role="status" className="mt-sm text-body-sm text-on-surface-muted">
+              {asked && <>Not enough evidence to answer “{asked}”. The graph query engine runs after ingest (T2–T4); until then Tessera abstains instead of guessing.</>}
             </p>
+          </section>
+
+          <section className="card">
+            <h3 className="card-title">Save plan draft</h3>
+            <p className="mt-sm text-body-sm">{account.plan}</p>
+            <Link href={`/review?account=${account.id}`} className="btn btn-secondary mt-md">
+              {decided ? "View decision in Review" : "Review this plan"}
+            </Link>
           </section>
 
           <section className="card">

@@ -1,4 +1,4 @@
-export type RiskLevel = "Critical" | "High" | "Medium";
+export type RiskLevel = "Critical" | "High" | "Medium" | "Low";
 
 type Evidence = {
   id: string;
@@ -21,7 +21,7 @@ export type Account = {
   id: string;
   name: string;
   domain: string;
-  riskIndex: number;
+  priorityScore: number;
   riskLevel: RiskLevel;
   contractValue: number;
   weightedValue: number;
@@ -35,22 +35,12 @@ export type Account = {
   plan: string;
 };
 
-export type ReviewItem = {
-  id: string;
-  accountId: string;
-  type: "Signal" | "Entity" | "Plan";
-  title: string;
-  detail: string;
-  consequence: string;
-  confidence: number;
-};
-
 export const accounts: Account[] = [
   {
     id: "nusa-retail",
     name: "Nusa Retail Group",
     domain: "nusaretail.example",
-    riskIndex: 82,
+    priorityScore: 82,
     riskLevel: "Critical",
     contractValue: 420_000_000,
     weightedValue: 344_400_000,
@@ -104,7 +94,7 @@ export const accounts: Account[] = [
     id: "arca-logistics",
     name: "Arca Logistics",
     domain: "arcalogistics.example",
-    riskIndex: 68,
+    priorityScore: 68,
     riskLevel: "High",
     contractValue: 285_000_000,
     weightedValue: 193_800_000,
@@ -142,7 +132,7 @@ export const accounts: Account[] = [
     id: "selaras-health",
     name: "Selaras Health",
     domain: "selarashealth.example",
-    riskIndex: 46,
+    priorityScore: 46,
     riskLevel: "Medium",
     contractValue: 198_000_000,
     weightedValue: 91_080_000,
@@ -166,36 +156,6 @@ export const accounts: Account[] = [
     decisions: [],
     plan:
       "Offer two branch onboarding sessions and check user activation seven days after the second session.",
-  },
-];
-
-export const reviewItems: ReviewItem[] = [
-  {
-    id: "review-1",
-    accountId: "nusa-retail",
-    type: "Signal",
-    title: "Does the role change mean the champion left?",
-    detail: "Jev noul 0.72 — inside the 0.50–0.85 human review zone.",
-    consequence: "If approved, a champion_change Signal is added for this demo session.",
-    confidence: 0.72,
-  },
-  {
-    id: "review-2",
-    accountId: "arca-logistics",
-    type: "Entity",
-    title: "Are \"Arca Logistik\" and \"Arca Logistics\" the same entity?",
-    detail: "Jev noul 0.81; the second source has no domain, so auto-merge is held.",
-    consequence: "If approved, an alias is linked without deleting either source.",
-    confidence: 0.81,
-  },
-  {
-    id: "review-3",
-    accountId: "nusa-retail",
-    type: "Plan",
-    title: "Save plan for Nusa Retail Group",
-    detail: "The draft asks for a stakeholder workshop before renewal negotiation.",
-    consequence: "Approval only records a session decision; no email is sent.",
-    confidence: 0.88,
   },
 ];
 
@@ -228,5 +188,5 @@ export const sortAccounts = (
   [...items].sort((a, b) => {
     if (sort === "weighted") return b.weightedValue - a.weightedValue;
     if (sort === "renewal") return a.renewalDate.localeCompare(b.renewalDate);
-    return b.riskIndex - a.riskIndex;
+    return b.priorityScore - a.priorityScore;
   });

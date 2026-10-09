@@ -1,27 +1,36 @@
 "use client";
 
 import { createContext, useContext, useMemo, useState } from "react";
-import type { Decision } from "@/lib/demo-data";
+import { accounts, type Decision } from "@/lib/demo-data";
 
 export type SessionDecision = Decision & { accountId: string };
+export type Feedback = { id: string; accountId: string; text: string; createdAt: string; reply?: string };
+
 type DemoStateValue = {
   decisions: SessionDecision[];
-  resolvedReviewIds: string[];
+  feedback: Feedback[];
   addDecision: (decision: SessionDecision) => void;
-  resolveReview: (id: string) => void;
+  addFeedback: (accountId: string, text: string) => void;
+  replyFeedback: (id: string, reply: string) => void;
 };
 
 const DemoState = createContext<DemoStateValue | null>(null);
 
+export const planDecisionId = (accountId: string) => `dec-session-${accountId}`;
+
 export function DemoStateProvider({ children }: { children: React.ReactNode }) {
   const [decisions, setDecisions] = useState<SessionDecision[]>([]);
-  const [resolvedReviewIds, setResolvedReviewIds] = useState<string[]>([]);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const value = useMemo(() => ({
     decisions,
-    resolvedReviewIds,
+    feedback,
+    // Append-only and idempotent: a second decision with the same id is ignored.
     addDecision: (decision: SessionDecision) => setDecisions(current => current.some(item => item.id === decision.id) ? current : [...current, decision]),
-    resolveReview: (id: string) => setResolvedReviewIds(current => current.includes(id) ? current : [...current, id]),
-  }), [decisions, resolvedReviewIds]);
+    addFeedback: (accountId: string, text: string) =>
+      setFeedback(current => [...current, { id: crypto.randomUUID(), accountId, text, createdAt: new Date().toISOString().slice(0, 10) }]),
+    replyFeedback: (id: string, reply: string) =>
+      setFeedback(current => current.map(item => item.id === id ? { ...item, reply } : item)),
+  }), [decisions, feedback]);
   return <DemoState.Provider value={value}>{children}</DemoState.Provider>;
 }
 
@@ -29,4 +38,9 @@ export function useDemoState() {
   const state = useContext(DemoState);
   if (!state) throw new Error("useDemoState must be used within DemoStateProvider");
   return state;
+}
+
+export function usePendingPlans() {
+  const { decisions } = useDemoState();
+  return accounts.filter(account => !decisions.some(decision => decision.id === planDecisionId(account.id)));
 }

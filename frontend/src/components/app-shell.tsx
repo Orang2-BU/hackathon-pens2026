@@ -4,14 +4,12 @@ import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { type ReactNode, useRef } from "react";
-import { Activity, Database, Menu, Search, ShieldCheck, Users, Waypoints, X } from "lucide-react";
-import { useDemoState } from "@/components/demo-state";
-import { reviewItems } from "@/lib/demo-data";
+import { Database, Menu, Search, ShieldCheck, Users, Waypoints, X } from "lucide-react";
+import { usePendingPlans } from "@/components/demo-state";
 
 const navigation = [
   { href: "/accounts", label: "Accounts", icon: Users },
   { href: "/review", label: "Review", icon: ShieldCheck },
-  { href: "/benchmark", label: "Benchmark", icon: Activity },
   { href: "/data", label: "Data", icon: Database },
 ];
 
@@ -20,12 +18,11 @@ const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opa
 
 function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?: boolean }) {
   const pathname = usePathname();
-  const { resolvedReviewIds } = useDemoState();
-  const pending = reviewItems.filter(item => !resolvedReviewIds.includes(item.id)).length;
+  const pending = usePendingPlans().length;
   const fade = rail ? railFade : "";
 
   return (
-    <div className={`flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md ${rail ? "bg-surface" : "glass"}`}>
+    <div className="glass flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md">
       <Link href="/accounts" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
         <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-primary text-on-primary">
           <Waypoints size={18} strokeWidth={2} aria-hidden />

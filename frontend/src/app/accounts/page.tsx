@@ -4,16 +4,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { ClipboardCheck, Gauge, type LucideIcon, Scale, ShieldAlert } from "lucide-react";
-import { useDemoState } from "@/components/demo-state";
+import { usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, filterAccounts, formatMoney, reviewItems, sortAccounts, type RiskLevel } from "@/lib/demo-data";
+import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/demo-data";
 
-const riskOptions = ["All", "Critical", "High", "Medium"] as const;
+const riskOptions = ["All", "Critical", "High", "Medium", "Low"] as const;
 const weightedTotal = accounts.reduce((sum, account) => sum + account.weightedValue, 0);
 const elevatedCount = accounts.filter(account => account.riskLevel !== "Medium").length;
-const riskIndexes = accounts.map(account => account.riskIndex).sort((a, b) => a - b);
-const mid = Math.floor(riskIndexes.length / 2);
-const medianRisk = riskIndexes.length % 2 ? riskIndexes[mid] : (riskIndexes[mid - 1] + riskIndexes[mid]) / 2;
+const scores = accounts.map(account => account.priorityScore).sort((a, b) => a - b);
+const mid = Math.floor(scores.length / 2);
+const medianScore = scores.length % 2 ? scores[mid] : (scores[mid - 1] + scores[mid]) / 2;
 
 type KpiProps = { icon: LucideIcon; label: string; value: string; note: string; featured?: boolean; small?: boolean };
 
@@ -40,8 +40,7 @@ export default function AccountsPage() {
   const query = useSearchParams().get("q") ?? "";
   const [risk, setRisk] = useState<"All" | RiskLevel>("All");
   const [sort, setSort] = useState<"risk" | "weighted" | "renewal">("risk");
-  const { resolvedReviewIds } = useDemoState();
-  const pendingReview = reviewItems.filter(item => !resolvedReviewIds.includes(item.id)).length;
+  const pendingPlans = usePendingPlans().length;
   const visible = sortAccounts(filterAccounts(accounts, query, risk), sort);
 
   return (
@@ -50,19 +49,19 @@ export default function AccountsPage() {
         <Kpi
           featured
           icon={Scale}
-          label="Risk-weighted contract value"
+          label="Weighted value for priority"
           value={formatMoney(weightedTotal, "IDR", true)}
-          note="Contract value × risk index ÷ 100. A priority index, not expected loss."
+          note="Contract value × priority score ÷ 100. Orders work; it is not expected loss."
         />
         <Kpi
           icon={ShieldAlert}
-          label="Accounts above risk threshold"
+          label="Accounts at High or Critical"
           value={`${elevatedCount} of ${accounts.length}`}
-          note="Accounts at High or Critical risk level."
+          note="Level set by the scoring formula in code."
         />
         <div className="grid grid-cols-2 gap-md md:col-span-2 xl:col-span-1">
-          <Kpi small icon={ClipboardCheck} label="In review" value={String(pendingReview)} note="Awaiting a human decision" />
-          <Kpi small icon={Gauge} label="Median risk index" value={String(medianRisk)} note={`Across ${accounts.length} accounts`} />
+          <Kpi small icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Awaiting approve or reject" />
+          <Kpi small icon={Gauge} label="Median priority score" value={String(medianScore)} note={`Across ${accounts.length} accounts`} />
         </div>
       </div>
 
@@ -96,8 +95,8 @@ export default function AccountsPage() {
             onChange={event => setSort(event.target.value as typeof sort)}
             className="h-11 rounded-md bg-secondary px-sm text-label-md ring-1 ring-outline ring-inset"
           >
-            <option value="risk">Sort: Risk index</option>
-            <option value="weighted">Sort: Risk-weighted value</option>
+            <option value="risk">Sort: Priority score</option>
+            <option value="weighted">Sort: Weighted value</option>
             <option value="renewal">Sort: Renewal date</option>
           </select>
         </div>
@@ -107,11 +106,11 @@ export default function AccountsPage() {
             <thead className="label-caps text-on-surface-muted">
               <tr className="border-b border-outline">
                 <th scope="col" className="px-md py-sm">Account</th>
-                <th scope="col" className="px-md py-sm">Risk index</th>
+                <th scope="col" className="px-md py-sm">Priority score</th>
                 <th scope="col" className="px-md py-sm">Signals</th>
                 <th scope="col" className="px-md py-sm">Renewal</th>
                 <th scope="col" className="px-md py-sm text-right">Contract</th>
-                <th scope="col" className="px-md py-sm text-right">Risk-weighted</th>
+                <th scope="col" className="px-md py-sm text-right">Weighted value</th>
               </tr>
             </thead>
             <tbody>
@@ -133,7 +132,7 @@ export default function AccountsPage() {
                     </td>
                     <td className="px-md py-sm">
                       <span className="flex items-center gap-sm">
-                        <span className="text-title font-bold">{account.riskIndex}</span>
+                        <span className="text-title font-bold">{account.priorityScore}</span>
                         <RiskBadge level={account.riskLevel} />
                       </span>
                     </td>
