@@ -1,6 +1,6 @@
 # 04 — TODO: Progres Build KasirNusa
 
-> Perbarui saat status berubah. ID mengikuti `03-ARCHITECTURE.md`. Frontend seed dan kontrak backend BE-01 tersedia; operasi DB dan alur persisten belum diimplementasikan. Rencana backend: [11-BACKEND-PLAN.md](11-BACKEND-PLAN.md); task, dependensi, acceptance dan bukti: [12-BACKEND-TASKS.md](12-BACKEND-TASKS.md); kontrak v1: [13-BACKEND-CONTRACT.md](13-BACKEND-CONTRACT.md).
+> Perbarui saat status berubah. ID mengikuti `03-ARCHITECTURE.md`. Backend ingest, graph, signal review, scoring, account reads, plan/Decision, auth, dan feedback sudah diimplementasikan dengan unit coverage; persistence/runtime belum terverifikasi terhadap PostgreSQL. Rencana backend: [11-BACKEND-PLAN.md](11-BACKEND-PLAN.md); task, dependensi, acceptance dan bukti: [12-BACKEND-TASKS.md](12-BACKEND-TASKS.md); kontrak v1: [13-BACKEND-CONTRACT.md](13-BACKEND-CONTRACT.md).
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
@@ -84,3 +84,4 @@
 | 9 Okt 2026 | BE-09 auth hardening test: a non-admin claim signed with the valid HMAC secret is still rejected; actor/origin/session route checks remain covered. Unit 58/58 + check/syntax pass. Single demo-admin only; CSM/user roles, two-way feedback authorization, HTTPS/proxy, and distributed limiter remain unresolved/undeployed. |
 | 9 Okt 2026 | BE-11 consistency fix: server-derived plan context now hashes factor evidence only from the latest score run used for its formula version; mock test asserts run scoping. Unit 58/58 + check/syntax/diff pass; PostgreSQL transaction checks still unavailable. |
 | 9 Okt 2026 | BE-09/12 role-aware feedback: optional distinct CSM/user credentials map to fixed signed identities; user can submit/read-own feedback, CSM/admin can respond and retain plan/Decision privileges. Tests cover permissions and actor scoping; unit 60/60 + static/syntax/diff pass. Real DB authorization/transactions and configured secrets remain unverified. |
+| 9 Okt 2026 | BE-14/15/16 gate audit: Docker CLI is absent; `corepack pnpm test:integration` exits before tests because `TEST_DATABASE_URL` is unset. No DB/provider/deploy target credentials are configured. Local backend unit 60/60, static check and syntax checks pass, but no image/Compose, PostgreSQL, public URL, golden-path or organic-user run is claimed. BE-13 remains excluded as frontend work. |
