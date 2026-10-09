@@ -10,6 +10,7 @@ import { TechText } from "@/components/ui/tech-text";
 
 const workspaceHref = `/login?next=${encodeURIComponent("/dashboard")}`;
 const sections = [
+  { name: "Home", href: "#hero-heading" },
   { name: "Evidence", href: "#evidence-heading" },
   { name: "Workflow", href: "#workflow-heading" },
   { name: "Decisions", href: "#decide-heading" },
@@ -23,7 +24,7 @@ export default function LandingPage() {
       <ShapeGrid />
       <a href="#evidence-heading" className="sr-only fixed top-md left-md z-50 rounded-md bg-primary p-md text-on-primary focus:not-sr-only">Skip to product details</a>
       <ResizableNavbar items={sections} workspaceHref={workspaceHref} />
-      <main className="mx-auto flex w-full max-w-(--container-6xl) flex-col gap-2xl px-md pb-2xl md:gap-24">
+      <main className="page-enter mx-auto flex w-full max-w-(--container-6xl) flex-col gap-2xl px-md pb-2xl md:gap-24">
         <section aria-labelledby="hero-heading" className="pt-24 md:pt-28">
           <ContainerScroll header={
             <div className="mx-auto flex max-w-(--container-3xl) flex-col items-center gap-md text-center">

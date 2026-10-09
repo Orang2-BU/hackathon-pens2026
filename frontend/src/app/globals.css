@@ -10,6 +10,7 @@
   html {
     color-scheme: dark;
     scrollbar-color: var(--color-outline-active) var(--color-neutral);
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-neutral text-on-surface antialiased;
@@ -228,6 +229,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   .page-enter,
   .page-enter .card,
   .page-enter .card-featured,
