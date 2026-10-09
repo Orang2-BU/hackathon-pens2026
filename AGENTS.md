@@ -8,7 +8,7 @@ Baca `docs/00-BRIEF.md` sampai `docs/08-DESIGN.md` yang tersedia, lalu ikuti `do
 
 ## Aplikasi
 
-Relasi membantu CSM menemukan sinyal churn lintas call, melihat bukti dan konteks historis, kemudian menyetujui save plan. Next.js sudah dipilih; SQLite dan dependency lain masih usulan. Jev mengklasifikasi di write time; kode memakai ambang dan menghitung risk index. SalesTranscriptQA menguji retrieval, bukan prediksi churn. Synthetic usage/invoice harus selalu ditandai.
+Relasi memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Next.js dipilih; PostgreSQL untuk demo publik diterima dalam ADR-0001, sedangkan library dan hosting belum dipilih. Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; LLM menjelaskan serta menyusun draf. SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
 
 ## Verifikasi
 
@@ -21,10 +21,10 @@ Perintah sesudah scaffold tercantum dalam `docs/03-ARCHITECTURE.md`; sebelum T1,
 - Ikuti YAGNI/ponytail; dependency baru dengan izin.
 - UI wajib mengikuti `docs/08-DESIGN.md`, termasuk Standar UI anti tampilan AI: tanpa emoji, palet dari token, satu layar satu tugas, tanpa elemen tanpa fungsi. Pakai impeccable bila tersedia.
 - AI calls untuk ekstraksi/klasifikasi/skor/agent: ikuti §4b `docs/03-ARCHITECTURE.md`, `docs/JEV-LENS.md`, dan klien/pola `docs/JEV-KIT.md`. Jev memberi output bertipe; kode memutuskan.
-- Tidak ada outreach/email nyata; approval CSM ditulis sebagai append-only Decision.
-- Jangan commit secret/API key/dataset penuh. SalesTranscriptQA CC BY-NC 4.0, hackathon nonkomersial dengan atribusi.
+- Tidak ada outreach/email nyata; approval pengguna terautentikasi (CSM/admin) ditulis sebagai append-only Decision. Feedback dua arah terpisah dari approval dan tidak mengubah skor otomatis.
+- Jangan commit secret/API key/dataset penuh; ZIP dan ekstraknya harus tetap diabaikan Git. Semua data KasirNusa sintetis. Jika SalesTranscriptQA dipakai, ikuti CC BY-NC 4.0 dan atribusi.
 - Update `docs/04-TODO.md` saat progres berubah; laporan akhir mengikuti `docs/07-RULES.md`.
 
 ## Baca sesuai kebutuhan
 
-Study case → `docs/00-BRIEF.md`; scope/demo → `docs/01-PRD.md`; konvensi → `docs/02-AGENT.md`; build/stack → `docs/03-ARCHITECTURE.md`; tugas → `docs/04-TODO.md`; pitch → `docs/05-PITCH.md`; workflow → `docs/06-WORKFLOW.md`; aturan → `docs/07-RULES.md`; UI → `docs/08-DESIGN.md`; Jev → `docs/JEV-LENS.md` dan `docs/JEV-KIT.md`.
+Study case → `docs/00-BRIEF.md`; scope/demo → `docs/01-PRD.md`; konvensi → `docs/02-AGENT.md`; build/stack → `docs/03-ARCHITECTURE.md`; tugas → `docs/04-TODO.md`; pitch → `docs/05-PITCH.md`; workflow → `docs/06-WORKFLOW.md`; aturan → `docs/07-RULES.md`; UI → `docs/08-DESIGN.md`; rencana KasirNusa → `docs/09-BUILD-PLAN-KASIRNUSA.md`; kolom, parameter, dan batasan dataset → `docs/10-DATA-PROFILE-KASIRNUSA.md`; Jev → `docs/JEV-LENS.md` dan `docs/JEV-KIT.md`.

@@ -5,7 +5,7 @@
 ## 1. Konteks
 
 - **Aplikasi:** Relasi — context graph untuk membantu CSM memprioritaskan risiko, memeriksa bukti, dan menyetujui save plan.
-- **Stack usulan:** TypeScript strict, Next.js App Router, SQLite, Jev, Tailwind v4, React Flow. Next.js sudah dikunci; lainnya berubah hanya dengan persetujuan.
+- **Stack:** Next.js App Router dipilih; PostgreSQL untuk demo publik diterima pada ADR-0001. TypeScript strict, Jev, Tailwind v4, React Flow, library DB, dan hosting masih keputusan implementasi.
 - **Sumber kebenaran:** `docs/07-RULES.md`, lalu instruksi user, `docs/00-BRIEF.md`, PRD dan arsitektur.
 
 ## 2. Struktur Folder
@@ -38,7 +38,7 @@ Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori koso
 - TypeScript `strict`; `unknown` pada boundary, validasi dengan Zod, lalu narrow. Tidak memakai `any`, `@ts-ignore`, atau cast untuk menyembunyikan error.
 - Server Component dahulu. Tambah `"use client"` hanya untuk interaksi browser/React Flow.
 - Fungsi kecil, satu tanggung jawab. Gunakan platform/framework/stdlib sebelum dependency.
-- Semua nilai uang membawa ISO currency; jangan menjumlah mata uang berbeda. Risk score adalah indeks, bukan probabilitas.
+- Semua nilai uang membawa ISO currency; jangan menjumlah mata uang berbeda. Parameter risiko adalah faktor bersumber; skor prioritas 0–100 bukan probabilitas churn.
 - DB writes memakai transaction dan idempotency key. Decision append-only; sumber mentah tidak dihapus saat merge.
 - API error dibedakan: invalid input 400, auth/provider config 401/503, conflict 409, unexpected 500. UI mendapat pesan aman; log tidak memuat API key atau data pelanggan mentah.
 - Waktu disimpan ISO-8601 UTC; format locale hanya di UI.
@@ -79,5 +79,5 @@ Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori koso
 - Semua synthetic overlay diberi label dekat nilai, bukan hanya di footer.
 - Kutipan hanya berasal dari source span valid. Jawaban tanpa bukti cukup harus abstain.
 - Approval tidak mengirim email; label tombol menyebut konsekuensinya.
-- Dataset SalesTranscriptQA hanya untuk hackathon/nonkomersial sesuai CC BY-NC 4.0.
+- Dataset KasirNusa sintetis dari ZIP lokal; jangan commit ZIP atau ekstraknya. SalesTranscriptQA hanya bila dipakai sebagai benchmark retrieval terpisah, sesuai CC BY-NC 4.0.
 - `JEV_API_KEY` dan key model generatif hanya dari environment server; tidak pernah dikirim ke client bundle.

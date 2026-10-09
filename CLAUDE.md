@@ -4,11 +4,11 @@
 
 ## Aplikasi
 
-Relasi mengompilasi sinyal call/tiket ke context graph agar CSM memprioritaskan risiko, memeriksa bukti lintas call, lalu menyetujui save plan. Jev dipakai untuk klasifikasi dan entity resolution di write time; kode menghitung risk score dan mengatur threshold. Benchmark utama SalesTranscriptQA B2B multi-call melawan baseline grep/RAG; hasil belum diukur. Usage/invoice seed sintetis dilabeli terbuka.
+Relasi mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; LLM menjelaskan serta menyusun draf. Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
 
 ## Stack & Verifikasi
 
-- **Stack tetap:** Next.js. **Usulan:** TypeScript, SQLite, Jev, Tailwind v4, React Flow.
+- **Stack tetap:** Next.js. **Penyimpanan demo publik:** PostgreSQL (ADR-0001). **Usulan:** TypeScript, Jev, Tailwind v4, React Flow; library dan hosting belum dipilih.
 - Perintah dev/test/build/lint/typecheck/dead code dicatat di `docs/03-ARCHITECTURE.md`; belum bisa dijalankan sebelum scaffold T1.
 
 ## Aturan Wajib
@@ -27,7 +27,7 @@ Relasi mengompilasi sinyal call/tiket ke context graph agar CSM memprioritaskan 
 - Decision model memberi score/noul; kode yang memutuskan. Tidak menyebut indeks risk sebagai probabilitas churn.
 - Semua kutipan dan tindakan punya source/provenance; human approval wajib; aplikasi tidak mengirim outreach.
 - Beri label angka: `[study case]`, `[asumsi]`, `[riset: URL]`. Jangan membuat klaim benchmark sebelum ada run.
-- SalesTranscriptQA CC BY-NC 4.0: atribusi, hackathon/nonkomersial saja.
+- Dataset KasirNusa sintetis; ZIP dan ekstraknya diabaikan Git. Jika SalesTranscriptQA dipakai, ikuti CC BY-NC 4.0, atribusi, dan penggunaan hackathon/nonkomersial.
 - Status task berubah → update `docs/04-TODO.md` dengan bukti.
 
 ## Baca Dokumen

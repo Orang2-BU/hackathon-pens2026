@@ -166,18 +166,18 @@ Inter [asumsi bentuk dari screenshot], fallback `system-ui, sans-serif`. Satu ke
 |---|---|---|---|
 | Mobile | <768px | 1 kolom, margin/gutter 16px | Burger 44×44 + drawer |
 | Tablet | 768–1199px | 2 kolom, gutter 16px | Burger + drawer |
-| Desktop | ≥1200px | 12 kolom, max 1280px | Sidebar Akun / Review / Benchmark / Data |
+| Desktop | ≥1200px | 12 kolom, max 1280px | Sidebar Akun / Review / Data; Benchmark hanya bila dibuat |
 
 - **Drawer:** kiri, ≤85vw, scrim; tutup via scrim/close/Esc/memilih item. `aria-expanded` dan `aria-controls`; fokus masuk, terkunci selama terbuka, kembali ke burger saat tutup; scroll halaman terkunci. Tutup otomatis saat desktop. Header sticky.
-- **Mobile:** urutan Akun = skor/nilai → alasan → daftar; Detail = nama/nilai → jawaban → bukti → save plan → histori; Benchmark = ringkasan pasangan → detail tabel. Graph kecil menjadi daftar jalur bukti tekstual yang dapat ditelusuri; bukan canvas yang harus digeser horizontal. Tabel lebar memakai detail per baris/kolom penting, bukan page overflow.
+- **Mobile:** urutan Akun = prioritas → parameter/bukti → daftar; Detail = nama/nilai kontrak → jawaban → bukti → save plan → histori/feedback. Graph kecil menjadi daftar jalur bukti tekstual yang dapat ditelusuri; bukan canvas yang harus digeser horizontal. Tabel lebar memakai detail per baris/kolom penting, bukan page overflow.
 - Target sentuh ≥44×44 di bawah 1200px, ≥36px desktop. Body ≥16px mobile. Tanpa scroll horizontal pada 360px. Header/detail aksi penting sticky tanpa menutup kutipan.
 
 | Layar | Tugas | Pola | Informasi utama | Sekunder |
 |---|---|---|---|---|
-| Akun | Prioritaskan | Daftar/tabel terurut dengan satu ringkasan di atas | Nama, risiko, uang tertimbang | Umur sumber, ID |
-| Detail akun | Periksa bukti dan tindak | Jawaban + jalur bukti, tab Sumber/Keputusan/Save plan | Kutipan, alasan risiko, aksi | Confidence, timestamp |
+| Akun | Prioritaskan | Daftar/tabel terurut dengan satu ringkasan di atas | Nama, parameter risiko, level prioritas | Cakupan data, nilai kontrak, umur sumber |
+| Detail akun | Periksa bukti dan tindak | Jawaban + jalur bukti, tab Sumber/Keputusan/Save plan | Kutipan, alasan prioritas, aksi dan feedback terkait | Confidence, timestamp |
 | Review | Putuskan item ragu | Satu item dan dua pilihan jelas | Bukti, dampak approve | Model/rubrik |
-| Benchmark | Bandingkan | Dua kolom sepadan, tabel per pertanyaan | Akurasi, biaya query/total, latensi | Seed, corpus, N |
+| Benchmark bila dibuat | Bandingkan retrieval | Dua kolom sepadan, tabel per pertanyaan | Akurasi, biaya query/total, latensi | Seed, corpus, N |
 | Data | Kompilasi | Dropzone/daftar job sederhana | Status ingest, jumlah sinyal, biaya | Hash/model, error |
 
 ## Elevation & Depth
@@ -198,6 +198,7 @@ Permukaan tonal dan divider tipis, tanpa glowing green halo. Popover/dialog mema
 - **Akun row:** nilai uang rata kanan, risiko di samping nama, kontrak/ID kecil. Tidak mengulang kartu KPI di layar detail. Kontrak sintetis mendapat label di dekat nilai.
 - **Evidence:** kutipan asli + call ID, waktu, confidence, asal synthetic/real; node graph highlight serentak saat dipilih. Jika bukti tak cukup, tulis “Bukti belum cukup”, bukan jawaban pasti.
 - **Review:** pasangan entitas dan identifier berdampingan; reject dan approve berkonsekuensi eksplisit; tidak ada bulk approve. Save plan panjang diedit di tab; konfirmasi approval singkat dalam modal hanya jika perlu.
+- **Feedback:** input pendapat terkait akun/rencana beserta riwayat tanggapan CSM/admin dalam konteks detail; tampilkan penulis, waktu, dan status. Feedback tidak mengubah prioritas atau Decision otomatis.
 - **Benchmark:** angka berformat unit, N, judge, runtime; baseline dan graph setara; tidak mewarnai pemenang bila data belum ada. Skeleton status run, error parsial dan retry aman.
 - **Motion:** 180ms ease-out pada disclosure/selection; reduced-motion mematikan transisi. Tidak ada animasi dekoratif.
 - **Empty/error:** empty menautkan langkah ingest; error Jev membedakan key/limit/jaringan; tidak menghapus draft saat gagal; toast singkat hanya setelah tindakan berhasil.
@@ -224,8 +225,8 @@ Permukaan tonal dan divider tipis, tanpa glowing green halo. Popover/dialog mema
 |---|---|
 | A1 Tanpa emoji | Semua ikon Lucide outline, label tombol tetap eksplisit |
 | A2 Palet bukan bawaan AI | Aksen hijau referensi hanya pada state/aksi penting; graph categorical dari token; tidak ada glow |
-| A3 Satu layar satu tugas | Akun prioritaskan, Detail buktikan/tindak, Review putuskan, Benchmark bandingkan, Data ingest |
-| A4 Navigasi fokus | Empat item sidebar; Detail route turunan; pengaturan/akun di popover sederhana |
+| A3 Satu layar satu tugas | Akun prioritaskan, Detail buktikan/tindak, Review putuskan, Data ingest; benchmark terpisah bila dibuat |
+| A4 Navigasi fokus | Navigasi tugas utama Akun / Review / Data; Detail route turunan; benchmark ditambah hanya bila berfungsi |
 | A5 Rapikan keramaian | Aksi sekunder dalam ⋯; label panjang jadi detail/tooltip; angka rata kanan; nominal penting dominan |
 | A6 Tanpa elemen kosong | Tombol/card/badge hanya bila berfungsi; tak ada chart revenue, promo tier, avatar dekoratif |
 | A7 Wadah sesuai isi | Persetujuan singkat di modal; save plan panjang dalam tab; graph dapat diganti daftar bukti |

@@ -2,6 +2,8 @@
 
 Sumber: link mentor Kyle Wild / Endgame Labs, dibaca 9 Okt 2026. Cocokkan lagi dengan quickstart TypeSafe saat hari H karena API dapat berubah.
 
+> Dataset demo utama sekarang KasirNusa sintetis di `dataset_kasirnusa/`; bagian SalesTranscriptQA adalah opsi benchmark retrieval terpisah. Ambang implementasi terkini mengikuti `03-ARCHITECTURE.md` §4b dan `07-RULES.md`.
+
 ## 1. Jev API
 
 ```http
@@ -55,7 +57,7 @@ Health-check: `state: { text: "hello world" }` dan `noul: "Is the text a greetin
 ### Kompilasi write time
 
 ```text
-call / tiket mentah
+interaksi JSONL / deskripsi tiket KasirNusa
   → potong per giliran bicara atau ±2.000 karakter
   → satu batch Jev per chunk:
      - champion pergi? (noul)
@@ -73,14 +75,14 @@ call / tiket mentah
 normalisasi nama + domain email
   → kandidat pasangan serupa
   → Jev noul: “Apakah dua entitas ini sama?”
-  → p ≥ 0,90 merge; 0,60–0,89 review; <0,60 pisah
+  → p ≥ 0,95 dan tanpa konflik hard ID: merge; 0,60–0,95 review; <0,60 pisah
 ```
 
 ### Query time
 
 ```text
 pertanyaan CSM
-  → traversal Account → Opportunity → Conversation → Signal / Decision
+  → traversal Akun → Interaksi/Tiket/Outlet/Kontrak → Signal / Decision
   → Jev score: chunk ini relevan untuk jawaban?
   → 3–6 bukti + jalur graph
   → LLM generatif hanya menyusun jawaban / draf save plan

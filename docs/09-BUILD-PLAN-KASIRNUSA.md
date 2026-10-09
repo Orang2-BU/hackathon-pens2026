@@ -1,6 +1,6 @@
 # 09 — BUILD PLAN: Churn Early Warning Graph (KasirNusa)
 
-> Pivot dari Relasi/SalesTranscriptQA ke case resmi panitia: PT KasirNusa Teknologi.
+> Pivot dari Relasi/SalesTranscriptQA ke case KasirNusa: PT KasirNusa Teknologi. Dataset ZIP sudah tersedia lokal; seluruh isinya sintetis.
 > Baca `AGENTS.md` + `PRODUCT.md`, lalu file ini sebagai sumber eksekusi.
 > Prinsip: graph dikompilasi saat ingest (write time). Keputusan = kode deterministik.
 > LLM hanya untuk frasa jawaban & draft save plan — tidak pernah untuk skor/keputusan.
@@ -17,6 +17,7 @@
   contact_employment_history, crm_deals, contracts_billing, decision_log, interactions.jsonl,
   outlets, product_usage_daily, feature_usage_monthly, support_tickets, bugs, releases,
   features, employees.
+- Arsip `dataset_kasirnusa.zip` sudah diekstrak ke `dataset_kasirnusa/`. Keduanya diabaikan Git. README menyebut histori operasional 1 Okt 2025–30 Sep 2026 dan snapshot 1 Okt 2026. Peta kolom, hitungan baris aktual, rumus parameter, dan data yang tidak tersedia ada di `10-DATA-PROFILE-KASIRNUSA.md`.
 
 ## Jadwal, checkpoint & aturan main (dari TM, 9 Okt 2026)
 
@@ -26,6 +27,7 @@
   PRD, relationship diagram, skematik — tim wajib bisa menjelaskan desainnya (bukan 100% AI).
 - Riwayat commit repo **diperiksa** — commit bertahap per langkah, jangan menumpuk sekali jadi.
 - **4 deliverable: PPT, GitHub, demo application (wajib running & bisa diakses), video.**
+- **Target pertama 9 Okt 22.00 menurut user; jenis deliverable pada jam itu belum dipastikan.** Jam 22.00 juga akhir CP2. Jangan samakan dengan deadline submit resmi yang belum terkonfirmasi.
 - Pitching besok: 2 jam untuk 5 tim presentasi.
 - Fokus penilaian utama: problem solving, bukan sekadar kecanggihan stack.
 - Bonus: poin khusus adopsi teknologi (detail tanyakan ke LO/mentor saat checkpoint).
@@ -48,11 +50,11 @@ Relasi minimal (nama boleh disesuaikan, makna jangan):
 - Interaksi -MENYEBUT-> Kompetitor (scan teks: KasirPro, dsb.)
 - Akun -MEMAKAI-> Fitur (`feature_usage_monthly`, dengan tren pengguna aktif)
 
-Simpan graph sebagai artefak terkompilasi (mis. `graph.json` / SQLite) hasil ingest — UI & scoring membaca dari situ.
+Simpan graph terkompilasi dalam PostgreSQL untuk demo publik (ADR-0001); UI dan scoring membaca artefak terverifikasi dari sana. Ekspor lokal boleh dipakai sebagai cadangan demo berlabel waktu/versi.
 
 ## 2. Scoring risiko (deterministik, per akun, snapshot 1 Okt 2026)
 
-Output per akun: `probabilitas` (desimal 0–1), `level` (Rendah/Sedang/Tinggi/Kritis),
+Output per akun: parameter risiko bersumber, skor prioritas internal 0–100, `level` (Rendah/Sedang/Tinggi/Kritis), cakupan data,
 flag boolean per faktor, dan daftar jalur bukti (node→relasi→node) untuk tiap faktor aktif.
 
 Faktor (normalisasi 0–1, bobot awal — tuning boleh, rumus jangan ganti diam-diam):
@@ -66,38 +68,42 @@ Faktor (normalisasi 0–1, bobot awal — tuning boleh, rumus jangan ganti diam-
 4. Beban tiket: tiket terbuka, tiket 90 hari, tiket terkait bug, rasio belum selesai.
 5. Perilaku bayar: `keterlambatan_bayar_12bln` (0 / 1 / 2+).
 6. Engagement dingin: hari sejak interaksi terakhir; email renewal tanpa balasan (rantai `membalas_id`).
-7. NPS terakhir (rendah = penguat).
-8. Kedekatan renewal: hari menuju `tanggal_renewal` sebagai pengganda urgensi.
+7. NPS terakhir sebagai konteks tanpa tanggal survei, bukan bobot risiko awal.
+8. Kedekatan renewal: hari menuju `tanggal_renewal` sebagai konteks urgensi, bukan pengganda skor risiko awal.
 
 Plus: `health_score_dashboard` (CRM) vs risiko graph → flag `mismatch` boolean.
-Nilai berisiko (Rp) = `nilai_tahunan` kontrak × probabilitas.
+Bobot percobaan pertama: pemakaian 30%, gangguan layanan 25%, relasi champion 20%, janji dan engagement 15%, pembayaran 10%. Uji pada C01–C06 dan seluruh 40 pelanggan, periksa perubahan peringkat saat bobot bergeser. Nilai hilang bukan nol; transaksi outlet yang gagal sinkron jangan dihitung dua kali. Renewal, NPS, dan nilai kontrak adalah konteks prioritas. Bila perlu nilai tertimbang (Rp), rumusnya `nilai_tahunan × skor_prioritas / 100`; ini bukan prediksi kerugian. Tanpa outcome churn historis dan kalibrasi, jangan sebut skor ini probabilitas churn.
 
 ## 3. Tindakan retensi
 
 Per akun risiko atas: hasilkan draft tindakan dari faktor terkuat (template deterministik),
 wajib cek preseden di `decision_log` (diskon/eskalasi/janji yang pernah disetujui untuk pola serupa)
 dan kutip `decision_id`-nya. Bila usulan menyimpang dari preseden, tulis alasan penyimpangannya.
-Draft boleh difrasa LLM; keputusan akhir: manusia (CSM) approve/reject → tersimpan append-only.
+Draft boleh difrasa LLM; keputusan akhir: pengguna aplikasi terautentikasi (CSM/admin) approve/reject → tersimpan append-only.
 
 ## 4. Layar aplikasi (Next.js, mode Operate: dark, padat data, satu layar satu tugas)
 
-1. **Peringkat risiko**: 40 akun terurut; C01–C06 terpin; kolom probabilitas, level, Rp berisiko,
+1. **Peringkat risiko**: 40 akun terurut; C01–C06 terpin; kolom parameter risiko, prioritas, nilai kontrak dan bila berguna nilai tertimbang berlabel jelas,
    flag mismatch; filter per level.
 2. **Detail akun**: visualisasi sub-graph bukti (jalur per faktor bisa di-highlight), breakdown
    faktor + jalur buktinya, timeline (pindah champion, tiket, keputusan, interaksi).
 3. **Tanya graph**: input pertanyaan bebas → query terstruktur ke graph → jawaban difrasa LLM
    dengan sitasi node bukti. Ini senjata untuk pertanyaan live juri.
 4. **Save plan**: draft tindakan + sitasi preseden → approve/reject (append-only, tercatat siapa & kapan).
+5. **Feedback dua arah**: pengguna aplikasi terautentikasi menyampaikan pendapat/usulan pada akun atau rencana; admin/CSM menanggapi. Feedback tersimpan terpisah dari Decision dan tidak mengubah skor atau approval otomatis. Akses pelanggan akhir masih pertanyaan produk.
+
+Ingest dan approval dibatasi pada pengguna aplikasi terautentikasi berperan CSM atau admin. Demo publik dapat membaca data demo sesuai izin, dengan rate limit. LLM menyusun penjelasan dan draf dari paket fakta bersumber; kode memvalidasi angka/rujukan dan menentukan skor.
 
 ## 5. Langkah eksekusi (commit per langkah, jangan ditumpuk)
 
-- S0 — Samakan `01-PRD.md` ke scope KasirNusa (PRODUCT.md sudah dipivot; jangan pakai asumsi SalesTranscriptQA lagi), commit docs.
+- S0 — Samakan dokumen utama ke scope KasirNusa; SalesTranscriptQA hanya opsi benchmark retrieval terpisah. Commit bertahap sesudah verifikasi dan sesuai otorisasi workflow.
 - S1 — Ingest: 15 file → graph terkompilasi + laporan statistik build (jumlah node/relasi per tipe).
 - S2 — Scoring engine + cek validasi (butir 6 di bawah harus lulus).
 - S3 — Layar peringkat risiko.
 - S4 — Detail akun + visualisasi graph.
 - S5 — Tanya graph (query + frasa + sitasi).
 - S6 — Save plan + approval append-only.
+- S6b — Feedback pengguna dan tanggapan admin/CSM, terpisah dari approval.
 - S7 — Deploy (demo wajib running & bisa diakses), README cara jalan, seed demo.
 
 Setiap langkah: test/build/typecheck hijau dulu, baru commit. Dataset penuh jangan ikut ke-commit.

@@ -2,6 +2,8 @@
 
 Sumber: Latent Space, "Why I couldn't build Jev at OpenAI — Diogo Almeida, TypeSafe Co-founder & CEO" (youtu.be/cFx9Z3ZXca0, 2:22). Panitia Track 3 meminta peserta menyimak video ini, jadi juri kemungkinan menilai apakah tim memahami cara berpikirnya. File ini berisi pemahaman dengan kata-kata sendiri, bukan transkrip.
 
+> Penerapan aktif Relasi memakai dataset sintetis KasirNusa dalam `dataset_kasirnusa/`. Rujukan SalesTranscriptQA di bawah adalah catatan riset/opsi benchmark retrieval terpisah, bukan demo utama atau validasi probabilitas churn. Kontrak implementasi terkini ada di `03-ARCHITECTURE.md` §4b.
+
 ## 0. Arahan mentor di Technical Meeting (9 Okt 2026) — prioritas tertinggi
 
 Mentor Track 3: **Kyle Wild** (CTO Endgame Labs, GitHub `dorkitude`). Bila bertentangan dengan bagian lain, bagian ini menang kecuali ada aturan tertulis panitia yang berbeda.
@@ -38,7 +40,7 @@ AI paling banyak dipanggil oleh kode. Jev adalah "System One model": cepat, mura
 
 | Primitif | Kode | Contoh Relasi |
 |---|---|---|
-| `choice` | `switch` | tipe sinyal: champion pergi / kompetitor / sentimen / urgensi |
+| `choice` | `switch` | kategori yang saling eksklusif; sinyal independen KasirNusa memakai noul terpisah |
 | `noul` + probabilitas | `if p >= threshold` | kutipan mengandung sinyal churn? |
 | `score` | sort / threshold | keparahan sinyal atau kemiripan preseden |
 
@@ -58,13 +60,13 @@ Aturan:
 
 ## 4. Penerapan untuk Relasi
 
-1. Pada write time, setiap call/tiket dipecah per giliran bicara atau ±2.000 karakter.
+1. Pada write time, interaksi JSONL dan deskripsi tiket KasirNusa dipotong dengan offset sumber yang dapat diverifikasi.
 2. Jev menilai `is_champion_exit`, `mentions_competitor`, `negative_sentiment`, `is_urgent`, `is_expansion`, dan `entity_match`.
 3. Kode menulis `Signal` bila confidence memenuhi ambang; sisanya ke review.
 4. Normalisasi nama/domain memberi kandidat entity resolution; Jev `noul` mengonfirmasi pasangan ragu.
-5. Risk score dihitung deterministik dari sinyal terverifikasi, usage, dan invoice. Jev tidak memutuskan risiko akhir.
-6. Graph menyimpan kutipan, waktu, sumber, confidence, dan `Decision` approval CSM.
-7. Benchmark: baseline grep/RAG versus traversal graph pada subset B2B multi-call yang sama; ukur akurasi Jev, token/biaya, dan latensi per pertanyaan.
+5. Skor prioritas dihitung deterministik dari parameter numerik dan sinyal terverifikasi. Jev tidak memutuskan prioritas akhir; skor bukan probabilitas churn.
+6. Graph menyimpan kutipan, waktu, sumber, confidence, dan `Decision` approval CSM/admin; Feedback pengguna ditanggapi terpisah.
+7. QA utama memakai pertanyaan baru pada graph KasirNusa dengan sitasi. SalesTranscriptQA bila dipakai hanya benchmark retrieval terpisah; ukur akurasi, token/biaya, dan latensi aktual.
 
 ## 5. Kalimat pitch
 

@@ -1,168 +1,79 @@
-# 03 — ARCHITECTURE & Rencana Build
+# 03 — ARCHITECTURE & Rencana Build: KasirNusa
 
-> Turunan dari 01-PRD. Prioritas: golden demo path stabil. Stack usulan; Next.js dikunci user. ID sama dengan 04-TODO.
+> Turunan `01-PRD.md` dan `09-BUILD-PLAN-KASIRNUSA.md`. Next.js dipilih; PostgreSQL untuk demo publik diterima dalam ADR-0001. ADR-0002 (parameter dan penjelasan) masih Proposed. Belum ada scaffold, provider hosting, library DB, atau identitas demo yang dipilih.
 
-## 1. Stack
+## 1. Stack dan batas keputusan
 
-| Lapisan | Pilihan | Alasan |
+| Lapisan | Keputusan / usulan | Catatan |
 |---|---|---|
-| Bahasa/framework | TypeScript strict + Next.js App Router (dashboard dan route handlers) | Sudah dipilih; satu codebase/deploy |
-| Package manager | pnpm | Install cepat/reproducible melalui lockfile |
-| Graph store | SQLite + tabel node/edge/provenance, query recursive CTE | Tidak perlu service/container; cukup untuk demo, relasi eksplisit dan temporal |
-| Decision model | Jev / TypeSafe `jev-latest` | Fokus penilaian; endpoint/pola lihat `docs/JEV-KIT.md`, validasi respons dengan Zod |
-| Generatif | Provider belum ditentukan; satu model hanya untuk jawaban/draf save plan | Konfirmasi akses, harga dan izin dahulu. Default tanpa provider: jawaban extractive dan save plan template berbukti; tidak menentukan risiko/approval | Scoring risiko tetap deterministik |
-| UI | Tailwind CSS v4, server components dahulu | Next.js default; tokens diekspor dari 08-DESIGN |
-| Graph/data visual | React Flow (`@xyflow/react`) untuk peta kecil; HTML table untuk perbandingan benchmark | Graph sebagai bukti; jangan pakai chart dekoratif |
-| Ikon | `lucide-react`, outline satu gaya | Tanpa emoji |
-| Hosting | Vercel atau lokal untuk demo [opsi; deployment belum diwajibkan] | Jangan deploy sebelum deliverable dikonfirmasi |
+| Web | Next.js App Router, TypeScript strict [Next.js dipilih; TypeScript usulan] | Server lebih dulu; UI ikuti `08-DESIGN.md` |
+| Data | PostgreSQL untuk demo publik (ADR-0001) | Graph melalui tabel node/edge/provenance dan query SQL; library koneksi/migrasi belum dipilih |
+| AI klasifikasi | Jev/TypeSafe | Sinyal teks ambigu saat ingest; output bertipe, ambang dan keputusan di kode |
+| AI generatif | Satu provider yang disetujui tim | Penjelasan, skenario berasumsi, dan draf tindakan; tidak menghitung skor/approve |
+| UI | Tailwind v4 dan visual graph kecil [usulan] | Token resmi di `08-DESIGN.md`; dependency baru memerlukan izin |
+| Hosting/auth | Belum dipilih | Demo publik membaca data berizin; ingest, feedback, dan approval butuh identitas dan otorisasi; rate limit |
 
-### Dependency yang disetujui sebagai rencana (bukan terpasang)
+Arsip `dataset_kasirnusa.zip` dan hasil ekstrak `dataset_kasirnusa/` diabaikan Git. README menyebut 15 file data sintetis, 40 pelanggan + 5 prospek, histori operasional 1 Okt 2025–30 Sep 2026, snapshot 1 Okt 2026. Peta kolom, cakupan terukur, rumus parameter, dan keterbatasan terdapat di `10-DATA-PROFILE-KASIRNUSA.md`. Jangan commit dataset penuh, secret, atau cache berisi data pelanggan.
 
-`next`, `react`, `react-dom`, `typescript`, `tailwindcss`, `@tailwindcss/postcss`, `lucide-react`, `@xyflow/react`, `better-sqlite3`, `zod`, `tsx`, `vitest`, `knip`. Tidak menambah ORM, graph DB server, vector DB, charting, atau wrapper LLM sebelum kebutuhan terukur. `@google/design.md` hanya tooling dokumen desain.
-
-## 2. Perintah Verifikasi (sesudah scaffold)
-
-```powershell
-pnpm dev
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
-pnpm exec knip
-pnpm exec tsx scripts/benchmark.ts
-```
+## 2. Perintah verifikasi setelah scaffold
 
 | Cek | Perintah |
 |---|---|
 | Dev | `pnpm dev` |
-| Seed/compile | `pnpm exec tsx scripts/seed.ts` lalu `pnpm exec tsx scripts/compile.ts` |
 | Test | `pnpm test` |
 | Build | `pnpm build` |
 | Typecheck | `pnpm typecheck` |
 | Lint | `pnpm lint` |
 | Dead code | `pnpm exec knip` |
-| Benchmark | `pnpm exec tsx scripts/benchmark.ts` → JSONL aktual |
-| Golden demo | Jalankan `pnpm dev`, ikuti 01-PRD §5 dari data ingest sampai query pasca-approval |
+| Golden demo | Jalankan `pnpm dev`, ikuti `01-PRD.md` §5 |
+| Benchmark bila retrieval/model berubah | `pnpm exec tsx scripts/benchmark.ts`, simpan output aktual |
 
-Nama script menunggu package scaffold dan harus direalisasikan di `package.json`; jangan klaim siap sebelum itu.
+Nama script adalah kontrak scaffold, belum tersedia. Jangan klaim cek lulus sebelum dijalankan. UI juga diperiksa di browser 375/768/1440, keyboard, state, dan Standar UI A1–A8. Jika `08-DESIGN.md` berubah, lint design tokens menurut `07-RULES.md`.
 
-## 3. Skema Context Graph
+## 3. Data dan graph
 
-Implementasi SQLite minimal; properti fleksibel JSON hanya di `attrs`, relasi/fakta inti dinormalisasi.
+Enam kelompok sumber berasal dari 15 file data: CRM (`crm_accounts`, `crm_contacts`, riwayat kerja, deals, employees), interaksi JSONL, pemakaian/outlet/fitur, support/bug/rilis, kontrak/billing, dan `decision_log`. Join utama: `account_id`, `contact_id`, `employee_id`, `outlet_id`, `bug_id`, `feature_id`, dan ID interaksi/keputusan. Email historis tidak selalu sama dengan email saat ini; konflik hard ID tidak boleh di-merge otomatis.
 
-**Node**: `id`, `type`, `attrs_json`, `valid_from`, `valid_to`, `created_at`, `source_id`, `quote`, `confidence`, `extracted_by`, `synthetic`.
+Node kandidat: Akun, Outlet, Kontak, Karyawan, Deal, Kontrak, Interaksi, Tiket, Bug, Rilis, Fitur, Keputusan, Kompetitor, Signal, Evidence. Relasi minimal dan contoh C01–C06 dijabarkan di `09-BUILD-PLAN-KASIRNUSA.md`. Setiap fakta/edge menyimpan source ID, waktu, status sintetis, dan bila berasal dari Jev: rubrik, model, confidence, kutipan/span. Hubungan turunan seperti tiket→bug yang tak punya `bug_id` ditandai `derived` dengan alasan dan confidence; jangan menyamakan dengan hard link.
 
-| Label | Properti kunci | Sumber |
-|---|---|---|
-| Account | `name`, `domain`, `contract_value`, `currency`, `renewal_date` | Metadata SalesTranscriptQA; nilai kontrak/usage overlay sintetis |
-| Contact | `name`, `email`, `role`, `valid_from/to` | Metadata/call; alias |
-| Opportunity | `stage`, `value`, `close_date` | Metadata dataset; beri label sintetis bila overlay |
-| Conversation | `call_id`, `occurred_at`, `text`, `dataset_split` | Calls dataset |
-| Signal | `kind`, `severity`, `confidence`, `quote`, `source_id`, `status` | Jev write-time; status active/review/rejected |
-| UsageEvent | `metric`, `value`, `period`, `synthetic` | Seed sintetis yang ditandai eksplisit |
-| Invoice | `amount`, `currency`, `due_at`, `paid_at`, `synthetic` | Seed sintetis |
-| Decision | `action`, `rationale`, `actor`, `created_at`, `outcome`, `source_ids`, `version` | Approval manusia; append-only |
-| Evidence | `quote`, `source_id`, `span_start/end`, `occurred_at` | Kutipan asli dan offset |
+Tabel konseptual: `sources`, `nodes`, `edges`, `signals`, `jev_runs`, `plans`, `decisions`, `feedback`, `feedback_replies`. Skema final menunggu T1. Fakta temporal menambah versi baru; sumber lama tidak dihapus. Hash + source ID mencegah ingest duplikat. Ingest dan approval memakai transaksi; Decision append-only dan idempotency key unik. Feedback menyimpan actor, waktu, konteks, isi/status; reply tersimpan tanpa mengubah Decision/score secara otomatis.
 
-**Edge**: `HAS_CONTACT`, `HAS_OPPORTUNITY`, `HAS_CONVERSATION`, `MENTIONS`, `HAS_SIGNAL`, `HAS_USAGE`, `HAS_INVOICE`, `ABOUT`, `BASED_ON`, `APPROVED_BY`, `SIMILAR_TO`. Semua edge punya `source_id`, `confidence`, `valid_from`, `valid_to`; edge `BASED_ON` mempertahankan call/time dan kutipan.
+## 4. Pipeline dan skor
 
-**Tabel inti**: `nodes(id PK,type,attrs_json,valid_from,valid_to,created_at,source_id,quote,confidence,extracted_by,synthetic)`; `edges(id PK,src,dst,type,valid_from,valid_to,source_id,confidence)`; `documents(id PK,content_hash,source_type,source_ref,content,synthetic,ingested_at)`; `decisions(id PK,account_id,action,rationale,actor,created_at,source_ids_json,version)`; `jev_runs(id PK,document_id,primitive,model,prompt_version,input_hash,output_json,input_tokens,output_tokens,elapsed_ms,error)`.
+1. Baca CSV/JSONL dari direktori lokal yang diabaikan Git; validasi skema, ID, tanggal, encoding, dan duplikasi. Simpan laporan baris, node, edge, error, serta cakupan per akun.
+2. Kompilasi hard link dari ID. Ambiguitas teks kecil (niat pindah, keluhan, urgensi, penyebutan kompetitor) dikirim ke Jev dengan rubrik berversi. Validasi respons; tulis/review/discard lewat ambang kode. Kutipan harus cocok source span.
+3. Kode/SQL menghitung perubahan transaksi per hari 90 hari terakhir vs 90 hari sebelumnya, tiket terbuka/umur/kaitan bug, champion/decision-maker, janji dan engagement, serta keterlambatan bayar 12 bulan. Pembacaan dilakukan pada snapshot 1 Okt 2026; faktor menyimpan sumber, periode, nilai, status data, dan alasan bila tak tersedia.
+4. Bobot uji pertama: pemakaian 30%, gangguan layanan 25%, relasi champion 20%, janji dan engagement 15%, pembayaran 10%. Kode menghasilkan skor prioritas 0–100 dan level, berversi. Ambang level dan aturan data kosong diputuskan setelah profiling; data kosong tidak menjadi nol. Gangguan sinkronisasi ditandai sebagai masalah layanan/kualitas data agar penurunan transaksi tak dihitung dua kali.
+5. Renewal, NPS, dan nilai kontrak ditampilkan sebagai konteks. Jika nilai tertimbang digunakan: `nilai_tahunan × skor_prioritas / 100`; tidak boleh disebut prediksi kerugian. Skor tidak disebut probabilitas churn tanpa outcome historis dan kalibrasi.
+6. Traversal graph mengembalikan node/relasi/sumber untuk pertanyaan baru. LLM hanya menerima paket fakta terpilih dengan hitungan kode, sumber, kutipan, asumsi, dan preseden Decision. Validasi angka dan sitasi sebelum ditampilkan; tanpa bukti cukup, abstain. Draf save plan disunting pengguna, lalu persetujuan ditulis sebagai Decision.
 
-Fakta temporal tidak di-overwrite: tutup `valid_to`, tambah node/edge baru. Query `as_of` mengecek rentang valid. `content_hash` + source id mencegah ingest duplikat. Approval disimpan transaksi SQLite append-only; idempotency key unik.
+## 4b. Peta panggilan AI dan evaluasi
 
-## 4. Pipeline Data
-
-1. **Ingest** calls dan metadata SalesTranscriptQA. Validasi JSONL, source ID, lisensi dan split; idempotency hash.
-2. **Chunk** per turn atau 2.000 karakter dengan overlap 20%; simpan offset agar kutipan bisa diverifikasi.
-3. **Kandidat entitas** dari metadata; normalisasi nama/domain tanpa merge fuzzy otomatis. Bila kandidat ragu, satu batch `noul` Jev `entity_match`.
-4. **Ekstraksi batch Jev** per chunk: noul champion exit, competitor mention, negative sentiment; score urgency 0–3. Pertanyaan berlabel independen; response runtime divalidasi Zod.
-5. **Control flow**: noul ≥0,85 tulis; 0,50–0,85 review; <0,50 abaikan. Entity merge ≥0,95 hanya jika tidak ada identifier keras bertentangan; 0,60–0,95 review; <0,60 pisah. Score severity ≥2 dan confidence ≥0,80 tulis; sisanya review. Ambang konfigurasi terpusat di `src/lib/thresholds.ts`.
-6. **Graph write** transaksi per dokumen: node/edge, kutipan, confidence, model/prompt version; simpan biaya, latensi dan error. Retry idempotent terbatas; jangan retry 401/403.
-7. **Cache** berdasarkan content hash + nama/version model + rubrik version. Cache tidak menggantikan evaluasi; cache hit tercatat.
-8. **Cadangan demo**: dataset dan hasil kompilasi terverifikasi lokal; tidak membuat hasil evaluasi palsu. API down → tampilkan cache dengan label, atau jelaskan benchmark tidak dapat dijalankan.
-
-## 4b. Peta Panggilan AI (lensa Jev)
-
-| Titik | Primitif | Input JSON | Control flow / ambang | Evaluasi & eskalasi |
-|---|---|---|---|---|
-| Champion resign | noul | `{call_id, quote, account_id}` | p≥.85 tulis; .50–.85 review; lainnya discard | 30 label; human review zona tengah |
-| Kompetitor disebut | noul | `{call_id, quote}` | sama, simpan kutipan | Precision/recall pada label |
-| Sentimen | score 0–3 dengan rubrik | `{call_id, quote, prior_signal?}` | expected score, confidence≥.80 dan score≥2 tulis | 30 label; sensitivitas sinonim |
-| Urgensi | score 0–3 | `{call_id, quote, time_context}` | prioritas review; bukan skor churn | 30 label |
-| Entity match | noul | `{entity_a, entity_b, domain_a, domain_b}` | ≥.95 merge tanpa konflik identifier; .60–.95 review | 30 pasangan + hard negatives |
-| Evidence relevance | score 0–3 | `{question, candidate_chunk}` | skor≥2 dan confidence≥.80 masuk konteks | Same subset/judge; cap 6 chunk kedua arm |
-| QA judgment | noul | `{question, reference_answer, answer, evidence}` | threshold .5 untuk label benar/salah | Jev judge; audit referensi dan disagreement manusia |
-| Expansion (Should) | noul | `{account, quote}` | p≥.85 sinyal expansion terpisah | 30 label jika waktu tersedia |
-| Draft save plan | Generatif, bukan keputusan | `{signals, evidence, precedent}` | output schema; CSM wajib edit/approve | Tidak menilai churn; gagal → template extractive |
-
-- Endpoint: `POST https://api.typesafe.ai/v1/systemone`, model `jev-latest`; API key hanya `JEV_API_KEY` dalam `.env.local`, jangan commit.
-- Validasi respons Zod; cap concurrency 4 (asumsi konservatif), batch pertanyaan sejenis; 429/5xx retry 3 kali exponential backoff; timeout 60s. Jangan retry auth error.
-- Biaya: panggilan + input/output tokens + elapsed ms per primitive/document/question. Rate token harus diambil dari pricing aktual; jangan hardcode asumsi USD.
-- Catat model string persis dari response, versi rubrik (`signal-v1`), versi prompt, hash input, split, timestamp. `jev-latest` alias dapat berubah; sebelum benchmark simpan respons dan jalankan ulang eval bila alias berganti.
-- Eval primitif: minimal 20–50 contoh berlabel per primitif; target awal H2 PRD. Uji urutan field/sinonim/urutan batch pada subset. Nilai probabilitas confidence calibration dengan bins; jangan menyebut calibrated tanpa bukti.
-- Benchmark utama: 50 pertanyaan holdout B2B multi-call [asumsi]; baseline grep dan graph pada corpus, answerer, token/context budget sama; judge Jev sama. Laporkan jawaban tepat, biaya query, biaya kompilasi per pertanyaan amortisasi terpisah, latensi median/p95, retrieved call IDs. Jangan leak source call dari metadata label ke index/retriever.
-
-## 5. Alur Sistem
-
-```text
-Call / metadata
- → hash + validasi + chunk
- → Jev primitives (batched)
- → kode: write / review / discard
- → Account—Opportunity—Conversation—Signal—Evidence
- → user asks question
- → SQL recursive traversal / multi-call retrieval
- → Jev relevance score (bila diperlukan)
- → jawaban extractive/generative + bukti + abstain jika bukti tak cukup
- → draf save plan + preseden
- → CSM edit + approve
- → append-only Decision + edges (transaction)
-```
-
-**Multi-hop**: `Account → Opportunity → Conversation(t1,t2) → Evidence/Signal`, menampilkan dua call yang melengkapi jawaban. **Preseden**: `Decision → Account → Signal/Outcome`, urut berdasarkan kedekatan fitur yang deterministik; jika pakai Jev similarity, score dan threshold harus tampak.
-
-**Baseline**: grep atas seluruh corpus dan RAG opsional hanya bila sempat; corpus sama, pertanyaan sama, budget jawaban sama. Benchmark utama baseline grep sesuai arahan mentor.
-
-## 6. Data
-
-- Utama: SalesTranscriptQA revision `183bd79178a3555351d25400225001a9b27ecc2f`, B2B multi-call. Data CC BY-NC 4.0 (Salesforce + Endgame Labs attribution); CLI MIT. Hanya dipakai untuk hackathon, tidak didistribusikan ke produk komersial.
-- Usage/invoice overlay: 3–5 akun sintetis [asumsi] dengan data sintetis berlabel pada UI dan pitch. Jangan menyajikan sinyal/kontrak overlay seolah berasal dari dataset.
-- Benchmark: holdout sample deterministik 50 pertanyaan, seed dan IDs dicatat; semua sumber terindeks agar tidak bocor label.
-- Jika dataset fetch gagal, tampilkan subset seed transparan untuk demo, tetapi benchmark tandai tidak representatif/tidak selesai.
-
-## 7. Rencana Build
-
-Task 30–120 menit, owner belum ditentukan. Urutan T1 wajib setup repo + tokens; T2 write-time compile; T3 benchmark.
-
-| ID | Task | Pemilik | Target | Fitur | Selesai bila |
-|---|---|---|---|---|---|
-| T1 | Scaffold Next.js, SQLite, tokens, nav | — | — | — | Dev/build/test jalan; data schema dan token tersedia |
-| T2 | Fetch data, compile Jev signals + entity review | — | — | F1 | Source/hash/citation; 20+ label eval; cost log; seed fallback |
-| T3 | Benchmark grep vs graph, Jev judge | — | — | F5 | Same 50 IDs/split, answer, score, cost, p50/p95 JSONL/report; no leakage |
-| T4 | Graph queries + evidence path + risk | — | — | F2–F4 | Query multi-call returns two source calls; deterministic formula test |
-| T5 | Review/save plan/Decision write-back | — | — | F6 | approve transaction/idempotent; no email sent; next query sees decision |
-| T6 | UI screens + responsive + golden path | — | — | all Must | UI states and 375/768/1440 checked; complete demo path |
-| T7 | Polish benchmark/pitch/fallback | — | — | pitch | Reproduce numbers, label synthetic data, backup local demo |
-
-Feature freeze: belum ditentukan; tanya panitia/tim.
-
-## 8. Risiko & Cadangan
-
-| Risiko | Cadangan |
-|---|---|
-| Jev API/credential gagal | Verifikasi health-check awal; cache hasil kompilasi; jangan klaim live call |
-| Merge entitas salah | Hard identifiers menang; ragu masuk review; merge audit/undo via alias, bukan hapus node sumber |
-| Dataset besar/time limit | Prioritaskan 50 QA dan subset calls yang tetap index seluruh corpus yang disetujui; jika subset korpus dipakai, tandai benchmark eksploratif |
-| Benchmark salah/leak | Holdout question IDs; seluruh dokumen tersedia; source IDs emas hanya untuk judge pasca-jawaban |
-| Biaya ingest menghapus penghematan query | Laporkan cost/query dan total-cost break-even terpisah |
-| Overlay sintetis disangka nyata | Tanda `synthetic` di DB, UI, fixture dan pitch |
-| DB write approval ganda | Transaction + unique idempotency key; append-only Decision |
-| Model/rubrik berubah | Pin versi rubrik dan simpan output; rerun eval sebelum demo |
-| Screenshot gelap sulit dibaca | Token foreground diuji WCAG AA; hijau tidak menjadi satu-satunya pembeda |
-
-## 9. Q&A Keputusan
-
-| # | Pertanyaan | Keputusan | Jam |
+| Titik | Primitif/input ringkas | Control flow kode | Evaluasi |
 |---|---|---|---|
-| Q1 | Graph DB khusus atau relational? | SQLite edge table + recursive CTE tercepat; migrasi hanya jika traversal/performa terbukti tidak cukup | 9 Okt |
-| Q2 | Deploy wajib? | Belum diketahui; lokal sebagai fallback | 9 Okt |
+| Niat pindah/kompetitor/keluhan | Jev `noul` pada kutipan bersumber | p≥0,85 tulis; 0,50–0,85 review; lainnya abaikan sebagai sinyal aktif | Label contoh KasirNusa, audit false positive/negative |
+| Urgensi/berat keluhan | Jev `score` 0–3 dengan rubrik | confidence≥0,80 dan skor≥2 tulis; ambigu review | Rubrik dan sampel berlabel berversi |
+| Identitas ambigu | Jev `noul` pasangan entitas + hard identifiers | p≥0,95 dan tanpa konflik ID: merge; 0,60–0,95 review; lainnya pisah | Hard negatives, precision auto-merge |
+| Relevansi bukti untuk tanya graph | Jev `score` 0–3 bila perlu | skor≥2 dan confidence≥0,80 masuk konteks | Query dan korpus sama untuk perbandingan |
+| Penjelasan/save plan | LLM generatif, paket fakta tersumber | Kode memeriksa angka/sitasi; manusia approve | Audit ketepatan sumber dan abstain |
+
+Ikuti pola API dan respons di `JEV-KIT.md`, rubrik di `JEV-LENS.md`. Semua provider dipanggil server-side; kunci dari environment. Retry terbatas hanya 429/5xx, bukan 401/403. Catat model string persis, versi rubrik/prompt, input hash, token, latensi, error, dan biaya dengan rate aktual. Confidence Jev adalah output primitif, bukan probabilitas churn dan belum tentu terkalibrasi pada domain ini. Eval primitif minimal 20–50 contoh berlabel per pertanyaan kecil; laporkan ukuran sampel serta kesalahan, tanpa klaim akurasi sebelum run.
+
+Benchmark retrieval, bila dibuat, memakai pertanyaan/korpus/answerer/judge dan budget identik; laporkan biaya query serta ingest/amortisasi terpisah. SalesTranscriptQA boleh menjadi benchmark eksternal terpisah sesuai lisensi, tidak dipakai untuk klaim churn KasirNusa. Pertanyaan live KasirNusa harus dijawab dari graph aktual dan jalur bukti, bukan jawaban hardcode.
+
+## 5. Hak akses, approval, dan feedback
+
+- Read publik hanya untuk data demo yang diizinkan, dengan rate limit. Jangan tampilkan secret atau dataset di log/client bundle.
+- Ingest dan approval: pengguna aplikasi terautentikasi (CSM/Account Manager) atau admin. Endpoint memeriksa peran server-side.
+- Approval/reject menambah `Decision` dengan actor, waktu, sumber, versi rencana, dan idempotency key. Tidak mengirim email/outreach.
+- Feedback: pengguna aplikasi memberi pendapat/usulan pada akun/rencana; CSM/admin menanggapi. Simpan actor, waktu, konteks, isi/status, dan reply. Feedback tidak otomatis mengubah graph fakta, parameter, skor, atau Decision. Jika yang dimaksud pengguna adalah pelanggan akhir, desain akses baru perlu keputusan tersendiri.
+
+## 6. Rencana build dan QA
+
+ID mengikuti `04-TODO.md`. T1 scaffold dan kontrak data; T2 ingest/graph/Jev; T3 skor dan uji C01–C06 + 40 pelanggan; T4 peringkat/detail/tanya graph; T5 save plan/Decision/feedback; T6 demo publik, verifikasi UI dan golden path; T7 pitch/artefak demo serta benchmark aktual bila dibuat. Setiap perubahan mengikuti `07-RULES.md`.
+
+QA kasus wajib dari `09-BUILD-PLAN-KASIRNUSA.md` §6: C03 dan C05 terkait BUG-412/offline, C01 champion pindah + FEAT-07, C04 renewal dekat, dan semua 40 pelanggan masuk peringkat. Jangan memakai dua akun churn historis sebagai backtest: data tidak memuat outcome Closed Lost renewal yang cukup. Hasil uji dan bobot akhir harus dicatat sebelum klaim demo.
+
+## 7. Keputusan tertunda
+
+Provider hosting dan identitas demo; library PostgreSQL dan migrasi; batas biaya; ambang level/aturan data kosong; jenis deliverable 9 Okt 22.00 dan deadline submit resmi; apakah feedback dari pengguna aplikasi atau pelanggan akhir. Jangan mengubah ADR Accepted diam-diam; perubahan pilihan penyimpanan perlu ADR baru.
