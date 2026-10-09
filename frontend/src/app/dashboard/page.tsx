@@ -121,7 +121,7 @@ export default function DashboardPage() {
                 >
                   {factor}
                   <span className="relative ml-auto h-1.5 w-24 overflow-hidden rounded-full bg-neutral" aria-hidden>
-                    <span className="absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${(count / accounts.length) * 100}%` }} />
+                    <span className="metric-fill absolute inset-y-0 left-0 rounded-full bg-warning" style={{ width: `${(count / accounts.length) * 100}%` }} />
                   </span>
                   <span className="w-6 text-right font-semibold">{count}</span>
                 </Link>

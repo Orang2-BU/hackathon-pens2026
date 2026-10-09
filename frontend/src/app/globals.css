@@ -188,7 +188,37 @@
   }
 }
 
+/* Route entry and quantitative fills run once on mount, without changing layout. */
+@keyframes page-in {
+  from { opacity: 0; translate: 0 var(--spacing-sm); }
+  to { opacity: 1; translate: 0 0; }
+}
+@keyframes metric-in {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+.page-enter {
+  animation: page-in 400ms ease-out both;
+}
+.page-enter .card,
+.page-enter .card-featured {
+  animation: page-in 500ms ease-out both;
+}
+.page-enter .card:nth-child(2) { animation-delay: 50ms; }
+.page-enter .card:nth-child(3) { animation-delay: 100ms; }
+.page-enter .card:nth-child(4) { animation-delay: 150ms; }
+.metric-fill {
+  transform-origin: left;
+  animation: metric-in 1100ms cubic-bezier(0.33, 1, 0.68, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .page-enter,
+  .page-enter .card,
+  .page-enter .card-featured,
+  .metric-fill {
+    animation: none;
+  }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;

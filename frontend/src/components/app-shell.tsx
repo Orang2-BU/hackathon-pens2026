@@ -161,7 +161,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Form>
         </header>
-        <main>{children}</main>
+        <main key={pathname} className="page-enter">{children}</main>
       </div>
     </div>
   );
