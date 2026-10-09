@@ -15,7 +15,7 @@
 | T3 | Parameter dan skor prioritas deterministik | — | 🟦 | Eksperimen formula risiko 30/25/20/15/10 dan sensitivitas ±10 diuji pada 40 akun; C03 di tiga besar, renewal C04 35 hari. Belum disetujui, belum ada level/mismatch, sinyal Jev dan hasil DB-persisted; rincian 12 §13. |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | ⬜ | Pertanyaan baru dijawab dari graph lewat router intent Jev; jalur bukti ≥3 sumber bila rekomendasi; abstain bila tidak cukup; eval routing 30 pertanyaan berlabel |
 | T5 | Save plan, Decision append-only, feedback dua arah | — | ⬜ | Preseden dikutip; approval atomik/idempotent; reply feedback tercatat; tidak ada outreach |
-| T6 | Demo publik dan verifikasi UI/golden path | — | 🟦 | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD. 9 Okt: shell + 5 layar sesuai 08-DESIGN, browser 375/768/1440 tanpa scroll horizontal, drawer lulus; data masih seed sintetis (belum KasirNusa). |
+| T6 | Demo publik dan verifikasi UI/golden path | — | 🟦 | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD. 9 Okt: shell + 5 layar sesuai 08-DESIGN, browser 375/768/1440 tanpa scroll horizontal, drawer lulus; data masih seed sintetis (belum KasirNusa). Backend login/session prototype ada, belum deploy atau terhubung ke frontend. |
 | T7 | Pitch, demo assets, benchmark bila dijalankan | — | ⬜ | Angka aktual dan klaim bersumber; PPT/GitHub/video sesuai jadwal resmi; SalesTranscriptQA hanya benchmark terpisah bila dipakai |
 
 | T8 | Bandingkan dua akun berdampingan | — | ⬜ | Could (A9): faktor dan jalur bukti dua akun dalam satu tampilan |
@@ -63,3 +63,4 @@
 | 9 Okt 2026 | BE-06 adapter/mock parsial: Jev API contract official diverifikasi; response validation, server fetch, retry, cache interface dan UTF-16 chunks diuji (backend 19/19). JEV_API_KEY dan TEST_DATABASE_URL tidak tersedia; live run/provider cost tidak diklaim. |
 | 9 Okt 2026 | BE-07 parsial: threshold Noul/Score, exact source span, idempotent candidate ID dan hard-ID merge guard diuji; total 23/23. Review persistence/auth masih menunggu DB + BE-09. |
 | 9 Okt 2026 | BE-08 parsial: formula eksperimen indeks risiko, data preview 40 akun, coverage/missing handling dan 10 sensitivitas; tests 27/27 + syntax check. Tidak mengklaim probabilitas churn; level/mismatch dan persetujuan bobot ditunda. Bukti 12 §13. |
+| 9 Okt 2026 | BE-09 parsial: sesi HMAC, login/logout, validasi Origin dan rate limit bounded diuji; total backend 30/30 + syntax check. Write-action authorization, role mapping final, dan verifikasi HTTPS/proxy masih belum ada. Bukti 12 §14. |

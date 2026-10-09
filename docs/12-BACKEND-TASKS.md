@@ -75,7 +75,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-09 — Auth, role, origin dan rate limit
 
-- **Trace:** T6; TASK-009. **Prerequisite:** BE-01/02. **Status:** Todo.
+- **Trace:** T6; TASK-009. **Prerequisite:** BE-01/02. **Status:** In Progress (single-admin signed session/login prototype tested; action authorization and deployment hardening remain).
 - **Output:** login/logout/session helpers, bounded limiter dan protected actions; role demo CSM sesuai ADR stack.
 - **Kerja:** env validation, fixed-length timing-safe password digest compare, HMAC session/expiry; HTTP-only/Secure/SameSite; origin/CSRF, proxy/IP policy; input size cap, brute force lock/rate limit; actor dari server.
 - **Lulus:** missing/expired/tampered session, salah role/origin, oversized input ditolak; read publik tetap berfungsi; login abuse 429; credential/key tak ada pada client bundle/log. Auth action dan cookie diuji di HTTPS deployment, bukan hanya localhost.
@@ -239,6 +239,13 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Sensitivitas mengubah setiap bobot ±10 dan meratakan ulang bobot lain: 10 skenario; perubahan top-three terjadi pada usage +10, promise/engagement ±10. Variasi payment −10 menghasilkan bobot nol yang sah hanya di skenario; konfigurasi dasar seluruh bobot tetap positif. Ini analisis sensitivitas, bukan bukti prediktif.
 - `corepack pnpm test` lulus 27/27; `corepack pnpm check` lulus. Preview sukses pada data yang diabaikan Git; tidak ada data mentah/score export yang dikomit.
 - BE-08 belum Done: formula, bobot, saturation, dan kebijakan coverage masih perlu review tim; Jev signal belum terintegrasi ke faktor teks; hasil belum dipersistenkan/di-query dari PostgreSQL. Integration DB gate juga tetap menunggu `TEST_DATABASE_URL`. Tidak ada branch khusus C01–C06 dan tidak ada perubahan frontend.
+
+## 14. Eksekusi BE-09 (parsial; sesi demo backend)
+
+- `backend/src/auth.js` menyediakan password comparison constant-time atas digest tetap panjang, signed HMAC-SHA256 session dengan expiry 8 jam, cookie HttpOnly/SameSite=Lax dan Secure di luar mode development, pemeriksaan origin exact, parser cookie, dan rate limiter in-memory berbatas 1.000 key.
+- HTTP backend menyediakan `POST /api/auth/login`, `POST /api/auth/logout`, dan `GET /api/auth/session`. Login menolak origin lain, membatasi body JSON 4 KiB, membatasi 5 percobaan per IP/5 menit, dan tidak membuka nilai actor dari client. Env wajib (saat auth diaktifkan): `DEMO_PASSWORD` ≥12 karakter, `SESSION_SECRET` ≥32 bytes, `PUBLIC_ORIGIN` HTTP(S). Placeholder ditambahkan ke `.env.example`; tidak ada secret.
+- Test signed/expired/tampered cookie, origin, limiter, login/session/logout lulus; total `corepack pnpm test` 30/30 dan `corepack pnpm check` lulus.
+- BE-09 belum Done: belum ada middleware yang melindungi ingest/review/Decision/feedback karena write endpoints belum dibangun; role masih single `admin`, bukan pemetaan actor CSM/admin yang disetujui; CSRF/HTTPS/reverse-proxy/trusted-client-IP/production rate limit belum diverifikasi pada VPS. Auth belum diaktifkan bila tiga env di atas tidak lengkap. Tidak ada frontend changes.
 
 ## 10. Eksekusi BE-05 (parsial)
 

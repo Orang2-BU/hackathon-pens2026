@@ -8,7 +8,7 @@
   "packageManager": "pnpm@10.15.0",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test test/health.test.js test/migrations.test.js test/fixtures.test.js test/csv.test.js test/graph.test.js test/jev.test.js test/signals.test.js test/scoring.test.js",
+    "test": "node --test test/health.test.js test/migrations.test.js test/fixtures.test.js test/csv.test.js test/graph.test.js test/jev.test.js test/signals.test.js test/scoring.test.js test/auth.test.js",
     "check": "node scripts/check.js",
     "migrate": "node scripts/migrate.js",
     "ingest:dry-run": "node scripts/ingest.js",
