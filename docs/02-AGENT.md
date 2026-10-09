@@ -47,7 +47,7 @@ Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori koso
 
 ## 4. Komentar
 
-- Bahasa Inggris untuk code/comment; UI dan dokumentasi Indonesia.
+- Bahasa Inggris untuk code/comment dan **seluruh teks UI web (wajib)**; dokumentasi di `docs/` boleh Indonesia.
 - Komentar menjelaskan alasan, batas, atau provenance. Jangan mengulang kode.
 - Gunakan `ponytail:` hanya untuk simplifikasi sengaja dengan ceiling dan upgrade path.
 - Jangan simpan kode commented-out atau debug log.
@@ -75,7 +75,7 @@ Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori koso
 ## 8. UI, Data, Keamanan
 
 - Ikuti `docs/08-DESIGN.md` termasuk Standar UI A1–A8. Tidak ada emoji sebagai ikon.
-- Bahasa UI Indonesia; ID/model/error teknis tetap aslinya.
+- **Bahasa UI wajib Inggris** (label, tombol, pesan, empty/error state, metadata, `lang="en"`); format angka/mata uang tetap IDR via `Intl` locale `en-US`/`id-ID` sesuai konteks. ID/model/error teknis tetap aslinya.
 - Semua synthetic overlay diberi label dekat nilai, bukan hanya di footer.
 - Kutipan hanya berasal dari source span valid. Jawaban tanpa bukti cukup harus abstain.
 - Approval tidak mengirim email; label tombol menyebut konsekuensinya.

@@ -10,12 +10,12 @@
 
 | ID | Task | Pemilik | Target | Status | Bukti / Catatan |
 |---|---|---|---|---|---|
-| T1 | Scaffold Next.js + SQLite + design tokens + nav | — | — | ⬜ | Pertama; setup repo + token |
+| T1 | Scaffold Next.js + SQLite + design tokens + nav | — | — | 🟦 | 9 Okt: 08-DESIGN disejajarkan ke referensi InsightX + PRD (lint 0 error, tanpa warning kontras). Frontend memakai token hasil export (`frontend/src/app/theme.css`), shell 4 menu + drawer `<dialog>`. test 4/4, typecheck, lint, knip, build hijau. SQLite belum. |
 | T2 | Fetch/compile Jev signal + entity resolution + review | — | — | ⬜ | Wajib; uji primitif dan kutipan |
 | T3 | Benchmark grep vs graph + Jev judge | — | — | ⬜ | Wajib sebelum klaim; B2B multi-call |
 | T4 | Multi-hop graph query + evidence + deterministic risk | — | — | ⬜ | Must |
 | T5 | Save plan review + Decision write-back | — | — | ⬜ | Must; no outreach nyata |
-| T6 | UI golden path + responsive verification | — | — | ⬜ | Must |
+| T6 | UI golden path + responsive verification | — | — | 🟦 | 9 Okt: UI ulang sesuai 08-DESIGN. Browser 375/768/1440 tanpa scroll horizontal di 5 route; drawer buka/Escape/fokus kembali/scroll lock lulus; approve save plan → decision history dan review approve → hitungan turun, dicek di browser. Data masih seed sintetis, backend belum. |
 | T7 | Reproduce metrics + pitch + fallback | — | — | ⬜ | Must |
 | T8 | Expansion signal (noul) | — | — | ⬜ | Should |
 | T9 | Bandingkan dua akun | — | — | ⬜ | Could |
