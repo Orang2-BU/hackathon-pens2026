@@ -1,6 +1,7 @@
-# ADR-0003: Library DB, hosting, autentikasi, dan LLM untuk Tessera
+# ADR-0005: Library DB, hosting, autentikasi, dan LLM untuk Tessera
 
-- **Status:** Accepted — user, 9 Okt 2026
+- **Status:** Accepted — user (dewaaa), 9 Okt 2026
+- **Hubungan:** menjawab pertanyaan terbuka ADR-0004 (library DB, hosting, identitas, provider generatif). Bila berbeda dengan usulan ADR-0004, ADR ini yang berlaku. Kontrak data tetap mengikuti ADR-0003.
 - **Konteks:** 03-ARCHITECTURE §1 dan PRD §8 masih mencatat library PostgreSQL, hosting, identitas, dan provider LLM "belum dipilih". Frontend sudah ada di `frontend/` (Next.js 16, TypeScript, Tailwind v4, lucide-react, @xyflow/react, Vitest, knip, pnpm).
 
 ## Keputusan
