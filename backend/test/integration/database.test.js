@@ -3,13 +3,14 @@ import { randomUUID } from 'node:crypto';
 import { test } from 'node:test';
 import postgres from 'postgres';
 import { ingestDataset } from '../../src/ingest.js';
+import { compilePublishedGraph } from '../../src/graph-compiler.js';
 
 const url = process.env.TEST_DATABASE_URL;
 if (!url) throw new Error('TEST_DATABASE_URL is required for disposable PostgreSQL integration tests.');
 const datasetDirectory = process.env.TEST_DATASET_DIR;
 if (!datasetDirectory) throw new Error('TEST_DATASET_DIR must point to the local KasirNusa directory for ingest integration tests.');
 
-test('dataset publish is atomic, records every source row, and is idempotent by revision hash', async () => {
+test('dataset publish and graph compile are repeatable by revision hash', async () => {
   const sql = postgres(url, { max: 1 });
   try {
     const first = await ingestDataset({ database: sql, directory: datasetDirectory });
@@ -31,6 +32,15 @@ test('dataset publish is atomic, records every source row, and is idempotent by 
     assert.equal(second.alreadyPublished, true);
     const [runCount] = await sql`SELECT count(*)::integer AS count FROM ingest_runs WHERE dataset_revision_id = ${first.revisionId}`;
     assert.equal(runCount.count, 1);
+    const compiled = await compilePublishedGraph({ database: sql, revisionId: first.revisionId });
+    assert.equal(compiled.status, 'compiled');
+    assert.ok(compiled.edgeCount >= 4000);
+    assert.ok(compiled.factCount > 0);
+    const repeated = await compilePublishedGraph({ database: sql, revisionId: first.revisionId });
+    assert.equal(repeated.edgeCount, compiled.edgeCount);
+    assert.equal(repeated.factCount, compiled.factCount);
+    const [candidateCount] = await sql`SELECT count(*)::integer AS count FROM edges WHERE dataset_revision_id = ${first.revisionId} AND type = 'bug_candidate' AND status = 'review'`;
+    assert.equal(candidateCount.count, 5);
   } finally {
     await sql.end({ timeout: 5 });
   }

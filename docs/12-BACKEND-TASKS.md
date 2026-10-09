@@ -47,10 +47,10 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-05 — Hard graph, derivasi, temporal evidence
 
-- **Trace:** T2/T4; TASK-006/010. **Prerequisite:** BE-04. **Status:** In Progress; bounded sourced traversal and temporal oracle implemented. Dataset graph compilation/query integration waits on BE-04 publication.
+- **Trace:** T2/T4; TASK-006/010. **Prerequisite:** BE-04. **Status:** In Progress; sourced dataset compiler and bounded temporal traversal are implemented. Local dataset preview passes; PostgreSQL persistence/query integration is not verified.
 - **Output:** node/edge per tipe, source refs, temporal query, bounded evidence path.
 - **Kerja:** semua relasi minimum 09 §1; employment/champion/owner/reply/feature/precedent; competitor mention hanya pola atau Jev berlabel; BUG-412 derived dengan waktu, versi, offline dan gejala; email historis unresolved masuk laporan.
-- **Lulus:** C01/K017/P01 dan janji fitur bisa ditelusuri; C03/C05 berbagi kandidat bug bersumber; versi 4.12 saja tidak menyebabkan false edge; hard-ID conflict tak di-merge. Query Oct 1 tidak memasukkan future events; import Oct 9 tetap terbaca. Cycles/node limit/depth≤4 diuji.
+- **Lulus:** C01/K017/P01, temporal employment, usage, and feature promises compile with source references; C03/C05 produce five review-only BUG-412 candidates backed by ticket, bug, outlet, and same-day usage records. Version 4.12 alone does not create an edge. Pure compiler tests pass and full local dataset preview reports 4,140 hard edges, 1,398 facts, and five review candidates. PostgreSQL persistence/rerun and database query integration remain unverified (`TEST_DATABASE_URL` unavailable); traversal tests cover cycles and depth≤4.
 
 ### BE-06 — Client Jev, cache, budget, enrichment dan eval
 
@@ -283,4 +283,6 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - `backend/src/graph.js` menyediakan traversal terbatas depth 1–4, edge aktif pada `businessAsOf` dengan rentang valid `[validFrom, validTo)`, hop dua arah, cycle guard, status review/rejected tidak aktif, serta provenance/reason untuk edge turunan.
 - Batas jumlah jalur maksimum 100; rekomendasi dapat memeriksa cakupan kelompok sumber tanpa menghitung beberapa source dari kelompok yang sama berulang.
 - Test synthetic graph mencakup C05→outlet→ticket→BUG-412, edge masa depan, reverse traversal, cycle/depth guard dan derived tanpa provenance; `corepack pnpm test` lulus 14/14; syntax check lulus.
-- BE-05 belum Done: belum dikompilasi terhadap seluruh relational dataset, query PostgreSQL, temporal source-facts, atau C01/C03/C05 karena BE-04 belum publish database. Fixture tidak mengklaim hubungan nyata di luar sumber dataset.
+- `backend/src/graph-compiler.js` mengkompilasi dataset lokal: relasi keras, employment temporal, usage bulanan, janji fitur, dan candidate BUG-412 dengan provenance empat sumber. Candidate tetap `review`; kesamaan versi bukan klaim kausal.
+- Preview read-only menghasilkan revision `revision:1cfe93c48be4cc588a1e6a8e0246d9e58d7fe66b7438e0b7fa575b43940069c5`, 14 file graph, 4.140 hard edges, 1.398 facts, dan lima candidate (T0521/T0523/T0526 di C03; T0563/T0580 di C05), semuanya BUG-412 dan empat sumber.
+- Backend test 44/44, static `check`, dan preview dataset pass. Integration test publish/compile/rerun disiapkan tetapi belum dijalankan karena PostgreSQL/`TEST_DATABASE_URL` belum tersedia. Preview bukan bukti persistence database.
