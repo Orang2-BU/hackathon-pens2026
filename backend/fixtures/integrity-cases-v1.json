@@ -1,0 +1,15 @@
+{
+  "version": "integrity-v1",
+  "synthetic": true,
+  "labelStatus": "deterministic-oracle",
+  "cases": [
+    { "id": "I001", "kind": "duplicate_primary_id", "input": ["R-1", "R-1"], "expected": "reject_publish" },
+    { "id": "I002", "kind": "orphan_account_reference", "input": { "accountId": "C-UNKNOWN" }, "expected": "report_orphan_and_reject_publish" },
+    { "id": "I003", "kind": "missing_numeric_baseline", "input": { "previous": null, "recent": 12 }, "expected": "unavailable_not_zero" },
+    { "id": "I004", "kind": "business_snapshot_exclusive_end", "input": { "businessAsOf": "2026-10-01", "eventDate": "2026-10-01" }, "expected": "exclude_from_prior_snapshot_window" },
+    { "id": "I005", "kind": "conflicting_hard_identifiers", "input": { "accountIdLeft": "C01", "accountIdRight": "C02", "emailMatch": true }, "expected": "never_auto_merge" },
+    { "id": "I006", "kind": "negated_migration_intent", "input": { "text": "Pelanggan tidak berniat pindah." }, "expected": { "intent_to_leave": false } },
+    { "id": "I007", "kind": "exact_quote_span_utf16", "input": { "text": "Catatan: café menyebut BUG-412." }, "quote": "BUG-412", "expectedStart": 23, "expectedEnd": 30 },
+    { "id": "I008", "kind": "historical_state_not_current", "input": { "validFrom": "2025-01-01", "validTo": "2026-02-01", "businessAsOf": "2026-10-01" }, "expected": "do_not_report_as_current" }
+  ]
+}

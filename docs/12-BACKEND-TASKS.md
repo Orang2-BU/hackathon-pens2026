@@ -33,7 +33,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-03 — Fixture kecil, QA oracle, eval sebelum model
 
-- **Trace:** T2/T3/T4; TASK-003. **Prerequisite:** DTO BE-01. **Status:** Todo.
+- **Trace:** T2/T3/T4; TASK-003. **Prerequisite:** DTO BE-01. **Status:** In Progress; 30 intent paraphrases and integrity oracle fixtures exist. Full labeled Jev primitive sets and team label review remain before any live Jev evaluation.
 - **Output:** fixture sintetis kecil, parameter oracle dan daftar pertanyaan/label versioned; bukan dataset penuh di Git.
 - **Kerja:** pilih contoh C01–C06 dan counterexample dari akun lain; label ≥30 contoh per primitif yang dipakai dan 30 parafrase intent sebelum live run. Tentukan test CSV/JSONL invalid, orphan, temporal, empty/missing dan hard-ID conflict.
 - **Lulus:** fixture menguji K017 C01→P01, D-2025-11→FEAT-07, D-2025-02→DL-006, BUG-412 vs BUG-415; malformed/negasi/kutipan historis ada; gold label tidak masuk state model/retrieval. Label/reviewer/version dicatat; belum ada klaim akurasi.
@@ -199,3 +199,10 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Pemeriksaan: `corepack pnpm install` berhasil dengan postgres.js 3.4.9; `corepack pnpm test` lulus 6/6; `corepack pnpm check` lulus (syntax check Node).
 - `corepack pnpm test:integration` belum dapat berjalan: `TEST_DATABASE_URL` tidak tersedia; Docker, `psql`, dan PostgreSQL lokal tidak ditemukan. Karena itu migration execution/idempotency/checksum mismatch, privileges runtime, dan rollback belum terverifikasi; BE-02 tetap Blocked, bukan Done.
 - Typecheck/build/ESLint/dead-code checker belum dikonfigurasi pada package JavaScript backend; tidak diklaim lulus. Tidak ada perubahan pada source frontend.
+
+## 8. Eksekusi BE-03 (parsial)
+
+- `backend/fixtures/intent-cases-v1.json`: 30 pertanyaan, 10 intent, tiga variasi per intent, label draft/versioned; tidak memuat jawaban gold atau data percakapan mentah.
+- `backend/fixtures/integrity-cases-v1.json`: 8 oracle untuk duplikasi, orphan, missing numeric, temporal cutoff, hard-ID conflict, negasi, exact UTF-16 quote span, dan histori.
+- Verifikasi `corepack pnpm test` lulus 8/8; `corepack pnpm check` lulus. Tidak ada Jev call dan tidak ada klaim akurasi.
+- BE-03 belum Done: rubric-specific 30-sample sets untuk tiap Jev primitive yang nanti dipakai belum tersedia dan label draft perlu konfirmasi tim sebelum evaluasi live.
