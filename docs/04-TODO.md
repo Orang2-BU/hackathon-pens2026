@@ -4,7 +4,7 @@
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-15 backend checks 38/38; integrasi/deploy/organik masih blocked
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-15 backend checks 48/48; integrasi/deploy/organik masih blocked
 
 ## Task
 
@@ -73,3 +73,4 @@
 | 9 Okt 2026 | BE-05 graph compiler: unit backend 44/44 + static check; preview read-only 14 file menghasilkan 4.140 hard edges, 1.398 facts, dan 5 kandidat BUG-412 review-only (C03/C05, masing-masing 4 sumber). PostgreSQL compile/persistence/rerun belum diverifikasi. |
 | 9 Okt 2026 | BE-07 review signal: service transactional/idempotent, migration 004, queue dan admin-only review endpoint. Backend unit 46/46 + static/syntax checks lulus; integration gagal sebelum tes karena `TEST_DATABASE_URL` belum disediakan. Kandidat hasil Jev belum terhubung ke ingest. |
 | 9 Okt 2026 | BE-10 read repository: account list/detail dan explicit sourced evidence projection ditambahkan; unknown account 404 dan query graph abstain ketika router Jev belum ada. Backend unit 48/48 + static/syntax check lulus. PostgreSQL query/live Jev/eval masih belum diverifikasi. |
+| 9 Okt 2026 | BE-15 checkpoint setelah BE-05/07/10: backend unit 48/48, `check`, syntax, dan migration discovery 001–004 lulus. Integration berhenti sebelum tes karena `TEST_DATABASE_URL` kosong. Docker serta DATABASE/Jev/deployment credentials tidak tersedia; BE-14 deploy dan BE-16 organik belum dapat dijalankan, bukan dinyatakan lulus. |
