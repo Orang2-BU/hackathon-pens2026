@@ -296,7 +296,7 @@ Node color is always paired with a text label and Lucide icon, never color alone
 
 ### App Shell
 
-1. **Sidebar card (desktop ≥ 1200px: 248px wide, 16px inset from viewport edges, full height minus insets):**
+1. **Sidebar card (desktop ≥ 1200px: collapsed rail 76px showing icons only; expands to 248px on hover or keyboard focus within, 200ms ease-out width transition that pushes the content; labels fade in; 16px inset from viewport edges, full height minus insets):**
    - Background `surface`, radius 16px, padding 16px, no border.
    - **Header:** Tessera wordmark with a symbol in `primary` (placeholder until a logo is chosen; no off-token colors). No collapse toggle until a collapsed layout exists.
    - **Navigation:** One group, three destinations from PRD §6: **Accounts** (risk ranking), **Review** (save plans), **Data**, and nothing else. Review shows a count chip of pending plans. Benchmark is not a screen: retrieval benchmark results, if run, live in the pitch, not the nav. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.

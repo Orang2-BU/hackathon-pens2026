@@ -15,18 +15,22 @@ const navigation = [
   { href: "/data", label: "Data", icon: Database },
 ];
 
-function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+// Desktop rail: labels fade out while the aside is collapsed and fade in on hover or keyboard focus.
+const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100";
+
+function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?: boolean }) {
   const pathname = usePathname();
   const { resolvedReviewIds } = useDemoState();
   const pending = reviewItems.filter(item => !resolvedReviewIds.includes(item.id)).length;
+  const fade = rail ? railFade : "";
 
   return (
-    <div className="flex h-full flex-col gap-lg rounded-lg bg-surface p-md">
+    <div className="flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg bg-surface p-md">
       <Link href="/accounts" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
-        <span className="grid size-8 place-items-center rounded-sm bg-primary text-on-primary">
+        <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-primary text-on-primary">
           <Waypoints size={18} strokeWidth={2} aria-hidden />
         </span>
-        Tessera
+        <span className={fade}>Tessera</span>
       </Link>
 
       <nav aria-label="Main" className="flex flex-col gap-xs">
@@ -37,17 +41,18 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               key={href}
               href={href}
               onClick={onNavigate}
+              title={rail ? label : undefined}
               aria-current={active ? "page" : undefined}
               className={`flex min-h-11 items-center gap-sm rounded-md px-1.5 text-label-md transition-colors xl:min-h-10 ${
                 active ? "bg-on-surface font-semibold text-neutral" : "text-on-surface-muted hover:bg-surface-elevated hover:text-on-surface"
               }`}
             >
-              <span className={`grid size-7 place-items-center rounded-sm ${active ? "bg-primary text-on-primary" : ""}`}>
+              <span className={`grid size-7 shrink-0 place-items-center rounded-sm ${active ? "bg-primary text-on-primary" : ""}`}>
                 <Icon size={18} strokeWidth={1.75} aria-hidden />
               </span>
-              {label}
+              <span className={fade}>{label}</span>
               {href === "/review" && pending > 0 && (
-                <span className="ml-auto mr-1.5 rounded-sm bg-neutral px-1.5 text-label-sm text-on-surface">
+                <span className={`ml-auto mr-1.5 rounded-sm bg-neutral px-1.5 text-label-sm text-on-surface ${fade}`}>
                   {pending}<span className="sr-only"> pending</span>
                 </span>
               )}
@@ -56,9 +61,14 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
 
-      <div className="mt-auto rounded-md bg-surface-elevated p-sm">
-        <p className="text-label-md font-semibold">Demo workspace</p>
-        <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic seed data · resets on refresh</p>
+      <div className="mt-auto flex items-center gap-sm rounded-md bg-surface-elevated p-sm">
+        <span className="grid size-7 shrink-0 place-items-center rounded-sm text-on-surface-muted">
+          <Database size={18} strokeWidth={1.75} aria-hidden />
+        </span>
+        <div className={fade}>
+          <p className="text-label-md font-semibold">Demo workspace</p>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic seed data</p>
+        </div>
       </div>
     </div>
   );
@@ -74,9 +84,9 @@ export function AppShell({ children }: { children: ReactNode }) {
     : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Tessera";
 
   return (
-    <div className="min-h-dvh xl:grid xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-md xl:p-md">
-      <aside className="sticky top-md hidden h-[calc(100dvh-2rem)] xl:block">
-        <Sidebar />
+    <div className="min-h-dvh xl:grid xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-md xl:p-md">
+      <aside className="group/rail sticky top-md hidden h-[calc(100dvh-2rem)] w-[76px] transition-[width] duration-200 ease-out hover:w-[248px] focus-within:w-[248px] xl:block">
+        <Sidebar rail />
       </aside>
 
       <dialog
