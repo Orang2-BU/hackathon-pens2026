@@ -82,7 +82,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-10 — Read API, katalog intent, graph answer dan sitasi
 
-- **Trace:** T4; TASK-010. **Prerequisite:** BE-05/08/09; BE-06 untuk live router. **Status:** Todo.
+- **Trace:** T4; TASK-010. **Prerequisite:** BE-05/08/09; BE-06 untuk live router. **Status:** In Progress (query boundary/catalog implemented; live Jev routing and PostgreSQL repository blocked).
 - **Output:** read boundaries 11 §8, sepuluh intent, `EvidencePackage`/template answer/abstain; query application Decision.
 - **Kerja:** ID/nama resolver (ambiguous → clarification), batch noul router p≥0,70/gap≥0,15, parameter-bound SQL, depth/result/time limits; timestamps/sources/derived labels, redaksi public fields.
 - **Lulus:** ≥30 held-out parafrase routing dilaporkan; pertanyaan baru tidak memakai field `account.answer`; unsupported/insufficient evidence abstain; recommendation lintas ≥3 kelompok sumber bila bukti cukup; quote/currency/period cocok. Bad entity/input/SQL-like strings aman. Committed Decision dibaca, rolled-back tidak.
@@ -246,6 +246,13 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - HTTP backend menyediakan `POST /api/auth/login`, `POST /api/auth/logout`, dan `GET /api/auth/session`. Login menolak origin lain, membatasi body JSON 4 KiB, membatasi 5 percobaan per IP/5 menit, dan tidak membuka nilai actor dari client. Env wajib (saat auth diaktifkan): `DEMO_PASSWORD` ≥12 karakter, `SESSION_SECRET` ≥32 bytes, `PUBLIC_ORIGIN` HTTP(S). Placeholder ditambahkan ke `.env.example`; tidak ada secret.
 - Test signed/expired/tampered cookie, origin, limiter, login/session/logout lulus; total `corepack pnpm test` 30/30 dan `corepack pnpm check` lulus.
 - BE-09 belum Done: belum ada middleware yang melindungi ingest/review/Decision/feedback karena write endpoints belum dibangun; role masih single `admin`, bukan pemetaan actor CSM/admin yang disetujui; CSRF/HTTPS/reverse-proxy/trusted-client-IP/production rate limit belum diverifikasi pada VPS. Auth belum diaktifkan bila tiga env di atas tidak lengkap. Tidak ada frontend changes.
+
+## 15. Eksekusi BE-10 (parsial; API/query boundary)
+
+- `backend/src/intents.js` memuat katalog 10 intent versi fixture, membentuk pertanyaan `noul` untuk batch router Jev, menerapkan threshold `p ≥0.70` dan gap `≥0.15`, serta abstain atas output malformed/ambigu. Entity resolver mendeteksi ID/nama dan nama parsial ambigu; `createGraphAnswer` menolak jawaban tanpa fakta dan citation.
+- Read API backend menyediakan `GET /api/accounts` dengan sort allowlist, `GET /api/accounts/:id` dan `POST /api/graph/answer` dengan batas body/question, rate limit query, error aman dan status `DATA_UNAVAILABLE`/`GRAPH_UNAVAILABLE` saat repository/provider tidak dikonfigurasi. Repository disuntikkan, bukan SQL dinamis dari pertanyaan.
+- Test ambang/gap, entity ambiguity, evidence gate, query validation, abstain dan route terkonfigurasi/tidak terkonfigurasi lulus; total `corepack pnpm test` 33/33 dan `corepack pnpm check` lulus.
+- BE-10 belum Done: read repository PostgreSQL, query graph temporal, pemetaan public DTO, Jev live routing, held-out eval yang direview, timeout/DB limit, serta sitasi dari data ter-publish menunggu BE-02/04/05/06 dan rubrik tim. Tidak ada frontend changes atau klaim jawaban live.
 
 ## 10. Eksekusi BE-05 (parsial)
 

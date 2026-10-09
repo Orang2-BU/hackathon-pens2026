@@ -14,8 +14,9 @@ function sendJson(response, status, body) {
   response.end(JSON.stringify(body));
 }
 
-export function createHttpServer({ database, auth = null }) {
+export function createHttpServer({ database, auth = null, readService = null }) {
   const loginLimit = createRateLimiter({ limit: 5, windowMs: 5 * 60 * 1000 });
+  const queryLimit = createRateLimiter({ limit: 20, windowMs: 60 * 1000 });
   return createNodeServer(async (request, response) => {
     const path = new URL(request.url ?? '/', 'http://localhost').pathname;
     if (path === '/api/auth/login' && request.method === 'POST') {
@@ -49,6 +50,59 @@ export function createHttpServer({ database, auth = null }) {
     if (path === '/api/auth/session' && request.method === 'GET') {
       const session = auth?.readSession(cookieValue(request.headers.cookie));
       sendJson(response, 200, session ? { authenticated: true, role: session.role, expiresAt: session.exp } : { authenticated: false });
+      return;
+    }
+
+    if (path === '/api/graph/answer' && request.method === 'POST') {
+      const limit = queryLimit(request.socket.remoteAddress ?? 'unknown');
+      if (!limit.allowed) {
+        response.setHeader('retry-after', String(limit.retryAfterSeconds));
+        sendJson(response, 429, { error: 'RATE_LIMITED' });
+        return;
+      }
+      let body;
+      try { body = await readJson(request, 8192); } catch (error) {
+        sendJson(response, error.message === 'BODY_TOO_LARGE' ? 413 : 400, { error: error.message === 'BODY_TOO_LARGE' ? 'BODY_TOO_LARGE' : 'INVALID_JSON' });
+        return;
+      }
+      if (typeof body.question !== 'string' || body.question.trim().length < 3 || body.question.length > 2000) {
+        sendJson(response, 400, { error: 'INVALID_QUESTION' });
+        return;
+      }
+      if (!readService?.answerGraphQuestion) { sendJson(response, 503, { error: 'GRAPH_UNAVAILABLE' }); return; }
+      try {
+        const answer = await readService.answerGraphQuestion(body.question.trim());
+        sendJson(response, 200, answer);
+      } catch {
+        sendJson(response, 503, { error: 'GRAPH_UNAVAILABLE' });
+      }
+      return;
+    }
+
+    if (path === '/api/accounts' && request.method === 'GET') {
+      const url = new URL(request.url ?? '/', 'http://localhost');
+      const search = url.searchParams.get('search') ?? '';
+      const sort = url.searchParams.get('sort') ?? 'priority';
+      if (search.length > 100 || !['priority', 'weighted', 'renewal'].includes(sort)) {
+        sendJson(response, 400, { error: 'INVALID_QUERY' });
+        return;
+      }
+      if (!readService?.listAccounts) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
+      try { sendJson(response, 200, await readService.listAccounts({ search, sort })); }
+      catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
+      return;
+    }
+
+    if (path.startsWith('/api/accounts/') && request.method === 'GET') {
+      let accountId;
+      try { accountId = decodeURIComponent(path.slice('/api/accounts/'.length)); } catch { sendJson(response, 400, { error: 'INVALID_ACCOUNT_ID' }); return; }
+      if (!/^[A-Za-z0-9_-]{1,80}$/u.test(accountId)) { sendJson(response, 400, { error: 'INVALID_ACCOUNT_ID' }); return; }
+      if (!readService?.getAccount) { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); return; }
+      try {
+        const account = await readService.getAccount(accountId);
+        if (!account) { sendJson(response, 404, { error: 'NOT_FOUND' }); return; }
+        sendJson(response, 200, account);
+      } catch { sendJson(response, 503, { error: 'DATA_UNAVAILABLE' }); }
       return;
     }
 
