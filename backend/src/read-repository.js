@@ -89,6 +89,17 @@ export function createPostgresReadService(database) {
         ORDER BY e.valid_from NULLS FIRST, e.id, sr.record_number
         LIMIT 300
       `;
+      const planRows = await database`
+        SELECT p.id AS plan_id, pr.id AS revision_id, pr.revision, pr.body, pr.actor_id AS revision_actor,
+          pr.context AS revision_context, pr.evidence_hash, pr.created_at AS revision_created_at,
+          d.id AS decision_id, d.outcome, d.reason AS decision_reason, d.actor_id AS decision_actor,
+          d.context AS decision_context, d.created_at AS decision_created_at
+        FROM plans p JOIN plan_revisions pr ON pr.plan_id = p.id
+        LEFT JOIN decisions d ON d.plan_revision_id = pr.id
+        WHERE p.account_node_id = ${row.id}
+        ORDER BY pr.created_at, pr.revision
+        LIMIT 100
+      `;
       const citations = sourceRows.map((source) => ({
         id: source.source_record_id,
         group: source.file_name,
@@ -109,6 +120,12 @@ export function createPostgresReadService(database) {
           target: { id: source.target_node_id, type: source.target_type, externalKey: source.target_key },
           sourceRecordIds: [source.source_record_id] })),
         citations,
+        plans: planRows.map((plan) => ({ id: plan.plan_id, revision: { id: plan.revision_id,
+          number: plan.revision, body: plan.body, actorId: plan.revision_actor, context: plan.revision_context,
+          evidenceHash: plan.evidence_hash, createdAt: plan.revision_created_at },
+          decision: plan.decision_id ? { id: plan.decision_id, outcome: plan.outcome, reason: plan.decision_reason,
+            actorId: plan.decision_actor, context: plan.decision_context, decidedAt: plan.decision_created_at,
+            outreachSent: false } : null })),
       };
     },
 

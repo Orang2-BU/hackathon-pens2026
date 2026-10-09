@@ -89,7 +89,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-11 — Draft bersumber, revisi plan, Decision atomik
 
-- **Trace:** T5; TASK-011. **Prerequisite:** BE-09/10. **Status:** In Progress (domain transaction functions + protected HTTP boundary implemented; PostgreSQL verification and plan-context repository missing).
+- **Trace:** T5; TASK-011. **Prerequisite:** BE-09/10. **Status:** In Progress; plan write service now derives revision/formula/evidence hash server-side and is wired into HTTP runtime; account detail reads immutable plan revisions and Decisions. PostgreSQL verification remains unavailable.
 - **Output:** template draft, preseden, plan revisions, approve/reject transaction dan query Decision.
 - **Kerja:** evidence/graph/formula hash; reason deviation; policy diskon >10% diarahkan VP Sales, akun demo tidak berpretensi punya role itu; Decision immutable dan no outreach; key unique actor+idempotency.
 - **Lulus:** approve/reject persisten, stale revision/conflicting payload 409, retry same key same Decision, concurrent double submit satu keputusan, forced transaction failure rollback. Reload/restart tidak hilang; query berikutnya menemukan keputusan actual meski snapshot bisnis Oct 1.
@@ -300,3 +300,10 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Unknown account menghasilkan `null` (HTTP 404); pertanyaan graph abstain eksplisit saat live Jev router belum dikonfigurasi. Boundary HTTP yang sudah ada tetap membatasi ukuran/rate pertanyaan.
 - Backend unit 48/48, static check dan syntax checks lulus. PostgreSQL repository query tidak teruji karena `TEST_DATABASE_URL` belum tersedia. Query intent, Jev routing, held-out parafrase dan committed-vs-rolled-back Decision belum diverifikasi.
 - Data profile aktual dipakai untuk ringkasan: NPS `nps_terakhir`, dashboard `health_score_dashboard`, dan nilai tahunan/renewal diambil dari `contracts_billing.csv`. Nilai kontrak tidak dibaca dari record account yang memang tidak memuat kolom tersebut.
+
+## 13. Eksekusi BE-11 (parsial; konteks dan query tersambung)
+
+- `backend/src/plan-service.js` menyusun `QueryContext` dari account pada published revision, formula version dari score run bila ada (fallback formula eksperimen terversi), dan hash SHA-256 atas source records/factors aktif pada snapshot bisnis. Context/evidence tidak diterima dari request body.
+- Plan create/revise/Decision services disambungkan pada runtime backend. Validator ID menerima node ID revision-scoped (`node:revision:...`) yang benar-benar dihasilkan oleh BE-04; ini memperbaiki mismatch yang sebelumnya membuat plan create untuk akun dataset ditolak.
+- Account detail kini memproyeksikan plan revisions dan Decision secara eksplisit, tanpa idempotency/payload hash, sehingga hasil keputusan dapat dibaca setelah refresh/query. `outreachSent` selalu false.
+- Backend unit 51/51, static check dan syntax checks lulus. PostgreSQL transaction/concurrency/restart verification belum dijalankan karena `TEST_DATABASE_URL` tidak tersedia.

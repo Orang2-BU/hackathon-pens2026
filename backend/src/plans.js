@@ -10,7 +10,7 @@ function requiredText(value, field, max = 8000) {
 }
 
 function validToken(value) {
-  return typeof value === 'string' && /^[A-Za-z0-9_-]{1,128}$/u.test(value);
+  return typeof value === 'string' && /^[A-Za-z0-9:_-]{1,256}$/u.test(value);
 }
 
 function stableJson(value) {
