@@ -3,7 +3,7 @@
 import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { Database, LayoutDashboard, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
 import { usePendingPlans } from "@/components/demo-state";
 
@@ -23,7 +23,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
   const fade = rail ? railFade : "";
 
   return (
-    <div className="glass flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md">
+    <div className="glass edge-glow flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md">
       <Link href="/dashboard" onClick={onNavigate} className="flex min-h-11 w-fit items-center gap-sm rounded-md card-title">
         <span className="grid size-8 shrink-0 place-items-center rounded-sm bg-primary text-on-primary">
           <svg viewBox="56 56 144 144" className="size-4" aria-hidden>
@@ -78,7 +78,34 @@ export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const query = useSearchParams().get("q") ?? "";
   const drawer = useRef<HTMLDialogElement>(null);
-  const closeDrawer = () => drawer.current?.close();
+
+  // One delegated listener feeds the border glow on cards and the sidebar (globals.css).
+  useEffect(() => {
+    const onMove = (event: PointerEvent) => {
+      const card = event.target instanceof Element ? event.target.closest<HTMLElement>(".card, .card-featured, .edge-glow") : null;
+      if (!card) return;
+      const box = card.getBoundingClientRect();
+      card.style.setProperty("--spot-x", `${event.clientX - box.left}px`);
+      card.style.setProperty("--spot-y", `${event.clientY - box.top}px`);
+    };
+    document.addEventListener("pointermove", onMove, { passive: true });
+    return () => document.removeEventListener("pointermove", onMove);
+  }, []);
+
+  // Play the slide-out, then close; close() restores focus to the burger.
+  const closeDrawer = () => {
+    const dialog = drawer.current;
+    if (!dialog?.open || dialog.classList.contains("closing")) return;
+    dialog.classList.add("closing");
+    dialog.addEventListener(
+      "animationend",
+      () => {
+        dialog.classList.remove("closing");
+        dialog.close();
+      },
+      { once: true },
+    );
+  };
   const title = pathname.startsWith("/accounts/")
     ? "Account detail"
     : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Tessera";
@@ -93,7 +120,11 @@ export function AppShell({ children }: { children: ReactNode }) {
         ref={drawer}
         aria-label="Navigation"
         onClick={event => event.target === event.currentTarget && closeDrawer()}
-        className="m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-transparent p-sm text-on-surface backdrop:bg-black/40 backdrop:backdrop-blur-sm"
+        onCancel={event => {
+          event.preventDefault();
+          closeDrawer();
+        }}
+        className="drawer m-0 h-dvh max-h-dvh w-72 max-w-[85vw] bg-transparent p-sm text-on-surface"
       >
         <Sidebar onNavigate={closeDrawer} />
         <button

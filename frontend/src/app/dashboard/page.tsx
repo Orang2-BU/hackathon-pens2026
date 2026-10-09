@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarClock, ClipboardCheck, Database, GitCommitHorizontal, type LucideIcon, Scale, ShieldAlert, TriangleAlert } from "lucide-react";
 import { useDemoState, usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, formatMoney, isElevated, riskFactors, SCORING_VERSION, SNAPSHOT, type RiskLevel } from "@/lib/accounts";
+import { accounts, formatMoney, isElevated, leadSignal, riskFactors, SCORING_VERSION, SNAPSHOT, type RiskLevel } from "@/lib/accounts";
 
 // Day counts are measured from the analysis snapshot, not from today.
 const DAY_MS = 86_400_000;
@@ -66,7 +66,7 @@ export default function DashboardPage() {
                       </Link>
                       <RiskBadge level={account.riskLevel} />
                     </div>
-                    <p className="mt-xs text-body-sm text-on-surface-muted">{account.signals[0]}</p>
+                    <p className="mt-xs text-body-sm text-on-surface-muted">{leadSignal(account)}</p>
                   </div>
                   <div className="flex items-center justify-between gap-md">
                     <p className="text-label-md">

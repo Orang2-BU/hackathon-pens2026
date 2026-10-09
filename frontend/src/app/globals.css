@@ -71,6 +71,71 @@
   }
 }
 
+/* Border glow (after React Bits "Spotlight Card"): a lime edge follows the pointer on cards and the sidebar.
+   AppShell writes --spot-x/--spot-y; pointer devices only. Layered so utilities still win. */
+@layer components {
+  @media (hover: hover) {
+    .card,
+    .card-featured,
+    .edge-glow {
+      position: relative;
+    }
+    .card::after,
+    .card-featured::after,
+    .edge-glow::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      padding: 1px;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(
+        200px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+        color-mix(in srgb, var(--color-primary) 70%, transparent),
+        transparent 70%
+      );
+      mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+      mask-clip: content-box, border-box;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 300ms ease-out;
+    }
+    .card:hover::after,
+    .card-featured:hover::after,
+    .edge-glow:hover::after {
+      opacity: 1;
+    }
+  }
+}
+
+/* Mobile nav drawer: slides in from the left while the scrim fades in; .closing plays it in reverse before close(). */
+@keyframes drawer-in {
+  from { translate: -100% 0; }
+}
+@keyframes drawer-out {
+  to { translate: -100% 0; }
+}
+@keyframes scrim-in {
+  from { background-color: transparent; backdrop-filter: blur(0); }
+}
+@keyframes scrim-out {
+  to { background-color: transparent; backdrop-filter: blur(0); }
+}
+.drawer[open] {
+  animation: drawer-in 300ms cubic-bezier(0.32, 0.72, 0, 1);
+}
+.drawer::backdrop {
+  background-color: rgb(0 0 0 / 0.4);
+  backdrop-filter: blur(4px);
+  animation: scrim-in 300ms ease-out;
+}
+.drawer.closing {
+  animation: drawer-out 220ms ease-in forwards;
+}
+.drawer.closing::backdrop {
+  animation: scrim-out 220ms ease-in forwards;
+}
+
 /* Customizable select (Chrome 135+); other browsers keep the native picker. */
 @supports (appearance: base-select) {
   select,
@@ -125,6 +190,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
+    animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }

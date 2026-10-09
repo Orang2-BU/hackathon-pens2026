@@ -50,6 +50,21 @@ export const strongestFactor = (account: Pick<Account, "factorScores">) =>
     account.factorScores[factor] * factorWeight[factor] > account.factorScores[best] * factorWeight[best] ? factor : best,
   );
 
+// Signals arrive as plain text; match each to the parameter it measures (wording from scoring_v1.py).
+const signalPatterns: [RiskFactor, RegExp][] = [
+  ["Champion", /champion/i],
+  ["Payment", /bayar/i],
+  ["Commitments", /janji|kontak/i],
+  ["Service", /tiket|bug|offline/i],
+  ["Usage", /transaksi/i],
+];
+
+export const signalFactor = (signal: string) => signalPatterns.find(([, pattern]) => pattern.test(signal))?.[0];
+
+// The signal behind the strongest factor, else the first one.
+export const leadSignal = (account: Pick<Account, "signals" | "factorScores">) =>
+  account.signals.find(signal => signalFactor(signal) === strongestFactor(account)) ?? account.signals[0];
+
 export const accounts: Account[] = scores.map(row => {
   const factorScores: Record<RiskFactor, number> = {
     Usage: row.sub.pakai,
