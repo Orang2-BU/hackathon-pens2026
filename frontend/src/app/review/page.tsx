@@ -6,11 +6,9 @@ import { useState } from "react";
 import { Check, CircleCheck, CircleDashed, CircleX, MessageSquare, X } from "lucide-react";
 import { planDecisionId, useDemoState, usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, factorWeight, formatMoney, isElevated, signalFactor, SNAPSHOT, strongestFactor, type RiskLevel } from "@/lib/accounts";
+import { accounts, daysToRenewal, factorWeight, formatMoney, isElevated, signalFactor, strongestFactor, type RiskLevel } from "@/lib/accounts";
 
 const levelRank: Record<RiskLevel, number> = { Critical: 0, High: 1, Medium: 2, Low: 3 };
-const DAY_MS = 86_400_000;
-const daysToRenewal = (date: string) => Math.round((Date.parse(date) - Date.parse(SNAPSHOT)) / DAY_MS);
 
 // Plans exist for High and Critical accounts; most urgent first.
 const queue = accounts
@@ -65,7 +63,7 @@ export default function ReviewPage() {
               <Icon size={16} aria-label={status ?? "Waiting"} className={status ? (status.includes("approved") ? "shrink-0 text-success" : "shrink-0 text-danger") : "shrink-0 text-on-surface-muted"} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate font-semibold">{item.name}</span>
-                <span className="block text-label-sm text-on-surface-muted">{item.id} · {daysToRenewal(item.renewalDate)} days to renewal</span>
+                <span className="block text-label-sm text-on-surface-muted">{item.id} · {daysToRenewal(item)} days to renewal</span>
               </span>
               <RiskBadge level={item.riskLevel} />
             </Link>
@@ -87,7 +85,7 @@ export default function ReviewPage() {
         <dl className="grid grid-cols-2 gap-md sm:grid-cols-4">
           {[
             ["Priority score", String(account.priorityScore)],
-            [`Renewal ${account.renewalDate}`, `${daysToRenewal(account.renewalDate)} days`],
+            [`Renewal ${account.renewalDate}`, `${daysToRenewal(account)} days`],
             ["Contract", formatMoney(account.contractValue, account.currency, true)],
             ["Weighted value", formatMoney(account.weightedValue, account.currency, true)],
           ].map(([term, value]) => (

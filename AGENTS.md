@@ -8,7 +8,7 @@ Baca `docs/00-BRIEF.md` sampai `docs/08-DESIGN.md` yang tersedia, lalu ikuti `do
 
 ## Aplikasi
 
-Tessera memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Stack: Next.js 16 di `frontend/`, PostgreSQL via postgres.js, VPS Docker Compose, satu akun demo (ADR-0001, ADR-0005). Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; penjelasan dan draf dirangkai template dari query graph (tanpa LLM dulu). SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
+Tessera memakai dataset sintetis KasirNusa (`dataset_kasirnusa/`, dari ZIP lokal yang diabaikan Git) untuk membantu CSM memprioritaskan akun, menelusuri bukti lintas CRM, interaksi, pemakaian, tiket, kontrak, dan keputusan, lalu menyetujui save plan. Stack: Next.js 16 di `frontend/`, backend service `node:http` terpisah di `backend/` (ADR-0005/0006, kontrak `docs/13-BACKEND-CONTRACT.md`), PostgreSQL via postgres.js, VPS Docker Compose, satu akun demo (ADR-0001, `docs/adr/0003-stack-hosting-auth-llm.md`). Jev mengklasifikasi sinyal teks saat ingest; kode menghitung parameter numerik dan skor prioritas; penjelasan dan draf dirangkai template dari query graph (tanpa LLM dulu). SalesTranscriptQA hanya opsi benchmark retrieval terpisah, bukan validasi churn.
 
 ## Verifikasi
 

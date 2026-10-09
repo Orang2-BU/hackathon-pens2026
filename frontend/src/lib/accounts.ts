@@ -91,6 +91,10 @@ export const accounts: Account[] = scores.map(row => {
   };
 });
 
+// Renewal urgency is counted from the analysis snapshot, not from today.
+export const daysToRenewal = (account: Pick<Account, "renewalDate">) =>
+  Math.round((Date.parse(account.renewalDate) - Date.parse(SNAPSHOT)) / 86_400_000);
+
 export const isElevated = (account: Account) => account.riskLevel === "Critical" || account.riskLevel === "High";
 
 export const formatMoney = (value: number, currency: Account["currency"], compact = false) =>
@@ -108,11 +112,12 @@ export const filterAccounts = (items: Account[], query: string, risk: "All" | Ri
       [account.id, account.name, ...account.signals].join(" ").toLowerCase().includes(query.trim().toLowerCase()),
   );
 
-// Focus accounts stay pinned on top, then the chosen order.
 export const sortAccounts = (items: Account[], sort: "risk" | "weighted" | "renewal") =>
   [...items].sort((a, b) => {
-    if (a.focus !== b.focus) return a.focus ? -1 : 1;
     if (sort === "weighted") return b.weightedValue - a.weightedValue;
     if (sort === "renewal") return a.renewalDate.localeCompare(b.renewalDate);
     return b.priorityScore - a.priorityScore;
   });
+
+// Position among all accounts by priority score (1 = highest), independent of filters and the focus group.
+export const globalRank = new Map(sortAccounts(accounts, "risk").map((account, index) => [account.id, index + 1]));

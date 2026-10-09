@@ -4,11 +4,11 @@
 
 ## Aplikasi
 
-Tessera mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; penjelasan dan draf save plan dirangkai template dari hasil query graph (tanpa LLM dulu, ADR-0005). Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
+Tessera mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; penjelasan dan draf save plan dirangkai template dari hasil query graph (tanpa LLM dulu, ADR stack (`adr/0003-stack-hosting-auth-llm.md`)). Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
 
 ## Stack & Verifikasi
 
-- **Stack:** Next.js 16 + TypeScript + pnpm di `frontend/`, Tailwind v4, lucide-react, @xyflow/react, Vitest, knip; PostgreSQL via postgres.js; Jev; VPS Docker Compose; satu akun demo (ADR-0001, ADR-0005).
+- **Stack:** Next.js 16 + TypeScript + pnpm di `frontend/`, Tailwind v4, lucide-react, @xyflow/react, Vitest, knip. Backend: service Node `node:http` terpisah di `backend/` (ADR-0005/0006, kontrak `docs/13-BACKEND-CONTRACT.md`); PostgreSQL via postgres.js; Jev; VPS Docker Compose; satu akun demo (ADR-0001, `docs/adr/0003-stack-hosting-auth-llm.md`).
 - Perintah dev/test/build/lint/typecheck/dead code ada di `docs/03-ARCHITECTURE.md` §2, dijalankan di `frontend/`.
 
 ## Aturan Wajib

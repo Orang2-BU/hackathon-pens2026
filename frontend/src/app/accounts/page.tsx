@@ -5,9 +5,49 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, filterAccounts, formatMoney, sortAccounts, type RiskLevel } from "@/lib/accounts";
+import { accounts, filterAccounts, formatMoney, globalRank, leadSignal, sortAccounts, type Account, type RiskLevel } from "@/lib/accounts";
 
 const riskOptions = ["All", "Critical", "High", "Medium", "Low"] as const;
+const COLUMNS = 7;
+
+function AccountRow({ account }: { account: Account }) {
+  const lead = leadSignal(account);
+  return (
+    <tr className="border-b border-outline transition-colors last:border-0 hover:bg-surface-elevated/50">
+      <td className="px-md py-sm text-right text-on-surface-muted">{globalRank.get(account.id)}</td>
+      <td className="px-md py-sm">
+        <Link href={`/accounts/${account.id}`} className="inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:text-primary hover:underline xl:min-h-0">
+          {account.name}
+        </Link>
+        <div className="text-label-sm text-on-surface-muted">{account.id}</div>
+      </td>
+      <td className="px-md py-sm">
+        <span className="flex items-center gap-sm">
+          <span className="text-title font-bold">{account.priorityScore}</span>
+          <RiskBadge level={account.riskLevel} />
+        </span>
+      </td>
+      <td className="max-w-80 px-md py-sm" title={account.signals.join(", ")}>
+        {lead ?? <span className="text-on-surface-muted">No signal</span>}
+        {account.signals.length > 1 && <span className="text-on-surface-muted"> +{account.signals.length - 1}</span>}
+      </td>
+      <td className="px-md py-sm">{account.renewalDate}</td>
+      <td className="px-md py-sm text-right text-on-surface-muted">{formatMoney(account.contractValue, account.currency)}</td>
+      <td className="px-md py-sm text-right font-semibold">{formatMoney(account.weightedValue, account.currency)}</td>
+    </tr>
+  );
+}
+
+function GroupHeader({ title, note }: { title: string; note: string }) {
+  return (
+    <tr className="border-b border-outline bg-neutral/40">
+      <th scope="colgroup" colSpan={COLUMNS} className="px-md py-sm text-left">
+        <span className="label-caps text-on-surface">{title}</span>
+        <span className="ml-sm text-label-sm font-normal normal-case text-on-surface-muted">{note}</span>
+      </th>
+    </tr>
+  );
+}
 
 export default function AccountsPage() {
   const params = useSearchParams();
@@ -17,6 +57,8 @@ export default function AccountsPage() {
   const [sort, setSort] = useState<"risk" | "weighted" | "renewal">("risk");
   const matched = filterAccounts(accounts, query, risk).filter(account => !factor || account.factors.some(item => item === factor));
   const visible = sortAccounts(matched, sort);
+  const focus = visible.filter(account => account.focus);
+  const others = visible.filter(account => !account.focus);
 
   return (
     <div className="flex flex-col gap-md">
@@ -60,9 +102,10 @@ export default function AccountsPage() {
         </div>
 
         <div className="-mx-md mt-md overflow-x-auto">
-          <table className="w-full min-w-[880px] text-left text-body-sm">
+          <table className="w-full min-w-[920px] text-left text-body-sm">
             <thead className="label-caps text-on-surface-muted">
               <tr className="border-b border-outline">
+                <th scope="col" className="px-md py-sm text-right" title="Rank among all 40 accounts by priority score">#</th>
                 <th scope="col" className="px-md py-sm">Account</th>
                 <th scope="col" className="px-md py-sm">Priority score</th>
                 <th scope="col" className="px-md py-sm">Signals</th>
@@ -74,38 +117,26 @@ export default function AccountsPage() {
             <tbody>
               {visible.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-md py-2xl text-center">
+                  <td colSpan={COLUMNS} className="px-md py-2xl text-center">
                     <p className="text-on-surface-muted">No accounts match this search and risk filter.</p>
                     <Link href="/accounts" onClick={() => setRisk("All")} className="btn btn-secondary mt-md">Clear filters</Link>
                   </td>
                 </tr>
               ) : (
-                visible.map(account => (
-                  <tr key={account.id} className="border-b border-outline transition-colors last:border-0 hover:bg-surface-elevated/50">
-                    <td className="px-md py-sm">
-                      <Link href={`/accounts/${account.id}`} className="inline-flex min-h-11 items-center font-semibold underline-offset-4 hover:text-primary hover:underline xl:min-h-0">
-                        {account.name}
-                      </Link>
-                      <div className="flex items-center gap-xs text-label-sm text-on-surface-muted">
-                        {account.id}
-                        {account.focus && <span className="badge text-on-surface">Focus</span>}
-                      </div>
-                    </td>
-                    <td className="px-md py-sm">
-                      <span className="flex items-center gap-sm">
-                        <span className="text-title font-bold">{account.priorityScore}</span>
-                        <RiskBadge level={account.riskLevel} />
-                      </span>
-                    </td>
-                    <td className="max-w-80 px-md py-sm" title={account.signals.join(", ")}>
-                      {account.signals[0] ?? <span className="text-on-surface-muted">No signal</span>}
-                      {account.signals.length > 1 && <span className="text-on-surface-muted"> +{account.signals.length - 1}</span>}
-                    </td>
-                    <td className="px-md py-sm">{account.renewalDate}</td>
-                    <td className="px-md py-sm text-right text-on-surface-muted">{formatMoney(account.contractValue, account.currency)}</td>
-                    <td className="px-md py-sm text-right font-semibold">{formatMoney(account.weightedValue, account.currency)}</td>
-                  </tr>
-                ))
+                <>
+                  {focus.length > 0 && (
+                    <>
+                      <GroupHeader title="Focus · C01–C06" note="Accounts assigned to our team; kept apart, not re-ranked" />
+                      {focus.map(account => <AccountRow key={account.id} account={account} />)}
+                    </>
+                  )}
+                  {others.length > 0 && (
+                    <>
+                      <GroupHeader title="Other accounts" note="# is the rank among all 40 by priority score" />
+                      {others.map(account => <AccountRow key={account.id} account={account} />)}
+                    </>
+                  )}
+                </>
               )}
             </tbody>
           </table>

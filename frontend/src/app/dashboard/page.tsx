@@ -1,22 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, CalendarClock, ClipboardCheck, Database, GitCommitHorizontal, type LucideIcon, Scale, ShieldAlert, TriangleAlert } from "lucide-react";
+import { ArrowRight, CalendarClock, Hourglass, ClipboardCheck, Database, GitCommitHorizontal, type LucideIcon, Scale, ShieldAlert, TriangleAlert } from "lucide-react";
 import { useDemoState, usePendingPlans } from "@/components/demo-state";
 import { RiskBadge } from "@/components/risk-badge";
-import { accounts, formatMoney, isElevated, leadSignal, riskFactors, SCORING_VERSION, SNAPSHOT, type RiskLevel } from "@/lib/accounts";
+import { accounts, daysToRenewal, formatMoney, isElevated, leadSignal, riskFactors, SCORING_VERSION, SNAPSHOT, type RiskLevel } from "@/lib/accounts";
 
-// Day counts are measured from the analysis snapshot, not from today.
-const DAY_MS = 86_400_000;
 const levelRank: Record<RiskLevel, number> = { Critical: 0, High: 1, Medium: 2, Low: 3 };
-const daysToRenewal = (date: string) => Math.round((Date.parse(date) - Date.parse(SNAPSHOT)) / DAY_MS);
 
 const weightedTotal = accounts.reduce((sum, account) => sum + account.weightedValue, 0);
 const elevated = accounts.filter(isElevated);
 const attention = [...elevated]
   .sort((a, b) => levelRank[a.riskLevel] - levelRank[b.riskLevel] || a.renewalDate.localeCompare(b.renewalDate))
   .slice(0, 5);
-const renewals90 = accounts.filter(account => daysToRenewal(account.renewalDate) <= 90).length;
+// Urgency is its own list: any level, nearest renewal first (C04 is Medium but renews first).
+const renewing90 = accounts.filter(account => daysToRenewal(account) <= 90).sort((a, b) => daysToRenewal(a) - daysToRenewal(b));
+const renewingValue = renewing90.reduce((sum, account) => sum + account.contractValue, 0);
 const factorCounts = riskFactors.map(factor => ({ factor, count: accounts.filter(account => account.factors.includes(factor)).length }));
 
 type StatProps = { icon: LucideIcon; label: string; value: string; note: string; featured?: boolean };
@@ -70,7 +69,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex items-center justify-between gap-md">
                     <p className="text-label-md">
-                      <span className="font-semibold">{daysToRenewal(account.renewalDate)}</span>
+                      <span className="font-semibold">{daysToRenewal(account)}</span>
                       <span className="text-on-surface-muted"> days to renewal</span>
                     </p>
                     <Link href={`/review?account=${account.id}`} className="btn btn-secondary">
@@ -83,15 +82,35 @@ export default function DashboardPage() {
           )}
         </section>
 
-        <section className="card" aria-labelledby="mismatch-heading">
-          <h2 id="mismatch-heading" className="card-title flex items-center gap-sm">
-            <TriangleAlert size={18} aria-hidden className="text-warning" /> CRM says healthy
+        <section className="card" aria-labelledby="renewing-heading">
+          <h2 id="renewing-heading" className="card-title flex items-center gap-sm">
+            <Hourglass size={18} aria-hidden className="text-on-surface-muted" /> Renewing soon
           </h2>
-          <p className="mt-xs text-label-sm text-on-surface-muted">Green in the CRM dashboard, High or Critical in the graph.</p>
-          <p className="mt-md text-body-sm">
-            Needs <code>health_score_dashboard</code> from <code>crm_accounts.csv</code>, which the {SCORING_VERSION} export does not include yet.
-          </p>
-          <p className="mt-sm text-label-sm text-on-surface-muted">Expected once added (docs/09 §6): C05 and C01 are Green in the CRM but Critical here.</p>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Next 90 days, any level. Urgency is separate from risk.</p>
+          {renewing90.length === 0 ? (
+            <p className="mt-md text-body-sm text-on-surface-muted">No renewal in the next 90 days.</p>
+          ) : (
+            <ul className="mt-md flex flex-col">
+              {renewing90.slice(0, 5).map(account => (
+                <li key={account.id}>
+                  <Link
+                    href={`/accounts/${account.id}`}
+                    className="flex min-h-11 items-center gap-sm rounded-md px-sm py-xs text-body-sm transition-colors hover:bg-surface-elevated"
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold">{account.name}</span>
+                      <span className="block text-label-sm text-on-surface-muted">{formatMoney(account.contractValue, account.currency, true)} annual contract</span>
+                    </span>
+                    <RiskBadge level={account.riskLevel} />
+                    <span className="w-16 shrink-0 text-right">
+                      <span className="font-semibold">{daysToRenewal(account)}</span>
+                      <span className="text-on-surface-muted"> days</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
       </div>
 
@@ -105,10 +124,10 @@ export default function DashboardPage() {
         />
         <Stat icon={ShieldAlert} label="Accounts at High/Critical" value={`${elevated.length} of ${accounts.length}`} note="Level set by the scoring formula" />
         <Stat icon={ClipboardCheck} label="Plans in review" value={String(pendingPlans)} note="Drafts for High and Critical accounts" />
-        <Stat icon={CalendarClock} label="Renewals in 90 days" value={String(renewals90)} note={`From the ${SNAPSHOT} snapshot`} />
+        <Stat icon={CalendarClock} label="Contract value renewing in 90 days" value={formatMoney(renewingValue, "IDR", true)} note={`${renewing90.length} contracts; if none renew, this annual value does not continue`} />
       </div>
 
-      <div className="grid gap-md xl:grid-cols-3">
+      <div className="grid gap-md md:grid-cols-2 xl:grid-cols-4">
         <section className="card" aria-labelledby="factors-heading">
           <h2 id="factors-heading" className="card-title">Risk factors in the portfolio</h2>
           <p className="mt-xs text-label-sm text-on-surface-muted">Accounts where each parameter is active</p>
@@ -152,6 +171,17 @@ export default function DashboardPage() {
               ))}
             </ul>
           )}
+        </section>
+
+        <section className="card" aria-labelledby="mismatch-heading">
+          <h2 id="mismatch-heading" className="card-title flex items-center gap-sm">
+            <TriangleAlert size={18} aria-hidden className="text-warning" /> CRM says healthy
+          </h2>
+          <p className="mt-xs text-label-sm text-on-surface-muted">Green in the CRM dashboard, High or Critical in the graph.</p>
+          <p className="mt-md text-body-sm">
+            Needs <code>health_score_dashboard</code> from <code>crm_accounts.csv</code>, which the {SCORING_VERSION} export does not include yet.
+          </p>
+          <p className="mt-sm text-label-sm text-on-surface-muted">Expected once added (docs/09 §6): C05 and C01 are Green in the CRM but Critical here.</p>
         </section>
 
         <section className="card" aria-labelledby="health-heading">

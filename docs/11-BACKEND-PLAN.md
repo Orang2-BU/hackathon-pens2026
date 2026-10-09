@@ -35,7 +35,7 @@ Tabel berikut adalah temuan checkpoint sebelum BE-01. Dokumen 01/02/03/05/Jev Ki
 | Entity merge | p ≥ 0,95 dan hard identifiers tidak konflik | Ambang lama 0,90 bukan pilihan pada build ini |
 | Preseden kalah harga | Decision `D-2025-02`, deal `DL-006`, akun C23 | `DL-006` bukan `decision_id`; bukan contoh churn renewal |
 
-Struktur workspace ini mengikuti permintaan user dan dicatat pada ADR-0005 Proposed; runtime service belum diimplementasikan. Pilihan `postgres` sudah disetujui; tambahan ORM, Zod, SDK, queue, Redis, atau framework memerlukan alasan dan keputusan tersendiri.
+Struktur workspace ini mengikuti permintaan user dan dicatat pada ADR-0005 (Accepted); runtime service diimplementasikan pada BE-02 (ADR-0006), verifikasi PostgreSQL masih tertunda. Pilihan `postgres` sudah disetujui; tambahan ORM, Zod, SDK, queue, Redis, atau framework memerlukan alasan dan keputusan tersendiri.
 
 ## 3. Alur dan batas modul
 

@@ -1,24 +1,27 @@
 # 03 — ARCHITECTURE & Rencana Build: KasirNusa
 
-> Turunan `01-PRD.md` dan `09-BUILD-PLAN-KASIRNUSA.md`. Produk: **Tessera**. Stack final: ADR-0001 (PostgreSQL), ADR-0005 (postgres.js, VPS Docker, akun demo, tanpa LLM dulu). ADR-0002 (parameter dan penjelasan) masih Proposed. Scaffold frontend ada di `frontend/`.
+> Turunan `01-PRD.md` dan `09-BUILD-PLAN-KASIRNUSA.md`. Produk: **Tessera**. Stack final: ADR-0001 (PostgreSQL), ADR stack (`adr/0003-stack-hosting-auth-llm.md`) (postgres.js, VPS Docker, akun demo, tanpa LLM dulu). Lokasi backend: service terpisah di `backend/` (ADR-0005 workspace, ADR-0006 runtime); kontrak HTTP di `13-BACKEND-CONTRACT.md`, rencana dan task di `11`/`12`. ADR-0002 (parameter dan penjelasan) masih Proposed. Frontend ada di `frontend/`.
 
 ## 1. Stack dan batas keputusan
 
 | Lapisan | Keputusan / usulan | Catatan |
 |---|---|---|
-| Web | Next.js 16 App Router, TypeScript strict, pnpm | Di `frontend/`; server lebih dulu; UI ikuti `08-DESIGN.md` |
-| Data | PostgreSQL (ADR-0001) via `postgres` (postgres.js) (ADR-0005) | Graph = tabel node/edge/provenance, query SQL + CTE rekursif; migrasi file `.sql` berurutan |
+| Web | Next.js 16 App Router, TypeScript strict, pnpm | Di `frontend/`; UI ikuti `08-DESIGN.md`; data lewat HTTP ke backend (integrasi belum dibuat) |
+| Backend | Node.js ≥22.18 ESM, `node:http`, tanpa framework (ADR-0006) | Di `backend/`; tidak mengimpor source frontend; DTO di `13-BACKEND-CONTRACT.md` |
+| Data | PostgreSQL (ADR-0001) via `postgres` (postgres.js) (ADR stack) | Graph = tabel node/edge/provenance, query SQL + CTE rekursif; migrasi file `.sql` berurutan |
 | AI klasifikasi | Jev/TypeSafe | Sinyal teks ambigu saat ingest; output bertipe, ambang dan keputusan di kode |
-| Penjelasan & draf | Template deterministik dari hasil query graph (ADR-0005) | Tanpa LLM dulu; jawaban menyebut node/sumber atau abstain. LLM hanya lewat ADR baru |
+| Penjelasan & draf | Template deterministik dari hasil query graph (ADR stack) | Tanpa LLM dulu; jawaban menyebut node/sumber atau abstain. LLM hanya lewat ADR baru |
 | UI | Tailwind v4, `lucide-react` (ikon), `@xyflow/react` (graph), `next/font` Inter | Token hasil export `08-DESIGN.md` → `frontend/src/app/theme.css`; dependency baru memerlukan izin |
-| Test & kualitas | Vitest, ESLint (next config), `tsc`, knip | Script di `frontend/package.json` |
-| Hosting | VPS sendiri, Docker Compose (`web` + `db`) (ADR-0005) | Deploy butuh izin user; read publik diberi rate limit |
-| Auth | Satu akun demo: `DEMO_PASSWORD` + cookie sesi HMAC `SESSION_SECRET` (ADR-0005) | Wajib untuk ingest, approve, feedback |
-| Env | `DATABASE_URL`, `JEV_API_KEY`, `DEMO_PASSWORD`, `SESSION_SECRET` | `.env` diabaikan Git; `.env.example` tanpa nilai |
+| Test & kualitas | Frontend: Vitest, ESLint, `tsc`, knip. Backend: `node --test`, `scripts/check.js` | Script di `frontend/package.json` dan `backend/package.json` |
+| Hosting | VPS sendiri, Docker Compose: frontend, API backend, PostgreSQL (ADR stack, ADR-0006) | Scaffold di `backend/docker-compose.yml` dan `backend/DEPLOY.md`; deploy butuh izin user |
+| Auth | Satu akun demo: `DEMO_PASSWORD` + cookie sesi HMAC `SESSION_SECRET` (ADR stack) | Wajib untuk ingest, approve, feedback |
+| Env | Backend: `DATABASE_URL` (runtime role), `MIGRATION_DATABASE_URL` (migrator role), `JEV_API_KEY`, kredensial demo dan secret sesi sesuai `backend/.env.example` | `.env` diabaikan Git; `.env.example` tanpa nilai |
 
 Arsip `dataset_kasirnusa.zip` dan hasil ekstrak `dataset_kasirnusa/` diabaikan Git. README menyebut 15 file data sintetis, 40 pelanggan + 5 prospek, histori operasional 1 Okt 2025–30 Sep 2026, snapshot 1 Okt 2026. Peta kolom, cakupan terukur, rumus parameter, dan keterbatasan terdapat di `10-DATA-PROFILE-KASIRNUSA.md`. Jangan commit dataset penuh, secret, atau cache berisi data pelanggan.
 
-## 2. Perintah verifikasi (jalankan di `frontend/`)
+## 2. Perintah verifikasi
+
+Frontend, jalankan di `frontend/`:
 
 | Cek | Perintah |
 |---|---|
@@ -30,6 +33,8 @@ Arsip `dataset_kasirnusa.zip` dan hasil ekstrak `dataset_kasirnusa/` diabaikan G
 | Dead code | `pnpm exec knip` |
 | Golden demo | Jalankan `pnpm dev`, ikuti `01-PRD.md` §5 |
 | Benchmark bila retrieval/model berubah | `pnpm exec tsx scripts/benchmark.ts`, simpan output aktual |
+
+Backend, jalankan di `backend/`: `corepack pnpm test` (unit), `corepack pnpm check`, `corepack pnpm test:integration` (butuh PostgreSQL disposable dan dataset lokal; lihat `backend/README.md`).
 
 Script dev/test/build/typecheck/lint/knip sudah ada; `scripts/benchmark.ts` belum (hanya bila benchmark retrieval dipakai). Jangan klaim cek lulus sebelum dijalankan. UI juga diperiksa di browser 375/768/1440, keyboard, state, dan Standar UI A1–A8. Jika `08-DESIGN.md` berubah, lint design tokens menurut `07-RULES.md`.
 
@@ -59,7 +64,7 @@ Tabel konseptual: `sources`, `nodes`, `edges`, `signals`, `jev_runs`, `plans`, `
 | Sinyal ekspansi (Should) | Jev `noul` "pelanggan menyebut butuh tambahan outlet/user/fitur?" | p≥0,85 tulis sebagai sinyal peluang, terpisah dari skor risiko | Sampel berlabel; tidak masuk skor prioritas |
 | Identitas ambigu | Jev `noul` pasangan entitas + hard identifiers | p≥0,95 dan tanpa konflik ID: merge; 0,60–0,95 review; lainnya pisah | Hard negatives, precision auto-merge |
 | Router pertanyaan (tanya graph) | Jev `noul` paralel: `{"question": ...}` × satu pertanyaan per intent di katalog (±10: faktor risiko akun X, akun terdampak bug Y, champion pindah, janji fitur belum ditepati, tiket terbuka, renewal terdekat, preseden diskon/eskalasi, mismatch dashboard, interaksi terakhir, akun pemakai fitur Z) | Ambil p tertinggi; p≥0,70 dan selisih ≥0,15 dari urutan kedua → jalankan query SQL template; entitas (C01, BUG-412, FEAT-07, nama akun) diambil kode lewat pencocokan ID/nama; selain itu abstain dan tampilkan intent yang didukung | 30 pertanyaan parafrase berlabel intent; laporkan akurasi routing dan rasio abstain |
-| Penjelasan/save plan | Template deterministik dari faktor terkuat + preseden `decision_log` (ADR-0005) | Kode mengisi angka dan sitasi; manusia approve | Setiap kalimat jawaban punya sitasi node |
+| Penjelasan/save plan | Template deterministik dari faktor terkuat + preseden `decision_log` (ADR stack) | Kode mengisi angka dan sitasi; manusia approve | Setiap kalimat jawaban punya sitasi node |
 
 Ikuti pola API dan respons di `JEV-KIT.md`, rubrik di `JEV-LENS.md`. Semua provider dipanggil server-side; kunci dari environment. Retry terbatas hanya 429/5xx, bukan 401/403. Catat model string persis, versi rubrik/prompt, input hash, token, latensi, error, dan biaya dengan rate aktual. Confidence Jev adalah output primitif, bukan probabilitas churn dan belum tentu terkalibrasi pada domain ini. Eval primitif minimal 20–50 contoh berlabel per pertanyaan kecil; laporkan ukuran sampel serta kesalahan, tanpa klaim akurasi sebelum run.
 
@@ -69,29 +74,20 @@ Benchmark retrieval, bila dibuat, memakai pertanyaan/korpus/answerer/judge dan b
 
 Kode menyaring dulu: hanya interaksi eksternal dan tiket berteks yang belum punya hard link yang dikirim. Batas atas ≈ (350 interaksi + 640 tiket) × 2–3 pertanyaan per dokumen, di-batch per id seperti `JEV-KIT.md` §2. Hasil di-cache per hash input, jadi ingest ulang tanpa perubahan = 0 panggilan. Per pertanyaan live: ±10 panggilan router paralel, sisanya SQL.
 
-## 4c. Backend (ADR-0001, ADR-0005)
+## 4c. Backend (ADR-0001, ADR stack, ADR-0005, ADR-0006)
 
-Tidak ada server terpisah: backend adalah server Next.js yang sama (monolit), cukup untuk satu VPS dan 40 akun.
+Rencana monolith Next.js di versi lama bagian ini **digantikan ADR-0006**. Backend sekarang service Node.js terpisah di `backend/` (`node:http`, satu dependency `postgres`). Sumber kebenaran: `11-BACKEND-PLAN.md` (rencana), `12-BACKEND-TASKS.md` (task dan bukti), `13-BACKEND-CONTRACT.md` (DTO dan boundary), `backend/README.md`, `backend/DEPLOY.md`.
 
-| Bagian | Pilihan | Alasan |
-|---|---|---|
-| Read publik | Route Handlers `app/api/*` (GET) + rate limit in-memory per IP | Satu instance VPS; batasnya ditandai `ponytail:` di kode, ganti ke tabel/Redis bila multi-instance |
-| Write (login, approve, reject, feedback, reply) | Server Actions dengan `requireSession()` | Form native, tanpa API client tambahan |
-| Ingest | Skrip CLI `node scripts/ingest.ts --dir ../dataset_kasirnusa` (Node 22.18+ menjalankan TS langsung) | 226.300 baris usage tidak cocok lewat upload HTTP, dan dataset tidak boleh dikirim ke server publik. Tabel mentah diisi dengan `COPY` postgres.js |
-| Migrasi | `db/migrations/NNN_nama.sql` + `node scripts/migrate.ts` (tabel `schema_migrations`) | Tanpa dependency migrasi |
-| Akses DB | `src/server/db.ts` mengekspor satu instance `postgres(DATABASE_URL)` | Hanya diimpor dari kode server |
-| Jev | `src/server/jev.ts`: `fetch` ke `https://api.typesafe.ai/v1/systemone`, timeout, retry 429/5xx maksimal 2×, tanpa retry 401/403, log ke `jev_runs`, cache per hash input | Pola `JEV-KIT.md` §1 |
-| Scoring | `src/server/scoring.ts`: fungsi murni baris faktor → skor 0–100 + level + flag, dengan `FORMULA_VERSION` | Bisa di-test Vitest tanpa DB |
-| Graph query | `src/server/graph.ts`: jalur bukti dengan CTE rekursif di `edges`, kedalaman maksimum 4 | Mengembalikan node/edge/source untuk UI dan sitasi |
-| Intent | `src/server/intents.ts`: katalog intent → pertanyaan Jev + query SQL template + kalimat template | Satu tempat untuk menambah pertanyaan yang didukung |
-| Auth | `src/server/auth.ts`: bandingkan `DEMO_PASSWORD` secara timing-safe; cookie HTTP-only `SameSite=Lax` berisi `exp` + HMAC-SHA256 (`SESSION_SECRET`, Web Crypto) | Tanpa dependency |
-| Deploy | `output: "standalone"`, Dockerfile multi-stage, `docker-compose.yml` dengan `web` + `postgres:16` (volume), migrasi saat start | ADR-0005; deploy butuh izin |
+| Bagian | Kondisi di repo |
+|---|---|
+| API HTTP | `backend/src/server.js`: `/api/health/live`, `/api/health/ready`, `/api/auth/{login,logout,session}`, `/api/accounts`, `/api/accounts/:id`, `/api/graph/answer`, `/api/plans`, `/api/decisions`, `/api/feedback`, `/api/signals/review` |
+| Database | Migrasi SQL di `backend/db/migrations/`, role migrator dan runtime terpisah; Decision append-only (UPDATE/DELETE dicabut untuk runtime) |
+| Ingest, graph, skor | CLI operator: `scripts/ingest.js` (`--dry-run`/`--publish`), `compile-graph.js`, `enrich-signals.js` (Jev, butuh izin biaya), `persist-score.js`; tidak ada upload HTTP publik |
+| Frontend | Masih membaca `ingest/scores_40_v1.json` dan menyimpan keputusan di memori; login frontend hanya penanda `sessionStorage`. Integrasi HTTP ke backend adalah task berikutnya |
 
-**Struktur folder** (di `frontend/`; nama dipertahankan agar riwayat Git tidak pecah): `src/app` (UI + route), `src/server/{db,jev,auth,scoring,graph,intents}.ts`, `db/migrations/*.sql`, `scripts/{migrate,ingest}.ts`.
+**Status verifikasi (9 Okt):** unit test backend ada, tetapi backend **belum pernah dijalankan dengan PostgreSQL**; readiness tetap 503 sampai migrasi dan ingest/publish berhasil (`backend/DEPLOY.md`). Belum ada deploy VPS.
 
-**Tabel inti:** `sources(id, file, sha256, rows, ingested_at)`; `nodes(id, type, key, props jsonb, valid_from, valid_to, source_id)`; `edges(id, type, src, dst, props jsonb, valid_from, valid_to, derived bool, confidence, source_id)`; `usage_daily` (salinan kolom `product_usage_daily`, agregasi lewat SQL, bukan node per baris); `signals(id, node_id, rubric_version, model, p, outcome, quote, span)`; `jev_runs(id, input_hash, model, latency_ms, tokens, cost, error, created_at)`; `account_factors(account_id, snapshot, formula_version, factor, value, status, evidence jsonb)`; `plans`; `decisions(..., idempotency_key unique)` append-only; `feedback`, `feedback_replies`.
-
-**Prasyarat lokal:** Node ≥22.18, pnpm, PostgreSQL 16 (Docker Desktop atau instalasi native). Per 9 Okt, Docker belum terpasang di laptop dewaaa.
+**Prasyarat lokal:** Node ≥22.18, pnpm (corepack), PostgreSQL 16 (Docker Desktop atau instalasi native), dan `dataset_kasirnusa/` di root repo. Per 9 Okt, Docker dan dataset belum ada di laptop dewaaa.
 
 ## 5. Hak akses, approval, dan feedback
 
@@ -108,4 +104,4 @@ QA kasus wajib dari `09-BUILD-PLAN-KASIRNUSA.md` §6: C03 dan C05 terkait BUG-41
 
 ## 7. Keputusan tertunda
 
-Hosting, identitas, library DB, migrasi, dan LLM sudah diputuskan di ADR-0005 dan §4c. Tertunda: batas biaya Jev aktual; ambang level/aturan data kosong; jenis deliverable 9 Okt 22.00 dan deadline submit resmi; apakah feedback dari pengguna aplikasi atau pelanggan akhir. Jangan mengubah ADR Accepted diam-diam; perubahan pilihan penyimpanan perlu ADR baru.
+Hosting, identitas, library DB, migrasi, dan LLM sudah diputuskan di ADR stack (`adr/0003-stack-hosting-auth-llm.md`) dan §4c. Tertunda: batas biaya Jev aktual; ambang level/aturan data kosong; jenis deliverable 9 Okt 22.00 dan deadline submit resmi; apakah feedback dari pengguna aplikasi atau pelanggan akhir. Jangan mengubah ADR Accepted diam-diam; perubahan pilihan penyimpanan perlu ADR baru.

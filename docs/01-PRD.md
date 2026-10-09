@@ -26,7 +26,7 @@ Feedback dua arah mencatat penulis, waktu, akun/rencana terkait, isi, status, da
 - Kode menggabungkan **parameter risiko** menjadi skor prioritas 0–100 yang deterministik dan berversi. UI mengutamakan faktor dan level Rendah/Sedang/Tinggi/Kritis; jika angka ditampilkan, labelnya *skor prioritas*. Ini bukan probabilitas churn.
 - Bobot percobaan pertama: pemakaian 30%, gangguan layanan 25%, relasi champion 20%, janji dan engagement 15%, pembayaran 10%. Uji C01–C06 dan seluruh 40 pelanggan; periksa bukti, cakupan, kasus offline, serta perubahan peringkat saat bobot digeser. Ambang level dan aturan data kosong menunggu profiling. Data hilang bukan nol; penurunan transaksi akibat gagal sinkron tidak dihitung dua kali.
 - Renewal, NPS, dan nilai kontrak adalah konteks urutan tindakan. Jika nilai tertimbang ditampilkan: `nilai_tahunan × skor_prioritas / 100`, berlabel *nilai tertimbang untuk prioritas*, bukan kerugian yang diprediksi.
-- Tanpa LLM generatif di MVP (ADR-0005). Pertanyaan bebas dipetakan ke katalog intent oleh Jev (`noul` per intent; kode memilih yang tertinggi di atas ambang), lalu dijawab template dari hasil query SQL graph dengan sitasi node. Draf save plan disusun template dari faktor terkuat dan preseden. Jika intent atau bukti tidak cukup, jawaban abstain dan menyebut pertanyaan yang didukung. Promo/profit/referral hanya dibahas dengan data biaya, margin, outcome, atau relasi yang mendukung; jika tidak ada, nyatakan asumsi tanpa klaim hasil.
+- Tanpa LLM generatif di MVP (ADR stack (`adr/0003-stack-hosting-auth-llm.md`)). Pertanyaan bebas dipetakan ke katalog intent oleh Jev (`noul` per intent; kode memilih yang tertinggi di atas ambang), lalu dijawab template dari hasil query SQL graph dengan sitasi node. Draf save plan disusun template dari faktor terkuat dan preseden. Jika intent atau bukti tidak cukup, jawaban abstain dan menyebut pertanyaan yang didukung. Promo/profit/referral hanya dibahas dengan data biaya, margin, outcome, atau relasi yang mendukung; jika tidak ada, nyatakan asumsi tanpa klaim hasil.
 
 ## 4. Fitur MVP
 
@@ -74,7 +74,7 @@ Demo membuktikan kompilasi graph, jalur bukti, jawaban pertanyaan baru, scoring 
 - Apakah target 9 Okt 22.00 adalah checkpoint, batas fitur utama, atau submit pertama? Apa deadline submit resmi?
 - Apakah "user" pemberi pendapat berarti CSM/pengguna aplikasi atau pelanggan akhir yang membutuhkan akun sendiri?
 - Setelah uji 40 akun, bobot, ambang level, dan aturan data kosong mana yang disetujui tim?
-- Hosting, identitas, library PostgreSQL, dan LLM diputuskan di ADR-0005 (VPS Docker, akun demo, postgres.js, tanpa LLM dulu). Batas biaya Jev aktual belum diketahui.
+- Hosting, identitas, library PostgreSQL, dan LLM diputuskan di ADR stack (`adr/0003-stack-hosting-auth-llm.md`) (VPS Docker, akun demo, postgres.js, tanpa LLM dulu). Batas biaya Jev aktual belum diketahui.
 
 ## 10. Startup Canvas (Mode Update 9 Okt, menunggu ACC)
 
@@ -131,4 +131,4 @@ Demo membuktikan kompilasi graph, jalur bukti, jawaban pertanyaan baru, scoring 
 |---|---|
 | 9 Okt 2026 | Menyelaraskan PRD ke KasirNusa, parameter risiko, bobot uji, feedback dua arah, dan target 22.00; menggantikan draf SalesTranscriptQA sebagai demo utama |
 | 9 Okt 2026 | ACC QA (joko): status disahkan; catatan cakupan MVP F5/autentikasi dan urutan prioritas F1–F4 ditambahkan |
-| 9 Okt 2026 | Mode Update (project-setup-01): nama Tessera; tanpa LLM (ADR-0005) dengan router intent Jev; momen wow C05; §10 Startup Canvas, bisnis, hipotesis, pertanyaan juri. Menunggu ACC ulang. |
+| 9 Okt 2026 | Mode Update (project-setup-01): nama Tessera; tanpa LLM (ADR stack (`adr/0003-stack-hosting-auth-llm.md`)) dengan router intent Jev; momen wow C05; §10 Startup Canvas, bisnis, hipotesis, pertanyaan juri. Menunggu ACC ulang. |

@@ -11,5 +11,6 @@ Nomor 0003 dipakai dua dokumen historis berbeda. Referensi wajib memakai **nama 
 | [0004-minimal-backend-tooling-and-access](0004-minimal-backend-tooling-and-access.md) | Proposed | Alternatif tooling lama; `pg`/Zod/managed auth/LLM bukan pilihan build aktif |
 | [0005-backend-workspace](0005-backend-workspace.md) | Accepted | Source backend terpisah di root `backend/`; frontend tidak diubah pada task backend |
 | [0006-standalone-backend-service](0006-standalone-backend-service.md) | Accepted | Node `node:http` service di `backend/`; menggantikan lokasi monolith tanpa mengganti keputusan PostgreSQL/Jev/no-LLM |
+| [0007-text-classifier-jev-first](0007-text-classifier-jev-first.md) | Accepted | Klasifikasi teks memakai Jev lewat adapter backend; `ingest/groq_classify.py` bukan pipeline aktif sampai ada ADR baru |
 
 ADR-0005/0006 mengikuti arahan user untuk memisahkan backend tanpa mengubah frontend. ADR-0006 supersedes hanya keputusan lokasi monolith; PostgreSQL, postgres.js, Jev, dan tanpa LLM dari stack ADR tetap berlaku. Backend mengikuti [13-BACKEND-CONTRACT](../13-BACKEND-CONTRACT.md), [11-BACKEND-PLAN](../11-BACKEND-PLAN.md), dan task pemilik.

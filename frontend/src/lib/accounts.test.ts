@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { accounts, filterAccounts, formatMoney, leadSignal, signalFactor, sortAccounts, strongestFactor } from "./accounts";
+import { accounts, daysToRenewal, filterAccounts, formatMoney, globalRank, leadSignal, signalFactor, sortAccounts, strongestFactor } from "./accounts";
 
 describe("KasirNusa accounts from scoring_v1", () => {
   it("loads all 40 customers with mapped levels", () => {
@@ -16,9 +16,15 @@ describe("KasirNusa accounts from scoring_v1", () => {
     expect(filterAccounts(accounts, "BUG-412", "All").map(account => account.id).sort()).toEqual(["C03", "C05"]);
   });
 
-  it("pins focus accounts C01–C06 above the rest whatever the sort", () => {
-    const ids = sortAccounts(accounts, "renewal").map(account => account.id);
-    expect(ids.slice(0, 6).sort()).toEqual(["C01", "C02", "C03", "C04", "C05", "C06"]);
+  it("sorts purely by the chosen key; focus is a separate flag, not a pin", () => {
+    const scores = sortAccounts(accounts, "risk").map(account => account.priorityScore);
+    expect(scores).toEqual([...scores].sort((a, b) => b - a));
+    expect(accounts.filter(account => account.focus).map(account => account.id).sort()).toEqual(["C01", "C02", "C03", "C04", "C05", "C06"]);
+  });
+
+  it("ranks all 40 accounts globally by priority score", () => {
+    expect(globalRank.get("C01")).toBe(1);
+    expect(globalRank.size).toBe(40);
   });
 
   it("picks the factor with the largest weighted contribution", () => {
@@ -38,6 +44,12 @@ describe("KasirNusa accounts from scoring_v1", () => {
   it("leads C01 with the champion signal, its strongest factor", () => {
     const c01 = accounts.find(account => account.id === "C01");
     expect(c01 && leadSignal(c01)).toMatch(/Champion/);
+  });
+
+  it("counts renewal days from the snapshot; C04 is the nearest renewal", () => {
+    const nearest = [...accounts].sort((a, b) => daysToRenewal(a) - daysToRenewal(b))[0];
+    expect(nearest.id).toBe("C04");
+    expect(daysToRenewal(nearest)).toBe(35);
   });
 
   it("formats money in standard and compact form", () => {
