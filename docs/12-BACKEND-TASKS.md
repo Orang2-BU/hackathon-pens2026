@@ -82,7 +82,7 @@ BE-03 dapat dimulai setelah DTO BE-01 disepakati. Query BE-10 dibangun dengan fi
 
 ### BE-10 — Read API, katalog intent, graph answer dan sitasi
 
-- **Trace:** T4; TASK-010. **Prerequisite:** BE-05/08/09; BE-06 untuk live router. **Status:** In Progress (query boundary/catalog implemented; live Jev routing and PostgreSQL repository blocked).
+- **Trace:** T4; TASK-010. **Prerequisite:** BE-05/08/09; BE-06 untuk live router. **Status:** In Progress; PostgreSQL account/evidence read repository and explicit DTO projection are implemented, while live Jev routing, intent-specific graph answers, and database verification remain blocked.
 - **Output:** read boundaries 11 §8, sepuluh intent, `EvidencePackage`/template answer/abstain; query application Decision.
 - **Kerja:** ID/nama resolver (ambiguous → clarification), batch noul router p≥0,70/gap≥0,15, parameter-bound SQL, depth/result/time limits; timestamps/sources/derived labels, redaksi public fields.
 - **Lulus:** ≥30 held-out parafrase routing dilaporkan; pertanyaan baru tidak memakai field `account.answer`; unsupported/insufficient evidence abstain; recommendation lintas ≥3 kelompok sumber bila bukti cukup; quote/currency/period cocok. Bad entity/input/SQL-like strings aman. Committed Decision dibaca, rolled-back tidak.
@@ -293,3 +293,9 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - `backend/src/signal-review.js` hanya mengizinkan kandidat berstatus `review` untuk diterima (`active`) atau ditolak (`discarded`), dalam satu transaksi; keputusan review tidak mengubah audit row sebelumnya.
 - `GET /api/signals/review` dan `POST /api/signals/:id/review` dibatasi sesi admin + Origin check, dengan aktor dari sesi, validasi request, dan rate limit write.
 - Backend unit 46/46 serta `check` dan syntax checks pass. PostgreSQL integration tidak berjalan karena `TEST_DATABASE_URL` tidak tersedia. Jev-run/signal candidate creation belum terintegrasi dan tidak diklaim selesai.
+
+## 12. Eksekusi BE-10 (parsial)
+
+- `backend/src/read-repository.js` menyediakan parameter-bound account list/detail, risk-factor dan evidence/citation projection dari PostgreSQL. Account tanpa persisted score ditampilkan `unscored`, bukan diberi skor sintetis. Detail menyertakan graph revision deterministik dan hanya field yang diizinkan.
+- Unknown account menghasilkan `null` (HTTP 404); pertanyaan graph abstain eksplisit saat live Jev router belum dikonfigurasi. Boundary HTTP yang sudah ada tetap membatasi ukuran/rate pertanyaan.
+- Backend unit 48/48, static check dan syntax checks lulus. PostgreSQL repository query tidak teruji karena `TEST_DATABASE_URL` belum tersedia. Query intent, Jev routing, held-out parafrase dan committed-vs-rolled-back Decision belum diverifikasi.

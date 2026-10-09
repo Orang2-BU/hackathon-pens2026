@@ -6,6 +6,7 @@ import { getReadiness } from './health.js';
 import { cookieValue, createRateLimiter } from './auth.js';
 import { createFeedbackService } from './feedback.js';
 import { createSignalReviewService } from './signal-review.js';
+import { createPostgresReadService } from './read-repository.js';
 
 function sendJson(response, status, body) {
   response.writeHead(status, {
@@ -235,7 +236,8 @@ if (import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   }
   const feedbackService = createFeedbackService(database);
   const signalReviewService = createSignalReviewService(database);
-  const readService = Object.freeze({ ...feedbackService, ...signalReviewService });
+  const postgresReadService = createPostgresReadService(database);
+  const readService = Object.freeze({ ...postgresReadService, ...feedbackService, ...signalReviewService });
   const writeService = Object.freeze({ ...feedbackService, ...signalReviewService });
   const server = createHttpServer({ database, auth, readService, writeService });
 
