@@ -1,22 +1,22 @@
 # 04 — TODO: Progres Build KasirNusa
 
-> Perbarui saat status berubah. ID mengikuti `03-ARCHITECTURE.md`. Semua task aplikasi belum dimulai; dokumen dan dataset lokal sudah disiapkan.
+> Kanban adalah sumber status tiket; dokumen ini hanya memetakan milestone T1–T7 ke tiket, bukan sistem status kedua. ID milestone mengikuti `03-ARCHITECTURE.md`. Status berikut adalah snapshot kanban 9 Okt 2026 setelah dispatch.
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, profil dataset dan parameter terukur ditambahkan
+**Target kerja pertama:** 9 Okt 2026, 22.00 [dari user; bukan deadline resmi dan jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, pemetaan T1–T7 ke tiket setelah dispatch
 
 ## Task
 
-| ID | Task | Pemilik | Status | Bukti / kriteria selesai |
-|---|---|---|---|---|
-| T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | ⬜ | Dev/test/build/typecheck/lint/knip tersedia; pilih library/hosting/identitas sebelum dependency berbayar/baru |
-| T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | ⬜ | Statistik baris/node/edge, source/hash, kutipan valid, idempotensi, eval primitif berlabel |
-| T3 | Parameter dan skor prioritas deterministik | — | ⬜ | Bobot 30/25/20/15/10 diuji pada C01–C06 dan 40 pelanggan; data kosong/offline jelas; sensitivitas bobot; QA §6 dokumen 09 |
-| T4 | Peringkat, detail, tanya graph dengan sitasi | — | ⬜ | Pertanyaan baru dijawab dari graph; jalur bukti ≥3 sumber bila rekomendasi; abstain bila tidak cukup |
-| T5 | Save plan, Decision append-only, feedback dua arah | — | ⬜ | Preseden dikutip; approval atomik/idempotent; reply feedback tercatat; tidak ada outreach |
-| T6 | Demo publik dan verifikasi UI/golden path | — | ⬜ | Read sesuai izin, write terautentikasi, rate limit, browser 375/768/1440, golden path §5 PRD |
-| T7 | Pitch, demo assets, benchmark bila dijalankan | — | ⬜ | Angka aktual dan klaim bersumber; PPT/GitHub/video sesuai jadwal resmi; SalesTranscriptQA hanya benchmark terpisah bila dipakai |
+| ID | Milestone | Tiket Kanban (owner; status saat snapshot) | Batas scope / kriteria selesai |
+|---|---|---|---|
+| T1 | Fondasi, kontrak data, scaffold minimal | TASK-001 Gatot (In Progress); TASK-002 Rini (In Progress); TASK-004 Sugeng (Backlog) | Perintah dev/test/build/typecheck/lint/knip tersedia setelah scaffold. Dependency baru, hosting, dan identitas menunggu keputusan/izin. Desain/UI tidak termasuk backlog non-frontend ini. |
+| T2 | Skema/persistensi, ingest graph temporal, Jev | TASK-005 Bejo (Backlog); TASK-006 Sugeng (Backlog); TASK-007 Tejo (Backlog); QA fixture TASK-003 Jessica (In Progress) | Statistik ingest, provenance/hash, kutipan valid, idempotensi, output Jev bertipe dan evaluasi berlabel. TASK-001/003 yang berjalan adalah kontrak/fixture, bukan implementasi fitur selesai. Sesuai dependensi kanban, setelah prasyarat TASK-005 dan fixture TASK-003 landed, TASK-006 dan TASK-007 dapat dikerjakan paralel. |
+| T3 | Parameter dan skor prioritas deterministik | TASK-008 Sugeng (Backlog); QA fixture TASK-003 Jessica (In Progress) | TASK-008 menunggu TASK-006 dan TASK-007; setelah prasyarat masing-masing landed, TASK-008 dan TASK-009 dapat dikerjakan paralel. Uji bobot percobaan 30/25/20/15/10 pada C01–C06 dan 40 pelanggan; jelaskan data kosong/offline, sensitivitas, dan kasus QA §6 dokumen 09. Skor bukan probabilitas churn. |
+| T4 | Peringkat, detail, dan tanya graph bersitasi | TASK-010 Sugeng (Backlog); QA fixture TASK-003 Jessica (In Progress) | Pertanyaan baru dijawab dari graph; jalur bukti minimal tiga sumber bila ada rekomendasi; abstain bila bukti tidak cukup. |
+| T5 | Save plan, Decision append-only, dan feedback | TASK-011 Tejo (Backlog); TASK-012 Tejo (Backlog); autentikasi prasyarat TASK-009 Tejo (Backlog) | Preseden dikutip; approval atomik/idempotent menjadi Decision baru tanpa outreach; balasan feedback tercatat terpisah dan tidak mengubah skor/Decision otomatis. |
+| T6 | Demo publik dan verifikasi alur terintegrasi | TASK-009 Tejo (Backlog); TASK-013 Adit (Backlog); TASK-014 Bimo (Backlog); TASK-015 Jono (Backlog) | Read sesuai izin, write terautentikasi/terotorisasi, rate limit, golden path §5 PRD, lalu review berurutan sesuai gate. **Pekerjaan frontend belum ditugaskan;** tidak ada tiket implementasi UI pada peta non-frontend ini. Uji browser menunggu frontend tersedia. |
+| T7 | Paket rilis, pitch, dan benchmark bila dijalankan | TASK-016 Agus (Backlog) | Rencana deliverable mencakup PPT, GitHub, aplikasi demo berjalan/terakses, dan video; jadwal resmi belum dikonfirmasi. Hanya klaim/angka dari run aktual. SalesTranscriptQA tetap benchmark retrieval terpisah bila dipakai. |
 
 ## Golden Demo Path Check
 
@@ -41,6 +41,7 @@
 |---|---|
 | 9 Okt 2026 | ZIP KasirNusa ditemukan (15 file data + README), diekstrak ke `dataset_kasirnusa/`; ZIP dan ekstrak diabaikan Git, ZIP lama dilepas dari indeks tanpa menghapus file lokal. |
 | 9 Okt 2026 | Bobot 30/25/20/15/10 dicatat sebagai percobaan; parameter risiko dan prioritas dipisahkan dari probabilitas churn; feedback dua arah dipisahkan dari Decision. |
-| 9 Okt 2026 | Dokumen utama diperbarui ke KasirNusa. Belum ada scaffold atau pemeriksaan build; task T1–T7 belum dikerjakan. |
-| 9 Okt 2026 | `git diff --check` lulus. Lint `08-DESIGN.md` belum tersedia: `npx --no-install` melaporkan `@google/design.md` tidak terpasang; belum memasang dependency tanpa izin. |
+| 9 Okt 2026 | Kanban setelah dispatch: TASK-001/002/003 In Progress; TASK-004–016 Backlog. Implementasi aplikasi belum dibuktikan selesai. Belum ada scaffold/package manifest/test runner di worktree; perintah build belum tersedia. Pekerjaan frontend belum ditugaskan. |
+| 9 Okt 2026 | Peta owner mengikuti board: TASK-004/006/008/010 Sugeng; TASK-007/009/011/012 Tejo; TASK-005 Bejo. Seluruh tiket implementasi tersebut masih Backlog. TASK-006/007 paralel setelah prasyarat, lalu TASK-008/009 paralel setelah dependensi masing-masing. |
+| 9 Okt 2026 | `git diff --check` lulus pada perubahan dokumentasi sebelumnya. Design lint dan perintah scaffold belum tersedia; package manifest/dependency belum ada. Jangan perlakukan pemeriksaan lama sebagai hasil untuk perubahan kode. |
 | 9 Okt 2026 | Profil read-only seluruh 15 file data selesai; peta kolom→parameter, periode 90 hari, batasan NPS/invoice/bug/promo/referral, dan SHA-256 arsip dicatat di `10-DATA-PROFILE-KASIRNUSA.md`. Skor dan benchmark belum dijalankan. |

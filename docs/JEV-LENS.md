@@ -2,7 +2,7 @@
 
 Sumber: Latent Space, "Why I couldn't build Jev at OpenAI — Diogo Almeida, TypeSafe Co-founder & CEO" (youtu.be/cFx9Z3ZXca0, 2:22). Panitia Track 3 meminta peserta menyimak video ini, jadi juri kemungkinan menilai apakah tim memahami cara berpikirnya. File ini berisi pemahaman dengan kata-kata sendiri, bukan transkrip.
 
-> Penerapan aktif Relasi memakai dataset sintetis KasirNusa dalam `dataset_kasirnusa/`. Rujukan SalesTranscriptQA di bawah adalah catatan riset/opsi benchmark retrieval terpisah, bukan demo utama atau validasi probabilitas churn. Kontrak implementasi terkini ada di `03-ARCHITECTURE.md` §4b.
+> Penerapan aktif Tessera (nama kerja sebelumnya: Relasi) memakai dataset sintetis KasirNusa dalam `dataset_kasirnusa/`. Rujukan SalesTranscriptQA di bawah adalah catatan riset/opsi benchmark retrieval terpisah, bukan demo utama atau validasi probabilitas churn. Kontrak implementasi terkini ada di `03-ARCHITECTURE.md` §4b dan kontrak respons di `JEV-KIT.md`.
 
 ## 0. Arahan mentor di Technical Meeting (9 Okt 2026) — prioritas tertinggi
 
@@ -16,7 +16,7 @@ Mentor Track 3: **Kyle Wild** (CTO Endgame Labs, GitHub `dorkitude`). Bila berte
 
 ### Jev API
 - Request: `state` JSON kecil + `questions`.
-- `noul`: ya/tidak → P(ya).
+- `noul`: ya/tidak → probabilitas jawaban ya; respons ini tidak memiliki field confidence terpisah.
 - `score`: rubrik level berurutan → skor, confidence, probabilitas per level.
 - Hasil tervalidasi tipe. Latensi target <100 ms; murah untuk klasifikasi massal.
 - Jangan suruh Jev mengambil keputusan bisnis langsung. Beri rubrik, lalu kode memakai ambang dan `if`/sort.
@@ -38,7 +38,7 @@ AI paling banyak dipanggil oleh kode. Jev adalah "System One model": cepat, mura
 
 ## 2. Primitif AI sebagai kontrol alur
 
-| Primitif | Kode | Contoh Relasi |
+| Primitif | Kode | Contoh Tessera |
 |---|---|---|
 | `choice` | `switch` | kategori yang saling eksklusif; sinyal independen KasirNusa memakai noul terpisah |
 | `noul` + probabilitas | `if p >= threshold` | kutipan mengandung sinyal churn? |
@@ -49,7 +49,7 @@ Aturan:
 - Banyak pertanyaan kecil jalan paralel.
 - Ambang tinggi ditulis ke graph; zona ragu masuk review; rendah dibuang.
 - Model besar hanya untuk teks bebas atau kasus ragu.
-- Versi model, rubrik, input, confidence, dan sumber dicatat sebagai provenance.
+- Versi model, rubrik, input, probabilitas `noul` atau confidence `score` (sesuai jenis primitif), dan sumber dicatat sebagai provenance.
 
 ## 3. Kualitas
 
@@ -58,19 +58,19 @@ Aturan:
 - Uji robustness: urutan field, sinonim, dan urutan pertanyaan berubah tanpa hasil material berubah.
 - Kunci versi model; jangan melatih data pelanggan tanpa izin.
 
-## 4. Penerapan untuk Relasi
+## 4. Penerapan untuk Tessera
 
 1. Pada write time, interaksi JSONL dan deskripsi tiket KasirNusa dipotong dengan offset sumber yang dapat diverifikasi.
 2. Jev menilai `is_champion_exit`, `mentions_competitor`, `negative_sentiment`, `is_urgent`, `is_expansion`, dan `entity_match`.
-3. Kode menulis `Signal` bila confidence memenuhi ambang; sisanya ke review.
+3. Untuk `noul`, kode menerapkan ambang pada probabilitas jawaban ya; untuk `score`, kode memakai skor dan confidence sesuai rubrik. Sisanya masuk review atau tidak ditulis menurut ambang yang ditetapkan.
 4. Normalisasi nama/domain memberi kandidat entity resolution; Jev `noul` mengonfirmasi pasangan ragu.
 5. Skor prioritas dihitung deterministik dari parameter numerik dan sinyal terverifikasi. Jev tidak memutuskan prioritas akhir; skor bukan probabilitas churn.
-6. Graph menyimpan kutipan, waktu, sumber, confidence, dan `Decision` approval CSM/admin; Feedback pengguna ditanggapi terpisah.
+6. Graph menyimpan kutipan, waktu, sumber, keluaran primitif yang sesuai (probabilitas `noul` atau skor/confidence `score`), dan `Decision` approval CSM/admin; Feedback pengguna ditanggapi terpisah.
 7. QA utama memakai pertanyaan baru pada graph KasirNusa dengan sitasi. SalesTranscriptQA bila dipakai hanya benchmark retrieval terpisah; ukur akurasi, token/biaya, dan latensi aktual.
 
 ## 5. Kalimat pitch
 
-- "Kami tidak meminta satu chatbot menebak semuanya. Kami memecah pekerjaan CSM menjadi keputusan kecil yang bisa diukur; setiap keputusan punya confidence dan bukti."
+- "Kami tidak meminta satu chatbot menebak semuanya. Kami memecah pekerjaan CSM menjadi keputusan kecil yang bisa diukur; setiap keputusan punya keluaran Jev yang sesuai primitif dan bukti."
 - "Yang yakin masuk graph, yang ragu ke manusia. Keputusan manusia ikut tersimpan sehingga sistem tahu kenapa tindakan sebelumnya diambil."
 - "RAG membayar mahal setiap pertanyaan. Kami mengompilasi context saat data masuk, lalu pertanyaan multi-call cukup menelusuri graph."
 - "Context graph adalah memori terstruktur untuk AI, bukan tumpukan teks."

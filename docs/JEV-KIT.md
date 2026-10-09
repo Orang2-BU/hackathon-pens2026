@@ -28,8 +28,8 @@ Content-Type: application/json
 - `state`: JSON bebas, kirim sekecil mungkin; batas sekitar 32k token.
 - `questions`: map nama pertanyaan. Batch banyak pertanyaan dalam satu request.
 - `score`: `criteria` berurutan dari nilai rendah ke tinggi.
-- `noul`: probabilitas jawaban ya.
-- `score` menghasilkan `score`, `confidence`, `probabilities`; `noul` menghasilkan probabilitas.
+- `noul`: probabilitas jawaban ya tanpa field confidence terpisah.
+- `score`: `score`, `confidence`, `probabilities`. Jangan mengasumsikan properti response lain selain kontrak yang terverifikasi.
 - Catat `usage.input_tokens` / `usage.output_tokens`; waktu request diukur aplikasi.
 - Retry 429, 5xx, dan jaringan maksimal 3 kali: 0,5 s, 1 s, 2 s. Timeout 60 s.
 
@@ -52,7 +52,7 @@ export async function jev(state: unknown, questions: unknown) {
 
 Health-check: `state: { text: "hello world" }` dan `noul: "Is the text a greeting?"`.
 
-## 2. Pola implementasi Relasi
+## 2. Pola implementasi Tessera
 
 ### Kompilasi write time
 
@@ -65,8 +65,7 @@ interaksi JSONL / deskripsi tiket KasirNusa
      - sentimen memburuk? (score)
      - urgensi? (score)
      - peluang expansion? (noul)
-  → kode menerapkan ambang
-  → Signal + kutipan + confidence + sumber ditulis ke graph
+  → kode menerapkan ambang pada keluaran sesuai primitif; Signal menyimpan keluaran Jev, kutipan, dan sumber
 ```
 
 ### Entity resolution dua tahap
@@ -89,6 +88,8 @@ pertanyaan CSM
 ```
 
 ## 3. SalesTranscriptQA
+
+Perintah di bawah adalah contoh dari catatan benchmark, bukan perintah yang sudah diverifikasi atau dijalankan di repository ini. Eksekusinya tetap opsional dan menunggu keputusan penggunaan dataset/lisensi yang sesuai.
 
 - 10.829 transkrip verbatim dan 2.962 QA direview.
 - B2B multi-call: 428 pertanyaan, masing-masing perlu dua call dalam satu opportunity.

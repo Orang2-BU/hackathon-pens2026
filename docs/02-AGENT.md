@@ -1,11 +1,11 @@
 # 02 — AGENT: Instruksi untuk AI
 
-> Konvensi minimum untuk developer dan AI pada Relasi.
+> Konvensi minimum untuk developer dan AI pada Tessera (nama kerja sebelumnya: Relasi).
 
 ## 1. Konteks
 
-- **Aplikasi:** Relasi — context graph untuk membantu CSM memprioritaskan risiko, memeriksa bukti, dan menyetujui save plan.
-- **Stack:** Next.js App Router dipilih; PostgreSQL untuk demo publik diterima pada ADR-0001. TypeScript strict, Jev, Tailwind v4, React Flow, library DB, dan hosting masih keputusan implementasi.
+- **Aplikasi:** Tessera — context graph untuk membantu CSM memprioritaskan akun, memeriksa bukti, dan menyetujui save plan.
+- **Stack:** Next.js App Router dipilih; PostgreSQL untuk demo publik diterima pada ADR-0001. TypeScript strict, Jev, Tailwind v4, React Flow, library DB, dan hosting masih usulan/keputusan terbuka sesuai `03-ARCHITECTURE.md` dan backlog.
 - **Sumber kebenaran:** `docs/07-RULES.md`, lalu instruksi user, `docs/00-BRIEF.md`, PRD dan arsitektur.
 
 ## 2. Struktur Folder
@@ -30,7 +30,7 @@ tests/                  # integration/golden-path tests
 data/                   # gitignored dataset/cache; fixtures kecil boleh dilacak
 ```
 
-Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori kosong.
+Path dan folder pada peta ini adalah target rencana, belum diverifikasi sebagai file yang ada karena scaffold aplikasi belum tersedia. Buat folder hanya ketika file pertama dibutuhkan. Jangan scaffold direktori kosong.
 
 ## 3. Gaya Koding
 

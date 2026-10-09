@@ -1,10 +1,10 @@
-# Relasi
+# Tessera
 
-> Dibuat oleh `project-setup-01` pada 9 Okt 2026. Ringkasan projek hackathon Track 3; status docs masih menunggu ACC.
+> Dibuat oleh `project-setup-01` pada 9 Okt 2026. Ringkasan projek hackathon Track 3; PRD ACC pada 9 Okt, sedangkan ADR-0002 masih Proposed dan keputusan teknis lain belum otomatis disetujui.
 
 ## Aplikasi
 
-Relasi mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; LLM menjelaskan serta menyusun draf. Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
+Tessera (nama kerja sebelumnya: Relasi) mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke context graph agar CSM memprioritaskan 40 pelanggan, memeriksa bukti lintas sumber, menjawab pertanyaan baru, lalu menyetujui save plan. Jev menilai sinyal teks saat ingest; kode menghitung parameter numerik, ambang, dan skor prioritas; LLM menjelaskan serta menyusun draf. Feedback pengguna dan tanggapan admin/CSM terpisah dari Decision. SalesTranscriptQA hanya opsi benchmark retrieval terpisah; hasil belum diukur.
 
 ## Stack & Verifikasi
 
@@ -24,11 +24,11 @@ Relasi mengompilasi 15 file data sintetis KasirNusa dari `dataset_kasirnusa/` ke
 - Baca `docs/00-BRIEF.md` untuk study case/aturan; `docs/01-PRD.md` untuk scope; `docs/03-ARCHITECTURE.md` untuk task/teknis.
 - UI wajib mengikuti `docs/08-DESIGN.md`, termasuk Standar UI anti tampilan AI: tanpa emoji, palet dari token, satu layar satu tugas, tanpa elemen tanpa fungsi.
 - Saat membuat panggilan AI (ekstraksi, klasifikasi, skor, agent), ikuti §4b `docs/03-ARCHITECTURE.md`, `docs/JEV-LENS.md`, dan klien/pola di `docs/JEV-KIT.md`.
-- Decision model memberi score/noul; kode yang memutuskan. Tidak menyebut indeks risk sebagai probabilitas churn.
+- Jev `noul` memberi probabilitas jawaban ya tanpa field confidence terpisah; `score` memberi skor, confidence, dan probabilitas per level. Kode yang memutuskan; skor prioritas bukan probabilitas churn.
 - Semua kutipan dan tindakan punya source/provenance; human approval wajib; aplikasi tidak mengirim outreach.
 - Beri label angka: `[study case]`, `[asumsi]`, `[riset: URL]`. Jangan membuat klaim benchmark sebelum ada run.
 - Dataset KasirNusa sintetis; ZIP dan ekstraknya diabaikan Git. Jika SalesTranscriptQA dipakai, ikuti CC BY-NC 4.0, atribusi, dan penggunaan hackathon/nonkomersial.
-- Status task berubah → update `docs/04-TODO.md` dengan bukti.
+- Kanban adalah sumber owner/status tiket; pemilik dokumentasi saja yang memperbarui `docs/04-TODO.md` sebagai peta milestone ke tiket.
 
 ## Baca Dokumen
 

@@ -1,8 +1,8 @@
-# Product
+# Tessera — Product
 
 ## Churn Early Warning Graph (KasirNusa)
 
-Dashboard Customer Success untuk PT KasirNusa Teknologi (SaaS POS B2B, fiktif):
+Dashboard Customer Success Tessera untuk PT KasirNusa Teknologi (SaaS POS B2B, fiktif):
 mengompilasi 6 sumber data yang tersebar (CRM, email/meeting, product usage, tiket support,
 kontrak & billing, log keputusan) menjadi context graph, agar Account Manager mendeteksi
 risiko churn lebih awal, melihat jalur bukti lintas sumber, lalu menyetujui tindakan retensi.
