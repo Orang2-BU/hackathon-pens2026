@@ -1,6 +1,6 @@
 # 01 — PRD: Tessera untuk KasirNusa
 
-> Status: ACC — QA joko, 9 Okt 2026. Catatan ACC: (1) istilah mengikuti ADR-0002 (parameter risiko & skor prioritas, bukan probabilitas churn); (2) F5/autentikasi cakupan minimal agar tidak memblokir F2–F4; (3) target 22.00 dan deadline resmi masih menunggu klarifikasi (lihat §8). Sumber data demo: `dataset_kasirnusa/` (15 file data sintetis dan README; ZIP serta ekstraknya diabaikan Git). Snapshot 1 Oktober 2026. Rincian graph dan contoh akun ada di `09-BUILD-PLAN-KASIRNUSA.md`; peta kolom, pengukuran, dan batasan aktual ada di `10-DATA-PROFILE-KASIRNUSA.md`.
+> Status: ACC — QA joko, 9 Okt 2026. Catatan ACC: (1) istilah parameter risiko dan skor prioritas mengikuti usulan ADR-0002, yang masih Proposed; (2) F5/autentikasi cakupan minimal agar tidak memblokir F2–F4; (3) target 22.00 dan deadline resmi masih menunggu klarifikasi (lihat §8). ADR-0001 menerima PostgreSQL untuk demo publik; library koneksi/migrasi, hosting, dan identitas belum dipilih. Sumber data demo: `dataset_kasirnusa/` (15 file data sintetis dan README; ZIP serta ekstraknya diabaikan Git). Snapshot 1 Oktober 2026. Rincian graph dan contoh akun ada di `09-BUILD-PLAN-KASIRNUSA.md`; peta kolom, pengukuran, dan batasan aktual ada di `10-DATA-PROFILE-KASIRNUSA.md`.
 
 ## 1. Masalah dan tujuan
 
@@ -22,7 +22,7 @@ Feedback dua arah mencatat penulis, waktu, akun/rencana terkait, isi, status, da
 
 - KasirNusa menyediakan 15 file data sintetis dari enam kelompok sumber: CRM, interaksi email/meeting, pemakaian produk, support, kontrak/billing, dan log keputusan. README menyebut histori operasional 1 Okt 2025–30 Sep 2026; log keputusan/deal lebih panjang. Verifikasi cakupan per akun saat ingest.
 - Kode menghitung angka numerik (transaksi per hari, umur tiket/janji, keterlambatan bayar, waktu menuju renewal) dan menyimpan periode, unit, sumber, serta cakupan.
-- Jev menilai teks ambigu dengan noul/score saat ingest. Kode memvalidasi output dan memakai ambang write/review/discard; confidence bukan kalibrasi churn.
+- Jev menilai teks ambigu dengan `noul`/`score` saat ingest. `noul` memberi probabilitas jawaban ya tanpa field confidence terpisah; `score` memberi skor, confidence, dan probabilitas per level. Kode memvalidasi output dan menerapkan ambang write/review/discard; confidence bukan kalibrasi churn.
 - Kode menggabungkan **parameter risiko** menjadi skor prioritas 0–100 yang deterministik dan berversi. UI mengutamakan faktor dan level Rendah/Sedang/Tinggi/Kritis; jika angka ditampilkan, labelnya *skor prioritas*. Ini bukan probabilitas churn.
 - Bobot percobaan pertama: pemakaian 30%, gangguan layanan 25%, relasi champion 20%, janji dan engagement 15%, pembayaran 10%. Uji C01–C06 dan seluruh 40 pelanggan; periksa bukti, cakupan, kasus offline, serta perubahan peringkat saat bobot digeser. Ambang level dan aturan data kosong menunggu profiling. Data hilang bukan nol; penurunan transaksi akibat gagal sinkron tidak dihitung dua kali.
 - Renewal, NPS, dan nilai kontrak adalah konteks urutan tindakan. Jika nilai tertimbang ditampilkan: `nilai_tahunan × skor_prioritas / 100`, berlabel *nilai tertimbang untuk prioritas*, bukan kerugian yang diprediksi.
