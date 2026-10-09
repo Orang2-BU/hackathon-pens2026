@@ -2,10 +2,14 @@
 
 import Form from "next/form";
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, useEffect, useRef } from "react";
-import { Database, LayoutDashboard, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
+import { Database, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
 import { usePendingPlans } from "@/components/demo-state";
+
+// Demo gate: public pages render bare; workspace routes ask for the demo password (see /login).
+export const AUTH_KEY = "tessera-demo-auth";
+const isPublicPath = (pathname: string) => pathname === "/" || pathname.startsWith("/login");
 
 const navigation = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -19,8 +23,15 @@ const railFade = "opacity-0 transition-opacity duration-200 group-hover/rail:opa
 
 function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?: boolean }) {
   const pathname = usePathname();
+  const router = useRouter();
   const pending = usePendingPlans().length;
   const fade = rail ? railFade : "";
+
+  const signOut = () => {
+    sessionStorage.removeItem(AUTH_KEY);
+    onNavigate?.();
+    router.push("/");
+  };
 
   return (
     <div className="glass edge-glow flex h-full flex-col gap-lg overflow-hidden whitespace-nowrap rounded-lg p-md">
@@ -70,14 +81,35 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
           <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic dataset · 1 Oct 2026</p>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={signOut}
+        title={rail ? "Sign out" : undefined}
+        className="flex min-h-11 items-center gap-sm rounded-md px-1.5 text-label-md text-on-surface-muted transition-colors hover:bg-surface-elevated hover:text-on-surface xl:min-h-10"
+      >
+        <span className="grid size-7 shrink-0 place-items-center rounded-sm">
+          <LogOut size={18} strokeWidth={1.75} aria-hidden />
+        </span>
+        <span className={fade}>Sign out</span>
+      </button>
     </div>
   );
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const query = useSearchParams().get("q") ?? "";
   const drawer = useRef<HTMLDialogElement>(null);
+  const isPublic = isPublicPath(pathname);
+
+  // Demo gate: workspace routes require the demo password (placeholder auth for judging, see /login).
+  useEffect(() => {
+    if (!isPublic && sessionStorage.getItem(AUTH_KEY) !== "1") {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    }
+  }, [isPublic, pathname, router]);
 
   // One delegated listener feeds the border glow on cards and the sidebar (globals.css).
   useEffect(() => {
@@ -109,6 +141,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const title = pathname.startsWith("/accounts/")
     ? "Account detail"
     : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Tessera";
+
+  if (isPublic) return <>{children}</>;
 
   return (
     <div className="min-h-dvh xl:grid xl:grid-cols-[auto_minmax(0,1fr)] xl:gap-md xl:p-md">
@@ -161,7 +195,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             />
           </Form>
         </header>
-        <main key={pathname} className="page-enter">{children}</main>
+        <main>{children}</main>
       </div>
     </div>
   );
