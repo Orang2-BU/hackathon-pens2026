@@ -62,10 +62,13 @@ test('dataset publish, graph compile, Jev signal persistence, and human review a
     const jevClient = { evaluate: async () => ({ runId: jevRunId, model, answers, usage: { input_tokens: 1, output_tokens: 1 }, metrics: { cached: false, latencyMs: 1, inputTokens: 1, outputTokens: 1 } }) };
     const enrichment = await enrichInteraction({ database: sql, jevClient, revisionId: first.revisionId, record: interaction });
     assert.equal(enrichment.signalCount, 1);
-    const [signal] = await sql`SELECT id, status, jev_run_id, quote, span_start, span_end FROM signals WHERE jev_run_id = ${jevRunId}`;
+    const [signal] = await sql`SELECT id, status, jev_run_id, quote, span_start, span_end, source_record_id, source_hash, source_field FROM signals WHERE jev_run_id = ${jevRunId}`;
     assert.equal(signal.status, 'review');
     assert.equal(signal.quote, interaction.payload.isi);
     assert.equal(interaction.payload.isi.slice(signal.span_start, signal.span_end), signal.quote);
+    assert.equal(signal.source_record_id, interaction.id);
+    assert.equal(signal.source_hash, interaction.record_hash);
+    assert.equal(signal.source_field, 'isi');
     const decision = await reviewSignal({ database: sql, signalId: signal.id, actorId: 'integration', idempotencyKey: `review-${randomUUID()}`, decision: 'accepted', reason: 'Integration fixture review' });
     assert.equal(decision.decision, 'accepted');
     const [approved] = await sql`SELECT status FROM signals WHERE id = ${signal.id}`;

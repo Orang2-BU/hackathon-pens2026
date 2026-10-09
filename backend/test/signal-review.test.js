@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { reviewSignal, SignalReviewError } from '../src/signal-review.js';
+import { createSignalReviewService, reviewSignal, SignalReviewError } from '../src/signal-review.js';
 
 function databaseWithReviewCandidate() {
   const state = { signal: { id: 'ab'.repeat(32), status: 'review' }, reviews: [] };
@@ -40,4 +40,15 @@ test('review validates decision, key, and reason before database access', async 
   await assert.rejects(reviewSignal({ ...base, decision: 'pending' }), /accepted or rejected/u);
   await assert.rejects(reviewSignal({ ...base, idempotencyKey: '' }), /idempotencyKey/u);
   await assert.rejects(reviewSignal({ ...base, reason: ' '.repeat(3) }), /Reason/u);
+});
+
+test('review queue projects source citation and original Jev output without exposing raw run state', async () => {
+  const database = async () => [{ id: 'signal-1', dataset_revision_id: 'revision:r1', node_id: 'node:r1:account:C01', jev_run_id: 'run-1',
+    label: 'mentions_competitor', score: null, confidence: null, probability: '0.91', quote: 'KompetitorX', span_start: 10, span_end: 21,
+    source_record_id: 'source:r1', source_hash: 'a'.repeat(64), source_field: 'isi', occurred_at: '2026-09-01', file_name: 'interactions.jsonl', synthetic: true,
+    model: 'jev-1', rubric_version: 'rubric-v1', provider_output: { type: 'noul', noul: 0.91 } }];
+  const result = await createSignalReviewService(database).listSignalReviews();
+  assert.deepEqual(result.items[0].source, { recordId: 'source:r1', recordHash: 'a'.repeat(64), field: 'isi', file: 'interactions.jsonl', occurredAt: '2026-09-01', synthetic: true });
+  assert.deepEqual(result.items[0].provider, { model: 'jev-1', rubricVersion: 'rubric-v1', output: { type: 'noul', noul: 0.91 } });
+  assert.equal(Object.hasOwn(result.items[0], 'response'), false);
 });

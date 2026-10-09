@@ -65,11 +65,11 @@ export async function enrichInteraction({ database, jevClient, revisionId, recor
         rows.push(...await tx`
           INSERT INTO signals (
             id, dataset_revision_id, node_id, jev_run_id, label, probability, score, confidence,
-            quote, span_start, span_end, status
+            quote, span_start, span_end, status, source_record_id, source_hash, source_field
           ) VALUES (
             ${candidate.id}, ${revisionId}, ${account.id}, ${candidate.jevRunId}, ${candidate.label},
             ${values.probability}, ${values.score}, ${values.confidence}, ${candidate.quote},
-            ${candidate.spanStart}, ${candidate.spanEnd}, 'review'
+            ${candidate.spanStart}, ${candidate.spanEnd}, 'review', ${candidate.sourceRecordId}, ${candidate.sourceHash}, 'isi'
           ) ON CONFLICT (id) DO NOTHING RETURNING id
         `);
       }

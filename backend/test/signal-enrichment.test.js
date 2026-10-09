@@ -12,7 +12,8 @@ function mockDatabase() {
       const id = values[0];
       if (state.signals.has(id)) return [];
       state.signals.set(id, { id, revisionId: values[1], nodeId: values[2], runId: values[3], label: values[4],
-        probability: values[5], quote: values[8], spanStart: values[9], spanEnd: values[10], status: 'review' });
+        probability: values[5], quote: values[8], spanStart: values[9], spanEnd: values[10], status: 'review',
+        sourceRecordId: values[11], sourceHash: values[12] });
       return [{ id }];
     };
     return callback(tx);
@@ -40,6 +41,8 @@ test('Jev signals retain exact source spans and remain review-only until human a
   assert.equal(signal.spanEnd, text.length);
   assert.equal(signal.nodeId, 'node:revision:r1:account:C01');
   assert.equal(signal.runId, 'run-1');
+  assert.equal(signal.sourceRecordId, record.id);
+  assert.equal(signal.sourceHash, record.record_hash);
 
   const repeated = await enrichInteraction({ database, jevClient, revisionId: 'revision:r1', record });
   assert.equal(repeated.signalCount, 0);

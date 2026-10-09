@@ -46,11 +46,24 @@ export function createSignalReviewService(database) {
   return Object.freeze({
     reviewSignal: (input) => reviewSignal({ database, ...input }),
     async listSignalReviews() {
-      const rows = await database`SELECT s.id, s.dataset_revision_id, s.node_id, s.jev_run_id, s.label, s.score, s.confidence, s.quote, s.span_start, s.span_end
-        FROM signals s WHERE s.status = 'review' ORDER BY s.id LIMIT 200`;
+      const rows = await database`
+        SELECT s.id, s.dataset_revision_id, s.node_id, s.jev_run_id, s.label, s.score, s.confidence,
+          s.probability, s.quote, s.span_start, s.span_end, s.source_record_id, s.source_hash, s.source_field,
+          sr.occurred_at, src.file_name, src.synthetic, jr.model, jr.rubric_version,
+          jr.response->'answers'->s.label AS provider_output
+        FROM signals s
+        JOIN jev_runs jr ON jr.id = s.jev_run_id
+        LEFT JOIN source_records sr ON sr.id = s.source_record_id
+        LEFT JOIN sources src ON src.id = sr.source_id
+        WHERE s.status = 'review'
+        ORDER BY s.id LIMIT 200
+      `;
       return { items: rows.map((row) => ({ id: row.id, datasetRevisionId: row.dataset_revision_id, nodeId: row.node_id,
         jevRunId: row.jev_run_id, label: row.label, score: row.score, confidence: row.confidence,
-        quote: row.quote, spanStart: row.span_start, spanEnd: row.span_end })) };
+        probability: row.probability, quote: row.quote, spanStart: row.span_start, spanEnd: row.span_end,
+        source: row.source_record_id ? { recordId: row.source_record_id, recordHash: row.source_hash,
+          field: row.source_field, file: row.file_name, occurredAt: row.occurred_at, synthetic: row.synthetic } : null,
+        provider: { model: row.model, rubricVersion: row.rubric_version, output: row.provider_output } })) };
     },
   });
 }

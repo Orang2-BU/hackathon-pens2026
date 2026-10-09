@@ -4,7 +4,7 @@
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-06 signal enrichment checks 53/53; Jev/DB live, deploy, dan organik masih blocked
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-07 provenance/review checks 54/54; Jev/DB live, deploy, dan organik masih blocked
 
 ## Task
 
@@ -76,3 +76,4 @@
 | 9 Okt 2026 | BE-15 checkpoint setelah BE-05/07/10: backend unit 48/48, `check`, syntax, dan migration discovery 001–004 lulus. Integration berhenti sebelum tes karena `TEST_DATABASE_URL` kosong. Docker serta DATABASE/Jev/deployment credentials tidak tersedia; BE-14 deploy dan BE-16 organik belum dapat dijalankan, bukan dinyatakan lulus. |
 | 9 Okt 2026 | BE-11 context/repository completion: plan service derive context/formula/evidence hash server-side; write routes wired; account detail reads plan revision + Decision history. Dataset node ID validation fixed. Backend unit 51/51 + static/syntax checks pass; PostgreSQL transactions still unverified. |
 | 9 Okt 2026 | BE-06 enrichment: Jev run IDs now survive cache hits; explicit bounded CLI writes provenance-backed signal candidates from interaction chunks, all gated in review until approval. Added integration coverage for DB persistence/review and isolated Compose enrichment profile. Backend 53/53 + static/syntax/scope checks pass; no Jev key or DB URL, so provider/DB integration was not executed. |
+| 9 Okt 2026 | BE-07 provenance: migration 005 stores signal source record/hash/field; protected review queue now projects citation, model/rubric, and typed Jev output. Backend 54/54 + static/syntax checks pass; PostgreSQL integration remains unrun. |
