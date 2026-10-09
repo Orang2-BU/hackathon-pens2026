@@ -30,6 +30,9 @@ import urllib.request
 
 BASE = os.environ.get("LLM_BASE_URL", "https://api.groq.com/openai/v1").rstrip("/")
 MODEL = os.environ.get("LLM_MODEL", "llama-3.3-70b-versatile")
+USAGE_LOG = os.environ.get("USAGE_LOG", os.path.join(os.path.dirname(os.path.abspath(__file__)), "usage_log.jsonl"))
+TOKEN_CAP = int(os.environ.get("LLM_INPUT_TOKEN_CAP", "90000000"))
+USAGE_TOTAL = {"input": 0, "output": 0, "calls": 0}
 DATASET = os.environ.get("DATASET_DIR", "/work/dataset")
 TYPES = ["competitor_mentioned", "vendor_evaluation", "unkept_commitment",
          "dissatisfaction", "churn_risk_statement", "expansion_interest",
@@ -64,6 +67,19 @@ def call_llm(items):
     )
     with urllib.request.urlopen(req, timeout=60) as resp:
         body = json.loads(resp.read())
+    # Monitoring pemakaian (syarat provider): catat usage per panggilan ke JSONL.
+    usage = body.get("usage") or {}
+    tin = int(usage.get("input_tokens") or usage.get("prompt_tokens") or 0)
+    tout = int(usage.get("output_tokens") or usage.get("completion_tokens") or 0)
+    USAGE_TOTAL["input"] += tin
+    USAGE_TOTAL["output"] += tout
+    USAGE_TOTAL["calls"] += 1
+    with open(USAGE_LOG, "a") as f:
+        f.write(json.dumps({"ts": time.strftime("%Y-%m-%dT%H:%M:%S"), "model": MODEL,
+                            "input_tokens": tin, "output_tokens": tout,
+                            "total_input": USAGE_TOTAL["input"]}) + "\n")
+    if USAGE_TOTAL["input"] > TOKEN_CAP:
+        sys.exit(f"STOP: total input token {USAGE_TOTAL['input']} melewati cap aman {TOKEN_CAP}.")
     text = body["choices"][0]["message"]["content"].strip()
     if text.startswith("```"):
         text = text.strip("`").removeprefix("json").strip()
@@ -167,6 +183,8 @@ def main():
     for r in rows:
         counts[r["status"]] = counts.get(r["status"], 0) + 1
     print(f"sumber={source} total={len(rows)} per-status={counts}")
+    print(f"token terpakai: {USAGE_TOTAL['calls']} panggilan, input={USAGE_TOTAL['input']}, "
+          f"output={USAGE_TOTAL['output']} (log: {USAGE_LOG})")
     for r in sorted(rows, key=lambda x: -x["confidence"])[:5]:
         print(f"  [{r['status']}] {r['account_id']} {r['signal_type']} {r['confidence']} :: {r['quote'][:90]}")
 
