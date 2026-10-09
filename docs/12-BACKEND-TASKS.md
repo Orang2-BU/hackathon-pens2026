@@ -322,3 +322,8 @@ Catatan error selama task: typecheck awal menemukan code/status error union yang
 - Score run ID deterministik dari revision + report/config; advisory lock dan existence check membuat retry no-op. Kolom score, coverage, status, level (tetap NULL), raw values, period, unit, IDR/weighted value, dan evidence disimpan terpisah. Bobot/cutoff tetap eksperimen; hasil bernama indeks risiko, bukan probabilitas churn.
 - `scripts/persist-score.js` wajib flag `--persist`, revision eksplisit dan validasi dataset aktual; Compose profile `scoring` mount dataset read-only dan hanya memakai DB-private network. Integration test menguji 40 hasil/200 parameter dan no-op repeat.
 - Preview lokal aktual: 40 customer, hash revision sesuai dataset, formula `risk-heuristic-v1`, top three C01/C05/C03, C04 renewal 35 hari, 10 sensitivity scenarios. Unit backend 58/58 + `check`/syntax pass. PostgreSQL persistence belum dijalankan karena Docker dan `TEST_DATABASE_URL` tidak tersedia; database contents belum diklaim.
+
+## Catatan implementasi lanjutan — BE-09
+
+- Tes autentikasi membuat token non-admin dengan HMAC valid dan memastikan parser sesi menolaknya; role tidak dapat ditentukan melalui claim tak tepercaya. Route tests menegaskan actor write berasal dari sesi dan write memerlukan Origin/session.
+- Backend unit 58/58, `check`, dan syntax checks lulus. BE-09 tetap parsial: hanya satu credential demo-admin yang ada; role CSM/user dan authorization feedback dua arah belum diprovisikan/disetujui. Cookie/proxy/HTTPS dan rate limit lintas-instance perlu validasi deploy.

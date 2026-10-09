@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHmac } from 'node:crypto';
 import { after, before, test } from 'node:test';
 import { cookieValue, createAuth, createRateLimiter } from '../src/auth.js';
 import { createHttpServer } from '../src/server.js';
@@ -13,6 +14,9 @@ test('signed sessions are tamper-proof, expire, and cookies are protected', () =
   const token = auth.issueSession();
   assert.equal(auth.readSession(token).role, 'admin');
   assert.equal(auth.readSession(`${token}x`), null);
+  const nonAdminPayload = Buffer.from(JSON.stringify({ actorId: 'demo-user', displayName: 'Demo User', role: 'user', exp: Math.floor(now / 1000) + 60 })).toString('base64url');
+  const forgedRoleToken = `${nonAdminPayload}.${createHmac('sha256', config.sessionSecret).update(nonAdminPayload).digest('base64url')}`;
+  assert.equal(auth.readSession(forgedRoleToken), null);
   assert.match(auth.cookie(token), /HttpOnly; SameSite=Lax; Max-Age=28800; Secure/u);
   assert.equal(cookieValue(`x=1; tessera_session=${token}`), token);
   now += 8 * 60 * 60 * 1000;
