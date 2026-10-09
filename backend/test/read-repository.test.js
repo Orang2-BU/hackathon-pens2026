@@ -7,7 +7,7 @@ test('read repository returns explicit synthetic account DTO and sourced evidenc
   const database = async (strings) => {
     const query = strings.join('?');
     calls.push(query);
-    if (query.includes('FROM nodes n JOIN dataset_revisions')) return [{ id: 'node:revision:r1:account:C01', dataset_revision_id: 'revision:r1', external_key: 'C01', properties: { nama: 'Kopi Satu', nps: '' } }];
+    if (query.includes('FROM nodes n JOIN dataset_revisions')) return [{ id: 'node:revision:r1:account:C01', dataset_revision_id: 'revision:r1', external_key: 'C01', properties: { nama: 'Kopi Satu', nps_terakhir: '', health_score_dashboard: 'Hijau' }, annual_value_idr: '149940000', renewal_date: '2026-12-15' }];
     if (query.includes('FROM account_factors')) return [{ factor: 'usage', raw_value: { decline: 0.2 }, normalized_value: '0.2', unit: 'ratio', status: 'available', reason: null, period_start: '2026-04-01', period_end: '2026-10-01', evidence: ['source:r1'] }];
     if (query.includes('FROM edges e')) return [{ edge_id: 'edge:r1', type: 'account_owner', relation_kind: 'hard', reason: null, status: 'active', valid_from: null, valid_to: null,
       source_node_id: 'node:employee:E01', source_type: 'employee', source_key: 'E01', target_node_id: 'node:account:C01', target_type: 'account', target_key: 'C01',
@@ -18,6 +18,9 @@ test('read repository returns explicit synthetic account DTO and sourced evidenc
   assert.equal(account.name, 'Kopi Satu');
   assert.equal(account.priority.status, 'unscored');
   assert.equal(account.nps, null);
+  assert.equal(account.annualValueIdr, 149940000);
+  assert.equal(account.renewalDate, '2026-12-15');
+  assert.equal(account.dashboardHealth, 'Hijau');
   assert.equal(account.parameters[0].normalizedValue, '0.2');
   assert.equal(account.evidence[0].sourceRecordIds[0], 'source:r1');
   assert.equal(account.citations[0].synthetic, true);

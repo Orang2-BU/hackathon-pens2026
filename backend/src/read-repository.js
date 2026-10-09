@@ -15,10 +15,10 @@ function summary(row) {
     businessAsOf: BUSINESS_AS_OF,
     synthetic: true,
     priority: { score: null, status: 'unscored', coverage: null, reason: 'Persisted score run is not available.' },
-    annualValueIdr: properties.nilai_kontrak_tahunan ? Number(properties.nilai_kontrak_tahunan) : null,
-    renewalDate: properties.tanggal_renewal ?? null,
-    nps: properties.nps === '' || properties.nps == null ? null : Number(properties.nps),
-    dashboardHealth: properties.health ?? properties.status_kesehatan ?? null,
+    annualValueIdr: row.annual_value_idr == null ? null : Number(row.annual_value_idr),
+    renewalDate: row.renewal_date ?? null,
+    nps: properties.nps_terakhir === '' || properties.nps_terakhir == null ? null : Number(properties.nps_terakhir),
+    dashboardHealth: properties.health_score_dashboard ?? null,
   };
 }
 
@@ -28,11 +28,19 @@ export function createPostgresReadService(database) {
       const [revision] = await database`SELECT id FROM dataset_revisions WHERE status = 'published' ORDER BY published_at DESC LIMIT 1`;
       if (!revision) return { items: [], datasetRevision: null, businessAsOf: BUSINESS_AS_OF, synthetic: true };
       const rows = await database`
-        SELECT id, dataset_revision_id, external_key, properties
-        FROM nodes
-        WHERE dataset_revision_id = ${revision.id} AND type = 'account'
-          AND (${search} = '' OR external_key ILIKE ${`%${search}%`} OR properties->>'nama' ILIKE ${`%${search}%`})
-        ORDER BY external_key
+        SELECT n.id, n.dataset_revision_id, n.external_key, n.properties,
+          (SELECT NULLIF(sr.payload->>'nilai_tahunan', '')::numeric
+           FROM source_records sr JOIN sources s ON s.id = sr.source_id
+           WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
+             AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS annual_value_idr,
+          (SELECT sr.payload->>'tanggal_renewal'
+           FROM source_records sr JOIN sources s ON s.id = sr.source_id
+           WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
+             AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS renewal_date
+        FROM nodes n
+        WHERE n.dataset_revision_id = ${revision.id} AND n.type = 'account'
+          AND (${search} = '' OR n.external_key ILIKE ${`%${search}%`} OR n.properties->>'nama' ILIKE ${`%${search}%`})
+        ORDER BY n.external_key
         LIMIT 100
       `;
       const items = rows.map(summary);
@@ -43,7 +51,15 @@ export function createPostgresReadService(database) {
 
     async getAccount(accountId) {
       const [row] = await database`
-        SELECT n.id, n.dataset_revision_id, n.external_key, n.properties
+        SELECT n.id, n.dataset_revision_id, n.external_key, n.properties,
+          (SELECT NULLIF(sr.payload->>'nilai_tahunan', '')::numeric
+           FROM source_records sr JOIN sources s ON s.id = sr.source_id
+           WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
+             AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS annual_value_idr,
+          (SELECT sr.payload->>'tanggal_renewal'
+           FROM source_records sr JOIN sources s ON s.id = sr.source_id
+           WHERE s.dataset_revision_id = n.dataset_revision_id AND s.file_name = 'contracts_billing.csv'
+             AND sr.payload->>'account_id' = n.external_key ORDER BY sr.record_number LIMIT 1) AS renewal_date
         FROM nodes n JOIN dataset_revisions r ON r.id = n.dataset_revision_id
         WHERE n.type = 'account' AND n.external_key = ${accountId} AND r.status = 'published'
         ORDER BY r.published_at DESC LIMIT 1
