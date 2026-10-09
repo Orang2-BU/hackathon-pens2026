@@ -4,18 +4,22 @@ import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, useEffect, useRef } from "react";
-import { Database, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
+import { Database, Globe, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
 import { usePendingPlans } from "@/components/demo-state";
 
 // Demo gate: public pages render bare; workspace routes ask for the demo password (see /login).
 const AUTH_KEY = "tessera-demo-auth";
 const isPublicPath = (pathname: string) => pathname === "/" || pathname.startsWith("/login");
 
+// Exact or nested match, so "/" never claims every route.
+const isOn = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
+
 const navigation = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/accounts", label: "Accounts", icon: Users },
   { href: "/review", label: "Review", icon: ShieldCheck },
   { href: "/data", label: "Data", icon: Database },
+  { href: "/", label: "Landing page", icon: Globe },
 ];
 
 // Desktop rail: labels fade out while the aside is collapsed and fade in on hover or keyboard focus.
@@ -46,7 +50,7 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
 
       <nav aria-label="Main" className="flex flex-col gap-xs">
         {navigation.map(({ href, label, icon: Icon }) => {
-          const active = pathname.startsWith(href);
+          const active = isOn(pathname, href);
           return (
             <Link
               key={href}
@@ -140,7 +144,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   };
   const title = pathname.startsWith("/accounts/")
     ? "Account detail"
-    : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Tessera";
+    : navigation.find(item => isOn(pathname, item.href))?.label ?? "Tessera";
 
   if (isPublic) return <>{children}</>;
 

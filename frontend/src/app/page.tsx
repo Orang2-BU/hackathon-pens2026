@@ -49,7 +49,35 @@ export default function LandingPage() {
           <a href={`mailto:${CONTACT_EMAIL}`} className="btn btn-secondary shrink-0"><Mail size={16} aria-hidden /> Talk to the team</a>
         </section>
       </main>
-      <footer className="mx-auto flex w-full max-w-(--container-6xl) flex-wrap items-center justify-between gap-md border-t border-outline px-md py-lg text-label-sm text-on-surface-muted"><span>Tessera · Customer Success, with context.</span><a href="#hero-heading" className="inline-flex min-h-11 items-center rounded-sm px-sm hover:text-on-surface">Back to top <ArrowRight size={14} className="ml-sm -rotate-90" aria-hidden /></a></footer>
+      <footer className="border-t border-outline">
+        <div className="mx-auto grid w-full max-w-(--container-6xl) gap-xl px-md py-2xl md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+          <div className="flex flex-col gap-md">
+            <Link href="/" className="flex min-h-11 w-fit items-center gap-sm card-title">
+              <span className="grid size-8 place-items-center rounded-sm bg-primary text-on-primary">
+                <svg viewBox="56 56 144 144" className="size-4" aria-hidden><path fill="currentColor" d="M56 56H200V104H152V200L104 152V104Z" /></svg>
+              </span>
+              Tessera
+            </Link>
+            <p className="max-w-(--container-sm) text-body-sm text-on-surface-muted">Customer Success, with context. Connected evidence, explainable priority and decisions your team makes.</p>
+          </div>
+          <nav aria-label="Product" className="flex flex-col gap-xs text-body-sm">
+            <p className="label-caps text-on-surface-muted">Product</p>
+            {sections.map(({ name, href }) => <a key={href} href={href} className="inline-flex min-h-11 w-fit items-center text-on-surface-muted transition-colors hover:text-on-surface xl:min-h-8">{name}</a>)}
+          </nav>
+          <nav aria-label="Workspace" className="flex flex-col gap-xs text-body-sm">
+            <p className="label-caps text-on-surface-muted">Workspace</p>
+            {[["Dashboard", "/dashboard"], ["Accounts", "/accounts"], ["Review", "/review"], ["Data", "/data"]].map(([name, href]) => <Link key={href} href={href} className="inline-flex min-h-11 w-fit items-center text-on-surface-muted transition-colors hover:text-on-surface xl:min-h-8">{name}</Link>)}
+          </nav>
+          <div className="flex flex-col gap-xs text-body-sm">
+            <p className="label-caps text-on-surface-muted">Contact</p>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex min-h-11 w-fit items-center gap-sm break-all text-on-surface-muted transition-colors hover:text-on-surface xl:min-h-8"><Mail size={14} className="shrink-0" aria-hidden />{CONTACT_EMAIL}</a>
+          </div>
+        </div>
+        <div className="mx-auto flex w-full max-w-(--container-6xl) flex-wrap items-center justify-between gap-md border-t border-outline px-md py-md text-label-sm text-on-surface-muted">
+          <span>Built for PENS Hackathon 2026. Preview uses synthetic sample data.</span>
+          <a href="#hero-heading" className="inline-flex min-h-11 items-center rounded-sm px-sm hover:text-on-surface">Back to top <ArrowRight size={14} className="ml-sm -rotate-90" aria-hidden /></a>
+        </div>
+      </footer>
     </div>
   );
 }
