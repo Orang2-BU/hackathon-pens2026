@@ -11,7 +11,7 @@
 | ID | Task | Pemilik | Status | Bukti / kriteria selesai |
 |---|---|---|---|---|
 | T1 | Scaffold Next.js, koneksi PostgreSQL, desain token, kontrak data | — | 🟦 | BE-02 membuat service, schema, dan migration runner dalam `backend/`; unit 6/6. Integrasi aktual menunggu PostgreSQL disposable; milestone T1 belum Done. Frontend tidak diubah. |
-| T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | ⬜ | Statistik baris/node/edge, source/hash, kutipan valid, idempotensi, eval primitif berlabel |
+| T2 | Ingest 15 file KasirNusa, graph temporal, Jev signals, review | — | 🟦 | BE-04 parser/dry-run memvalidasi semua 15 file; 0 issue/orphan dan hash aktual tercatat di 12 §9. Publish PostgreSQL, graph, Jev dan review masih belum selesai; BE-02 DB gate belum tersedia. |
 | T3 | Parameter dan skor prioritas deterministik | — | ⬜ | Bobot 30/25/20/15/10 diuji pada C01–C06 dan 40 pelanggan; data kosong/offline jelas; sensitivitas bobot; QA §6 dokumen 09 |
 | T4 | Peringkat, detail, tanya graph dengan sitasi | — | ⬜ | Pertanyaan baru dijawab dari graph lewat router intent Jev; jalur bukti ≥3 sumber bila rekomendasi; abstain bila tidak cukup; eval routing 30 pertanyaan berlabel |
 | T5 | Save plan, Decision append-only, feedback dua arah | — | ⬜ | Preseden dikutip; approval atomik/idempotent; reply feedback tercatat; tidak ada outreach |
@@ -58,3 +58,4 @@
 | 9 Okt 2026 | Workspace root `backend/` diminta user agar backend dipisahkan dan frontend tidak dikerjakan. README workspace + ADR-0005 Proposed ditambahkan. Pilihan API runtime belum dibuat; folder frontend tidak masuk commit. |
 | 9 Okt 2026 | BE-02 parsial: Node HTTP service, health endpoints, PostgreSQL schema/migration runner dan role boundary dibuat; unit 6/6 + syntax check lulus. Integration DB terblokir karena tidak ada Docker/psql/PostgreSQL atau TEST_DATABASE_URL. Runtime diputuskan pada ADR-0006; source frontend tidak disentuh. |
 | 9 Okt 2026 | BE-03 parsial: 30 pertanyaan intent untuk 10 kategori dan 8 fixture integrity tersedia, versi dan status draft tercatat. Unit 8/8. Rubric-specific Jev label sets dan konfirmasi tim belum ada; tidak ada Jev call atau akurasi yang diklaim. |
+| 9 Okt 2026 | BE-04 parsial: streaming parser/dry-run memvalidasi seluruh dataset lokal (15 file; expected counts; 0 issue/orphan). Belum ada database staging/publish/idempotency; tidak ada data mentah masuk Git. |
