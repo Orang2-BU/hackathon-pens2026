@@ -4,7 +4,7 @@
 
 **Legenda:** ⬜ Todo · 🟦 In Progress · ✅ Done · ⛔ Blocked · ✂️ Dipotong
 
-**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-08 eksperimen formula dan preview dataset selesai; task masih parsial
+**Target pertama:** 9 Okt 2026, 22.00 [dari user; jenis deliverable belum jelas] · **Deadline submit resmi:** belum terkonfirmasi · **Feature freeze:** belum ditetapkan · **Update terakhir:** 9 Okt 2026, BE-15 backend checks 38/38; integrasi/deploy/organik masih blocked
 
 ## Task
 
@@ -68,3 +68,4 @@
 | 9 Okt 2026 | BE-11 parsial: plan revision, Decision idempotency/context dan protected write boundary; backend 36/36 + syntax check. Transaction/concurrency DB gate belum dijalankan. Bukti 12 §16. |
 | 9 Okt 2026 | BE-12 parsial: submit/reply/list feedback berbasis sesi; total backend 38/38 + syntax check. DB persistence dan akun CSM/user terpisah belum terverifikasi. Bukti 12 §17. |
 | 9 Okt 2026 | BE-13 tidak disentuh sesuai scope backend-only. BE-14 Docker/Compose/runbook ditambahkan; Docker/target VPS tak tersedia, BE-04 ingest/publish belum ada, jadi tidak deploy. BE-15 unit/syntax checks saja (38/38); BE-16 organik belum mungkin tanpa deploy dan tester. Bukti 12 §18. |
+| 9 Okt 2026 | BE-15 gate diulang setelah privilege/migration changes: unit 38/38, syntax check, migration discovery 001/002/003 lulus; `test:integration` berjalan dan berhenti karena `TEST_DATABASE_URL` tidak ada. BE-16 tetap blocked; tidak ada sesi user/deploy yang diklaim. |
