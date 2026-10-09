@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: "Relasi"
+name: "Tessera"
 description: "An English-language Customer Success workspace with warm graphite surfaces, electric lime precision accents, diffuse olive depth, and tabular evidence."
 colors:
   primary: "#9FE85C"
@@ -208,13 +208,13 @@ components:
     backgroundColor: "{colors.focus-ring}"
 ---
 
-# Relasi — Design System
+# Tessera — Design System
 
 > Source of truth for product UI. Format: [Google DESIGN.md spec](https://github.com/google-labs-code/design.md). Status: Draf — menunggu ACC. Kemiripan referensi: belum diukur (tanpa preview).
 
 ## Overview
 
-Relasi is an **Operate** workspace where Customer Success Managers (CSMs) investigate retention risks, verify cross-call evidence, and approve save plans before renewals.
+Tessera is an **Operate** workspace where Customer Success Managers (CSMs) investigate retention risks, verify cross-call evidence, and approve save plans before renewals.
 
 The visual system is derived from the **InsightX Dark Analytics reference** (Dribbble shot supplied by the team):
 - **Canvas & Shell:** Near-black canvas (`#0B0B0B`). The sidebar and every content block are floating graphite cards (`#191919`) with 16px radius, separated from the canvas by tone, not by heavy borders. Header sits directly on the canvas: page title left, pill search and circular icon buttons right.
@@ -298,7 +298,7 @@ Node color is always paired with a text label and Lucide icon, never color alone
 
 1. **Sidebar card (desktop ≥ 1200px: 248px wide, 16px inset from viewport edges, full height minus insets):**
    - Background `surface`, radius 16px, padding 16px, no border.
-   - **Header:** Relasi wordmark with a symbol in `primary` (placeholder until a logo is chosen; no off-token colors) and a collapse toggle icon button (`aria-label="Collapse sidebar"`).
+   - **Header:** Tessera wordmark with a symbol in `primary` (placeholder until a logo is chosen; no off-token colors). No collapse toggle until a collapsed layout exists.
    - **Navigation:** One group, four destinations from PRD §5b: **Accounts, Review, Benchmark, Data**. Review shows a count chip of pending items. Account Detail is a drill-down from Accounts, not a menu item. No Settings, no Analysis/System groups.
    - **Bottom card:** workspace label and data source line in text (no avatar). Today: `Synthetic seed data · resets on refresh`; once SalesTranscriptQA is fetched: `SalesTranscriptQA · CC BY-NC 4.0`. This replaces the reference user dock and its ⋯ menu.
 2. **Header (on canvas, 64px tall):**
@@ -374,7 +374,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 
 ### UX Principles (1–9)
 
-| # | Principle | Implementation in Relasi |
+| # | Principle | Implementation in Tessera |
 |---|---|---|
 | 1 | **Design for variation** | Layout handles 1 to 20 evidence items; empty states explain and offer ingest; graph has list fallback. |
 | 2 | **Consistency** | One warm graphite palette, one type family, Lucide 1.75px, 16px card radius everywhere. |
@@ -401,7 +401,7 @@ Drawer rules: scrim `rgba(0,0,0,0.6)`, Escape closes, focus moves into drawer an
 
 ## Deviations from Reference
 
-| Aspect | InsightX Reference | Relasi | Rationale |
+| Aspect | InsightX Reference | Tessera | Rationale |
 |---|---|---|---|
 | **Domain metrics** | Revenue, Active Users, Conversion Rate | Risk-weighted contract value, Accounts above threshold, Signals this week | CSM job; avoids implying certain loss or churn probability (07-RULES §4). |
 | **Navigation** | 3 groups, 10 items, Settings | 4 items, no groups, no Settings | PRD §5b and A4. |

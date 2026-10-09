@@ -26,7 +26,7 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         <span className="grid size-8 place-items-center rounded-sm bg-primary text-on-primary">
           <Waypoints size={18} strokeWidth={2} aria-hidden />
         </span>
-        Relasi
+        Tessera
       </Link>
 
       <nav aria-label="Main" className="flex flex-col gap-xs">
@@ -71,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const closeDrawer = () => drawer.current?.close();
   const title = pathname.startsWith("/accounts/")
     ? "Account detail"
-    : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Relasi";
+    : navigation.find(item => pathname.startsWith(item.href))?.label ?? "Tessera";
 
   return (
     <div className="min-h-dvh xl:grid xl:grid-cols-[248px_minmax(0,1fr)] xl:gap-md xl:p-md">

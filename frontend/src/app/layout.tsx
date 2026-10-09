@@ -8,7 +8,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Relasi",
+  title: "Tessera",
   description: "Prioritize renewal risk with cross-call evidence.",
 };
 
