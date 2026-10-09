@@ -53,10 +53,10 @@ export const strongestFactor = (account: Pick<Account, "factorScores">) =>
 // Signals arrive as plain text; match each to the parameter it measures (wording from scoring_v1.py).
 const signalPatterns: [RiskFactor, RegExp][] = [
   ["Champion", /champion/i],
-  ["Payment", /bayar/i],
-  ["Commitments", /janji|kontak/i],
-  ["Service", /tiket|bug|offline/i],
-  ["Usage", /transaksi/i],
+  ["Payment", /payment/i],
+  ["Commitments", /commitment|inbound customer contact/i],
+  ["Service", /ticket|bug|offline/i],
+  ["Usage", /transactions/i],
 ];
 
 export const signalFactor = (signal: string) => signalPatterns.find(([, pattern]) => pattern.test(signal))?.[0];

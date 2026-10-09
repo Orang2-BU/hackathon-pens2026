@@ -32,13 +32,18 @@ describe("KasirNusa accounts from scoring_v1", () => {
   });
 
   it("maps each scoring_v1 signal to the parameter it measures", () => {
-    expect(signalFactor("Champion Rina Hapsari pindah ke Grup Ritel Mandala")).toBe("Champion");
-    expect(signalFactor("6 tiket masih terbuka, 6 terkait BUG-412")).toBe("Service");
-    expect(signalFactor("1 outlet mode offline aktif (rawan isu sinkronisasi)")).toBe("Service");
-    expect(signalFactor("Transaksi/hari turun 12%")).toBe("Usage");
-    expect(signalFactor("1 janji belum ditepati (FEAT-07)")).toBe("Commitments");
-    expect(signalFactor("100 hari tanpa kontak masuk dari pelanggan")).toBe("Commitments");
-    expect(signalFactor("Riwayat telat bayar 1x dalam 12 bulan")).toBe("Payment");
+    expect(signalFactor("Champion Rina Hapsari moved to Grup Ritel Mandala (since 2026-09-01); CRM not updated")).toBe("Champion");
+    expect(signalFactor("6 support tickets still open, 6 match the offline-sync/BUG-412 pattern (derived)")).toBe("Service");
+    expect(signalFactor("1 outlets in active offline mode (exposed to sync issues)")).toBe("Service");
+    expect(signalFactor("Transactions per day down 12% (last 90 days vs prior 90 days)")).toBe("Usage");
+    expect(signalFactor("1 unkept commitments (FEAT-07)")).toBe("Commitments");
+    expect(signalFactor("100 days without inbound customer contact")).toBe("Commitments");
+    expect(signalFactor("Late payment 1x in the last 12 months")).toBe("Payment");
+  });
+
+  it("maps every signal in the current export, so a wording change fails here", () => {
+    const unmapped = accounts.flatMap(account => account.signals).filter(signal => !signalFactor(signal));
+    expect(unmapped).toEqual([]);
   });
 
   it("leads C01 with the champion signal, its strongest factor", () => {
