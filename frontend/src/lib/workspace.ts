@@ -4,7 +4,7 @@ export type AccountSummary = { id: string; nodeId: string; name: string; busines
 type Parameter = { factor: string; rawValue: unknown; normalizedValue: number | string | null; status: string; reason: string | null; unit: string | null; period: { start: string | null; end: string | null }; evidence: unknown };
 type Plan = { id: string; revision: { id: string; number: number; body: string; actorId: string; createdAt: string }; decision: { id: string; outcome: string; reason: string; actorId: string; decidedAt: string } | null };
 export type AccountDetail = AccountSummary & { parameters: Parameter[]; plans: Plan[] };
-type Citation = { id: string; file: string; group: string; recordId: string; occurredAt: string | null; recordedAt: string; quote: string | null; field: string | null; recordHash: string; span: { start: number; end: number } | null };
+export type Citation = { id: string; file: string; group: string; recordId: string; occurredAt: string | null; recordedAt: string; quote: string | null; field: string | null; recordHash: string; span: { start: number; end: number } | null };
 export type Graph = { rootId: string; businessAsOf: string; recordedAsOf: string; depth: number; truncated: boolean; nodes: { id: string; type: string; key: string; label: string; details: Record<string, string> }[]; edges: { id: string; source: string; target: string; type: string; status: string; relationKind: string; reason: string | null; validFrom: string | null; validTo: string | null; sourceRecordIds: string[] }[]; citations: Citation[] };
 export type Recommendation = { leadFactor: string | null; draft: string | null; reason: string; sourceGroups: string[]; limitations: string[]; citations: Citation[]; precedents: { id: string; accountId: string; body: string; reason: string; outcome: string | null; effectiveness: string; actorId: string; createdAt: string; conditions: { factor: string; normalizedValue: number | string | null; status: string }[]; sourceRefs: {id:string;hash:string}[] }[]; datasetPrecedents: Graph["nodes"] };
 export type Action = { id: string; decisionId: string; accountId: string; accountName: string; plan: string; revision: number; owner: string; dueDate: string; status: string; note: string; outcome: string | null; actorId: string; updatedAt: string; stuck: boolean };
@@ -28,3 +28,9 @@ export function useResource<T>(path: string | null) {
 export const money = (value: number | null) => value === null ? "Unavailable" : new Intl.NumberFormat("en-US", { style: "currency", currency: "IDR", maximumFractionDigits: 0, notation: "compact" }).format(value);
 export const renewalDays = (account: Pick<AccountSummary, "renewalDate" | "businessAsOf">) => account.renewalDate ? Math.round((Date.parse(account.renewalDate) - Date.parse(account.businessAsOf)) / 86_400_000) : null;
 export const elevated = (a: { priority: Pick<AccountSummary["priority"], "level"> }) => ["High", "Critical", "Tinggi", "Kritis"].includes(a.priority.level ?? "");
+// Risk level colour: Critical red, High amber, Medium neutral, Low muted. Accepts English or Indonesian labels.
+export const levelTone = (level: string | null) =>
+  /critical|kritis/i.test(level ?? "") ? "bg-danger-container text-danger"
+  : /high|tinggi/i.test(level ?? "") ? "bg-warning/15 text-warning"
+  : /medium|sedang/i.test(level ?? "") ? "bg-surface-elevated text-on-surface"
+  : "bg-surface-elevated text-on-surface-muted";

@@ -51,8 +51,8 @@ export default function LandingPage() {
         </section>
       </main>
       <footer className="border-t border-outline">
-        <div className="mx-auto grid w-full max-w-(--container-6xl) gap-xl px-md py-2xl md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
-          <div className="flex flex-col gap-md">
+        <div className="mx-auto grid w-full max-w-(--container-6xl) grid-cols-2 gap-xl px-md py-2xl md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+          <div className="col-span-2 flex flex-col gap-md md:col-span-1">
             <Link href="/" className="flex min-h-11 w-fit items-center gap-sm card-title">
               <span className="grid size-8 place-items-center rounded-sm bg-primary text-on-primary">
                 <svg viewBox="56 56 144 144" className="size-4" aria-hidden><path fill="currentColor" d="M56 56H200V104H152V200L104 152V104Z" /></svg>
@@ -69,7 +69,7 @@ export default function LandingPage() {
             <p className="label-caps text-on-surface-muted">Workspace</p>
             {[["Dashboard", "/dashboard"], ["Accounts", "/accounts"], ["Review", "/review"], ["Data", "/data"]].map(([name, href]) => <Link key={href} href={href} className="inline-flex min-h-11 w-fit items-center text-on-surface-muted transition-colors hover:text-on-surface xl:min-h-8">{name}</Link>)}
           </nav>
-          <div className="flex flex-col gap-xs text-body-sm">
+          <div className="col-span-2 flex flex-col gap-xs text-body-sm md:col-span-1">
             <p className="label-caps text-on-surface-muted">Contact</p>
             <a href={`mailto:${CONTACT_EMAIL}`} className="inline-flex min-h-11 w-fit items-center gap-sm break-all text-on-surface-muted transition-colors hover:text-on-surface xl:min-h-8"><Mail size={14} className="shrink-0" aria-hidden />{CONTACT_EMAIL}</a>
           </div>
