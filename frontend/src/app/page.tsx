@@ -26,6 +26,8 @@ export default function LandingPage() {
       <ResizableNavbar items={sections} workspaceHref={workspaceHref} />
       <main className="page-enter mx-auto flex w-full max-w-(--container-6xl) flex-col gap-2xl px-md pb-2xl md:gap-24">
         <section aria-labelledby="hero-heading" className="pt-24 md:pt-28">
+          {/* The product window breaks out of the 6xl column so the workspace reads at near full width. */}
+          <div className="relative left-1/2 w-[min(calc(100vw-2rem),88rem)] -translate-x-1/2">
           <ContainerScroll header={
             <div className="mx-auto flex max-w-(--container-3xl) flex-col items-center gap-md text-center">
               <h1 id="hero-heading" className="h-36 w-full scroll-mt-28 md:h-56"><TechText text="Tessera" /></h1>
@@ -35,6 +37,7 @@ export default function LandingPage() {
               <Link href={workspaceHref} className="btn btn-primary">Open workspace <ArrowRight size={16} aria-hidden /></Link>
             </div>
           }><DashboardPreview /></ContainerScroll>
+          </div>
         </section>
         <LandingDetails workspaceHref={workspaceHref} />
         <Reveal>
