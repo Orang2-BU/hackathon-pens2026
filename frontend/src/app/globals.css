@@ -49,20 +49,12 @@
   .card {
     @apply rounded-lg bg-surface p-md;
   }
+  /* Featured card: lime glow by default; set --card-glow / --card-base on the element to tint it. */
   .card-featured {
     @apply rounded-lg p-md;
     background:
       radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--card-glow, var(--color-glow-lime)) 28%, transparent) 0%, transparent 70%),
       var(--card-base, var(--color-surface-featured));
-  }
-  /* Tinted featured cards: same glow, coloured by what the number means. */
-  .card-danger {
-    --card-glow: var(--color-danger);
-    --card-base: color-mix(in srgb, var(--color-danger-container) 55%, var(--color-surface));
-  }
-  .card-warning {
-    --card-glow: var(--color-warning);
-    --card-base: color-mix(in srgb, var(--color-warning) 6%, var(--color-surface));
   }
   .card-title {
     @apply text-title font-semibold tracking-title;
