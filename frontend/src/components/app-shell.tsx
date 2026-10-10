@@ -4,7 +4,7 @@ import Form from "next/form";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { Database, GitBranch, ClipboardList, Globe, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
+import { Building2, Database, GitBranch, ClipboardList, Globe, LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Users, X } from "lucide-react";
 import { api } from "@/lib/workspace";
 
 // Public pages render bare; workspace writes use the backend-authenticated session.
@@ -79,13 +79,13 @@ function Sidebar({ onNavigate, rail = false }: { onNavigate?: () => void; rail?:
         })}
       </nav>
 
-      <div className="mt-auto flex items-center gap-sm rounded-md bg-surface-elevated p-sm">
-        <span className="grid size-7 shrink-0 place-items-center rounded-sm text-on-surface-muted">
-          <Database size={18} strokeWidth={1.75} aria-hidden />
+      <div className="mt-auto flex min-w-0 items-center gap-sm rounded-md bg-surface-elevated px-1.5 py-sm" title={rail ? "KasirNusa · Synthetic dataset · 1 Oct 2026" : undefined}>
+        <span className="grid size-7 shrink-0 place-items-center rounded-sm bg-primary text-label-sm font-bold text-on-primary" aria-hidden>
+          <Building2 size={16} strokeWidth={2} />
         </span>
-        <div className={fade}>
-          <p className="text-label-md font-semibold">KasirNusa</p>
-          <p className="mt-xs text-label-sm text-on-surface-muted">Synthetic dataset · 1 Oct 2026</p>
+        <div className={`min-w-0 ${fade}`}>
+          <p className="truncate text-label-md font-semibold leading-tight">KasirNusa</p>
+          <p className="truncate text-label-sm text-on-surface-muted">Synthetic data · 1 Oct 2026</p>
         </div>
       </div>
 
